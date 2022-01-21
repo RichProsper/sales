@@ -196,7 +196,41 @@ export default class {
             FiltersBtn.type = 'button'
             FiltersBtn.className = 'toolbar-btn'
             FiltersBtn.innerHTML = `<i class="fas fa-filter"></i> Filters`
+
+                const Indicator = document.createElement('indicator-rui')
+                Indicator.className = 'hide'
+
+            FiltersBtn.appendChild(Indicator)
+
+            const FiltersPanel = document.createElement('toolbar-panel-rui')
+            FiltersPanel.className = 'filters hide'
+
+            FiltersBtn.addEventListener('click', e => {
+                e.stopPropagation()
+
+                /**
+                 * @param {MouseEvent} e Click event
+                 */
+                const cleanup = e => {
+                    console.log(this.ElemIsDescendantOf(e.target, FiltersPanel))
+                    if (this.ElemIsDescendantOf(e.target, FiltersPanel) === -1) {
+                        FiltersPanel.classList.add('hide')
+                        window.removeEventListener('click', cleanup)
+                    }
+                }
+
+                if ( FiltersPanel.classList.contains('hide') ) {
+                    FiltersPanel.classList.remove('hide')
+                    window.addEventListener('click', cleanup)
+                }
+                else {
+                    FiltersPanel.classList.add('hide')
+                    window.removeEventListener('click', cleanup)
+                }
+            })
+        
         FiltersPanelContainer.appendChild(FiltersBtn)
+        FiltersPanelContainer.appendChild(FiltersPanel)
 
         this.Toolbar.appendChild(FiltersPanelContainer)
     }

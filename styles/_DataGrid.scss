@@ -6,6 +6,7 @@ datagrid-rui {
 
     --hs-1      : 0, 0%;
     --grey      : hsl(var(--hs-1), 35%);
+    --grey-md   : hsl(var(--hs-1), 14%);
     --grey-dark : hsl(var(--hs-1), 7%);
     --white     : hsl(var(--hs-1), 100%);
     --btn-hover : hsla(var(--hs-1), 100%, .125);
@@ -54,14 +55,14 @@ toolbar-rui {
 
         toolbar-panel-rui {
             position: absolute;
-            left: -.5rem;
             top: 3.5rem;
             border-radius: .4rem;
             z-index: 2;
             
             &.columns {
+                left: -.5rem;
                 width: 30rem;
-                background-color: rgb(36, 36, 36);
+                background-color: var(--grey-md);
                 box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
                             0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
                             0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
@@ -105,9 +106,18 @@ toolbar-rui {
                         }
                     }
                 }
-                &.hide {
-                    display: none;
-                }
+            }
+            &.filters {
+                left: -10.9rem;
+                width: 51rem;
+                height: 10rem;
+                background-color: var(--grey-md);
+                box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
+                            0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
+                            0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
+            }
+            &.hide {
+                display: none;
             }
         }
     }

@@ -176,6 +176,7 @@ datagrid-rui {
   --Resizable-Width: 24px;
   --hs-1: 0, 0%;
   --grey: hsl(var(--hs-1), 35%);
+  --grey-md: hsl(var(--hs-1), 14%);
   --grey-dark: hsl(var(--hs-1), 7%);
   --white: hsl(var(--hs-1), 100%);
   --btn-hover: hsla(var(--hs-1), 100%, .125);
@@ -224,15 +225,15 @@ toolbar-rui toolbar-panel-container-rui {
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui {
   position: absolute;
-  left: -.5rem;
   top: 3.5rem;
   border-radius: .4rem;
   z-index: 2;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns {
+  left: -.5rem;
   width: 30rem;
-  background-color: #242424;
+  background-color: var(--grey-md);
   -webkit-box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
           box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
 }
@@ -287,7 +288,16 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-r
   background-color: var(--row-select);
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns.hide {
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters {
+  left: -10.9rem;
+  width: 51rem;
+  height: 10rem;
+  background-color: var(--grey-md);
+  -webkit-box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
+          box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.hide {
   display: none;
 }
 
