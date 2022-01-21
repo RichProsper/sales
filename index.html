@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Linda's Garden Sales">
+    <!-- Prevents favicon.ico requests -->
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- JS -->
+    <script defer type="module" src="scripts/main.js"></script>
+    <title>Sales</title>
+</head>
+<body>
+    <!-- Top Nav -->
+    <header class="header">
+        <span class="logo">Sales</span>
+        <ul class="links">
+            <li><a href="#orders">Orders</a></li>
+            <li><a href="#customers">Customers</a></li> 
+            <li><a href="#products">Products</a></li>
+        </ul>
+    </header>
+
+    <!-- Orders -->
+    <section id="orders" class="section">
+        <h2 class="heading">Orders</h2>
+        <div data-grid-id="orders"></div>
+    </section>
+
+    <!-- Customers -->
+    <section id="customers" class="section">
+        <h2 class="heading">Customers</h2>
+        <div data-grid-id="customers"></div>
+    </section>
+
+    <!-- Products -->
+    <section id="products" class="section">
+        <h2 class="heading">Products</h2>
+        <div data-grid-id="products"></div>
+    </section>
+</body>
+</html>

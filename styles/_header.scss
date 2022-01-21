@@ -1,0 +1,45 @@
+.header {
+    height: var(--NavHeight);
+    background-color: var(--col-3rd-1);
+    display: flex;
+    justify-content: space-between;
+
+    .logo {
+        line-height: var(--NavHeight);
+        padding: 0 1.2rem;
+        font-size: 2.4rem;
+        font-weight: 600;
+        letter-spacing: .2rem;
+    }
+    .links {
+        list-style-type: none;
+        display: flex;
+
+        li {
+            padding-right: 1.2rem;
+            line-height: var(--NavHeight);
+
+            a {
+                text-decoration: none;
+                color: inherit;
+                padding-bottom: .2rem;
+                border-bottom: .2rem solid transparent;
+                transition: .2s;
+
+                &:hover,
+                &:focus {
+                    border-color: currentColor;
+                }
+            }
+        }
+    }
+
+    @media only screen and (min-width: 400px) {
+        .logo {
+            padding: 0 2.4rem;
+        }
+        .links li {
+            padding-right: 2.4rem;
+        }
+    }
+}

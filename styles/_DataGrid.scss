@@ -1,0 +1,368 @@
+datagrid-rui {
+    --Toolbar-Height  : 4rem;
+    --Footer-Height   : 6rem;
+    --Row-Height      : 5rem;
+    --Resizable-Width : 24px;
+
+    --hs-1      : 0, 0%;
+    --grey      : hsl(var(--hs-1), 35%);
+    --grey-dark : hsl(var(--hs-1), 7%);
+    --white     : hsl(var(--hs-1), 100%);
+    --btn-hover : hsla(var(--hs-1), 100%, .125);
+    --row-hover : hsla(var(--hs-1), 100%, .08);
+    // Light Red
+    --hue-1 : 349;
+    --red-1 : hsla(var(--hue-1), 84%, 60%, .25);
+    --red-2 : hsl(var(--hue-1), 84%, 80%);
+    // Light Green
+    --hue-2   : 122;
+    --green-1 : hsla(var(--hue-2), 39%, 49%, .25);
+    --green-2 : hsl(var(--hue-2), 39%, 75%);
+    // Light Blue
+    --hue-3            : 207;
+    --blue-1           : hsl(var(--hue-3), 90%, 77%);
+    --row-select       : hsla(var(--hue-3), 90%, 77%, .16);
+    --row-select-hover : hsla(var(--hue-3), 90%, 77%, .24);
+    
+    
+    display: block;
+    height: 100%;
+    border: .1rem solid var(--grey);
+    border-radius: .5rem;
+}
+
+// *** TOOLBAR ***
+toolbar-rui {
+    display: flex;
+    height: var(--Toolbar-Height);
+    padding: .5rem;
+    border-bottom: .1rem solid var(--grey);
+
+    %btn {
+        background: none;
+        border: none;
+        color: inherit;
+        font-size: 1.3rem;
+        padding: .5rem 1rem;
+        cursor: pointer;
+        border-radius: .4rem;
+        transition: .2s;
+    }
+    toolbar-panel-container-rui {
+        display: block;
+        position: relative;
+
+        toolbar-panel-rui {
+            position: absolute;
+            left: -.5rem;
+            top: 3.5rem;
+            border-radius: .4rem;
+            z-index: 2;
+            
+            &.columns {
+                width: 30rem;
+                background-color: rgb(36, 36, 36);
+                box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
+                            0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
+                            0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
+
+                panel-header-rui {
+                    display: block;
+                    padding: .8rem;
+                    padding-top: 2.4rem;
+                }
+                panel-content-rui {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1 1 0%;
+                    max-height: 32rem;
+                    padding: .8rem 0px .8rem .8rem;
+                    overflow: auto;
+
+                    label[data-switch-container] {
+                        &.hide {
+                            display: none;
+                        }
+                        &:hover {
+                            background-color: var(--row-hover);
+                        }
+                    }
+                }
+                panel-footer-rui {
+                    display: flex;
+                    justify-content: space-between;
+                    height: 4.2rem;
+                    padding: .4rem;
+
+                    .panel-btn {
+                        @extend %btn;
+                        color: var(--blue-1);
+                        font-weight: 500;
+
+                        &:hover,
+                        &:focus {
+                            background-color: var(--row-select);
+                        }
+                    }
+                }
+                &.hide {
+                    display: none;
+                }
+            }
+        }
+    }
+    .toolbar-btn {
+        @extend %btn;
+        position: relative;
+
+        &:hover,
+        &:focus {
+            background-color: var(--btn-hover);
+        }
+        &.new {
+            color: var(--green-2);
+
+            &:hover,
+            &:focus {
+                background-color: var(--green-1);
+            }
+        }
+        &.del {
+            color: var(--red-2);
+
+            &:hover,
+            &:focus {
+                background-color: var(--red-1);
+            }
+        }
+        indicator-rui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--blue-1);
+            z-index: 1;
+
+            &.hide {
+                display: none;
+            }
+        }
+    }
+}
+
+// *** MAIN ***
+main-rui {
+    display: block;
+    height: calc(100% - var(--Toolbar-Height) - var(--Footer-Height));
+    font-size: 1.4rem;
+
+    %cell {
+        display: block;
+        height: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: var(--Row-Height);
+        padding: 0 1rem;
+    }
+    headings-container-rui {
+        display: block;
+        height: calc(var(--Row-Height) + .1rem);
+        border-bottom: .1rem solid var(--grey);
+        overflow: hidden;
+
+        headings-rui {
+            display: flex;
+            height: 100%;
+            font-weight: 500;
+    
+            hcol-rui {
+                position: relative;
+                display: block;
+                height: 100%;
+                
+                &.hide {
+                    display: none;
+                }
+                &:first-child {
+                    border-right: .1rem solid var(--row-hover);
+                }
+                heading-title-rui {
+                    @extend %cell;
+                    user-select: none;
+                }
+                resizable-rui {
+                    position: absolute;
+                    top: 0;
+                    right: calc(-1 * var(--Resizable-Width) / 2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: var(--Resizable-Width);
+                    height: 100%;
+                    z-index: 1;
+                    cursor: col-resize;
+                    touch-action: none;
+
+                    resizable-icon-rui {
+                        display: block;
+                        width: 2px;
+                        height: 1.4rem;
+                        background-color: var(--grey);
+                        user-select: none;
+                    }
+                    &:hover resizable-icon-rui,
+                    &.active resizable-icon-rui {
+                        background-color: var(--white);
+                    }
+                }
+            }
+        }
+    }
+    rows-container-rui {
+        display: block;
+        height: calc(100% - var(--Row-Height));
+        overflow: auto;
+
+        row-rui {
+            display: flex;
+            height: calc(var(--Row-Height) + .1rem);
+            transition: .1s;
+
+            col-rui {
+                @extend %cell;
+                border-right: .1rem solid var(--row-hover);
+                border-bottom: .1rem solid var(--grey);
+
+                &.hide {
+                    display: none;
+                }
+            }
+            &:hover col-rui {
+                background-color: var(--row-hover);
+            }
+            &.selected {
+                col-rui {
+                    background-color: var(--row-select);
+                }
+                &:hover col-rui {
+                    background-color: var(--row-select-hover);
+                }
+            }
+        }
+    }
+    .select-column {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 5rem;
+        max-width: 5rem;
+        text-align: center;
+    }
+}
+
+// *** FOOTER ***
+footer-rui {
+    display: flex;
+    justify-content: space-between;
+    border-top: .1rem solid var(--grey);
+    height: var(--Footer-Height);
+    padding: 1rem 2rem;
+    font-size: 1.4rem;
+    line-height: 4rem;
+
+    %btn {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        transition: .2s;
+    }
+    pagination-rui {
+        display: flex;
+
+        .rows-per-page {
+            margin-right: 1rem;
+        }
+        .rows-per-page-container {
+            position: relative;
+            width: 5rem;
+            text-align: center;
+            margin-right: 2rem;
+            border-radius: .4rem;
+            cursor: pointer;
+            transition: .2s;
+
+            &:hover,
+            &:focus {
+                background-color: var(--btn-hover);
+            }
+            .rows-per-page-options {
+                position: absolute;
+                top: -21.6rem;
+                left: 0;
+                display: none;
+                border-radius: .4rem;
+                padding: .8rem 0;
+                overflow: hidden;
+                z-index: 1;
+                list-style: none;
+                background-color: var(--grey-dark);
+                min-width: 5rem;
+                box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
+                            0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
+                            0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
+
+                li .rows-per-page-option-btn {
+                    @extend %btn;
+                    width: 100%;
+                    height: 100%;
+                    font-size: inherit;
+                    line-height: inherit;
+
+                    &:hover {
+                        background-color: var(--btn-hover);
+                    }
+                    &.selected {
+                        background-color: var(--row-select);
+
+                        &:hover {
+                            background-color: var(--row-select-hover);
+                        }
+                    }
+                }
+            }
+            &:hover .rows-per-page-options,
+            &:focus .rows-per-page-options {
+                display: block;
+            }
+        }
+        displayed-rows-rui {
+            margin-right: 2rem;
+        }
+    }
+    pagination-actions-rui {
+        button {
+            @extend %btn;
+            font-size: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+
+            &:hover,
+            &:focus {
+                background-color: var(--btn-hover);
+            }
+            &:disabled {
+                pointer-events: none;
+                cursor: default;
+                color: var(--grey);
+            }
+        }
+    }
+}
