@@ -163,12 +163,14 @@ export default class {
             ColumnsPanel.appendChild(PanelFooter)
 
             ColumnsBtn.addEventListener('click', e => {
+                // Click the filters btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.filters').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[1].click()
+
+                if ( !ColumnsPanel.classList.contains('hide') ) return
+
                 e.stopPropagation()
                 ColumnsPanel.classList.toggle('hide')
-                
-                if (!ColumnsPanel.classList.contains('hide')) {
-                    PanelHeader.querySelector('input').focus()
-                }
+                PanelHeader.querySelector('input').focus()
 
                 /**
                  * @param {MouseEvent} e Click event
@@ -206,27 +208,26 @@ export default class {
             FiltersPanel.className = 'filters hide'
 
             FiltersBtn.addEventListener('click', e => {
+                 // Click the columns btn to close it if it's panel is open
+                 if ( !this.Toolbar.querySelector('toolbar-panel-rui.columns').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[0].click()
+
+                if ( !FiltersPanel.classList.contains('hide') ) return
+
                 e.stopPropagation()
+
+                FiltersPanel.classList.remove('hide')
 
                 /**
                  * @param {MouseEvent} e Click event
                  */
                 const cleanup = e => {
-                    console.log(this.ElemIsDescendantOf(e.target, FiltersPanel))
                     if (this.ElemIsDescendantOf(e.target, FiltersPanel) === -1) {
                         FiltersPanel.classList.add('hide')
                         window.removeEventListener('click', cleanup)
                     }
                 }
 
-                if ( FiltersPanel.classList.contains('hide') ) {
-                    FiltersPanel.classList.remove('hide')
-                    window.addEventListener('click', cleanup)
-                }
-                else {
-                    FiltersPanel.classList.add('hide')
-                    window.removeEventListener('click', cleanup)
-                }
+                window.addEventListener('click', cleanup)
             })
         
         FiltersPanelContainer.appendChild(FiltersBtn)
