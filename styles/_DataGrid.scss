@@ -59,6 +59,23 @@ toolbar-rui {
             border-radius: .4rem;
             z-index: 2;
             
+            %panel-footer-rui {
+                display: flex;
+                justify-content: space-between;
+                height: 4.2rem;
+                padding: .4rem;
+
+                .panel-btn {
+                    @extend %btn;
+                    color: var(--blue-1);
+                    font-weight: 500;
+
+                    &:hover,
+                    &:focus {
+                        background-color: var(--row-select);
+                    }
+                }
+            }
             &.columns {
                 left: -.5rem;
                 width: 30rem;
@@ -90,31 +107,56 @@ toolbar-rui {
                     }
                 }
                 panel-footer-rui {
-                    display: flex;
-                    justify-content: space-between;
-                    height: 4.2rem;
-                    padding: .4rem;
-
-                    .panel-btn {
-                        @extend %btn;
-                        color: var(--blue-1);
-                        font-weight: 500;
-
-                        &:hover,
-                        &:focus {
-                            background-color: var(--row-select);
-                        }
-                    }
+                    @extend %panel-footer-rui;
                 }
             }
             &.filters {
                 left: -10.9rem;
                 width: 51rem;
-                height: 10rem;
                 background-color: var(--grey-md);
                 box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
                             0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
                             0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
+
+                panel-content-rui {
+                    display: block;
+                    max-height: 40rem;
+                    overflow: auto;
+
+                    row-rui  {
+                        display: flex;
+                        padding: .8rem;
+
+                        [delete-row] {
+                            display: inline-flex;
+                            flex-direction: column;
+                            justify-content: flex-end;
+                            margin: 0 .4rem .16rem 0;
+
+                            button {
+                                background: none;
+                                border: none;
+                                color: inherit;
+                                width: 3rem;
+                                height: 3rem;
+                                font-size: 2.5rem;
+                                font-weight: 300;
+                                line-height: 1;
+                                border-radius: 50%;
+                                cursor: pointer;
+                                transition: .2s;
+
+                                &:hover,
+                                &:focus {
+                                    background-color: var(--btn-hover);
+                                }
+                            }
+                        }
+                    }
+                }
+                panel-footer-rui {
+                    @extend %panel-footer-rui;
+                }
             }
             &.hide {
                 display: none;

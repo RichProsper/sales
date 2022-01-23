@@ -191,7 +191,6 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } //CreateColumnsPanelContainer()
     
-    // TODO
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -206,6 +205,41 @@ export default class {
 
             const FiltersPanel = document.createElement('toolbar-panel-rui')
             FiltersPanel.className = 'filters hide'
+
+                const PanelContent = document.createElement('panel-content-rui')
+
+                    /**
+                     * @param {'show'|'hide'|'disabled'|'invisible'} operators - Display option for operators
+                     */
+                    const CreateFilterRow = (operators = 'show') => {
+                        const Row = document.createElement('row-rui')
+
+                            const DeleteRow = document.createElement('div')
+                            DeleteRow.setAttribute('delete-row', '')
+                                const Btn = document.createElement('button')
+                                Btn.type = 'button'
+                                Btn.innerHTML = '&times;'
+                            DeleteRow.appendChild(Btn)
+
+                            // TODO Selects
+
+                        Row.appendChild(DeleteRow)
+
+                        PanelContent.appendChild(Row)
+                    }
+                    CreateFilterRow()
+
+                const PanelFooter = document.createElement('panel-footer-rui')
+
+                    const AddFilterBtn = document.createElement('button')
+                    AddFilterBtn.type = 'button'
+                    AddFilterBtn.className = 'panel-btn'
+                    AddFilterBtn.innerHTML = `<i class="fas fa-plus"></i> ADD FILTER`
+
+                PanelFooter.appendChild(AddFilterBtn)
+
+            FiltersPanel.appendChild(PanelContent)
+            FiltersPanel.appendChild(PanelFooter)
 
             FiltersBtn.addEventListener('click', e => {
                  // Click the columns btn to close it if it's panel is open

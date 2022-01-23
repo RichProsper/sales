@@ -206,7 +206,7 @@ toolbar-rui {
   border-bottom: 0.1rem solid var(--grey);
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn, toolbar-rui .toolbar-btn, toolbar-rui footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li .rows-per-page-option-btn, footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li toolbar-rui .rows-per-page-option-btn, toolbar-rui footer-rui pagination-actions-rui button, footer-rui pagination-actions-rui toolbar-rui button {
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui .panel-btn, toolbar-rui .toolbar-btn, toolbar-rui footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li .rows-per-page-option-btn, footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li toolbar-rui .rows-per-page-option-btn, toolbar-rui footer-rui pagination-actions-rui button, footer-rui pagination-actions-rui toolbar-rui button {
   background: none;
   border: none;
   color: inherit;
@@ -228,6 +228,26 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui {
   top: 3.5rem;
   border-radius: .4rem;
   z-index: 2;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  height: 4.2rem;
+  padding: .4rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui .panel-btn {
+  color: var(--blue-1);
+  font-weight: 500;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn:hover, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui .panel-btn:hover, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn:focus, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui .panel-btn:focus {
+  background-color: var(--row-select);
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns {
@@ -268,33 +288,58 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-content-
   background-color: var(--row-hover);
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  height: 4.2rem;
-  padding: .4rem;
-}
-
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn {
-  color: var(--blue-1);
-  font-weight: 500;
-}
-
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn:hover, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn:focus {
-  background-color: var(--row-select);
-}
-
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters {
   left: -10.9rem;
   width: 51rem;
-  height: 10rem;
   background-color: var(--grey-md);
   -webkit-box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
           box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui {
+  display: block;
+  max-height: 40rem;
+  overflow: auto;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: .8rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  margin: 0 .4rem .16rem 0;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] button {
+  background: none;
+  border: none;
+  color: inherit;
+  width: 3rem;
+  height: 3rem;
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] button:hover, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] button:focus {
+  background-color: var(--btn-hover);
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.hide {
@@ -494,7 +539,7 @@ footer-rui {
   line-height: 4rem;
 }
 
-footer-rui toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui footer-rui .panel-btn, footer-rui toolbar-rui .toolbar-btn, toolbar-rui footer-rui .toolbar-btn, footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li .rows-per-page-option-btn, footer-rui pagination-actions-rui button {
+footer-rui toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui .panel-btn, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui footer-rui .panel-btn, footer-rui toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui .panel-btn, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui footer-rui .panel-btn, footer-rui toolbar-rui .toolbar-btn, toolbar-rui footer-rui .toolbar-btn, footer-rui pagination-rui .rows-per-page-container .rows-per-page-options li .rows-per-page-option-btn, footer-rui pagination-actions-rui button {
   background: none;
   border: none;
   color: inherit;
