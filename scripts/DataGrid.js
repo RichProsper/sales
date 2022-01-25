@@ -1,6 +1,7 @@
 import Checkbox from '../vendors/rui/rui-checkbox.min.js'
 import Switch from '../vendors/rui/rui-switch.min.js'
 import Input from '../vendors/rui/rui-input.min.js'
+import Select from '../vendors/rui/rui-select.min.js'
 
 /**
  * Grid Data
@@ -191,6 +192,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } //CreateColumnsPanelContainer()
     
+    // TODO
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -296,7 +298,10 @@ export default class {
                 const HCol = document.createElement('hcol-rui')
                 HCol.className = 'select-column'
                 HCol.appendChild( Checkbox({
-                    group: { type: 'all', id: this.CheckboxId }
+                    attrs: {
+                        'data-checkbox-group-all': '',
+                        'data-checkbox-selected-count': 0
+                    }
                 }) )
             Headings.appendChild(HCol)
 
@@ -340,7 +345,9 @@ export default class {
                 const Col = document.createElement('col-rui')
                 Col.className = 'select-column'
                 Col.appendChild( Checkbox({
-                    group: { type: 'single', id: this.CheckboxId }
+                    attrs: {
+                        'data-checkbox-group-single': ''
+                    }
                 }) )
             Row.appendChild(Col)
 
@@ -493,22 +500,19 @@ export default class {
 
     SetupAllCheckbox = () => {
         const allCheckbox = this.DataGrid.querySelector('[data-checkbox-group-all]')
-        const NumSelectedRows = this.DataGrid.querySelector('num-selected-rows-rui')
-        const DataGrid = this
+        const Datagrid = this
 
         allCheckbox.addEventListener('change', function() {
-            const selectedCount = +this.getAttribute('data-checkbox-selected-count')
-
-            NumSelectedRows.textContent = selectedCount === 1 ? `${selectedCount} row selected` : `${selectedCount} rows selected`
+            const checkboxes = Datagrid.DataGrid.querySelectorAll('[data-checkbox-group-single]')
 
             if (this.checked) {
-                for (let row of DataGrid.RowsContainer.children) {
-                    row.classList.add('selected')
+                for (const checkbox of checkboxes) {
+                    if (!checkbox.checked) checkbox.click()
                 }
             }
             else {
-                for (let row of DataGrid.RowsContainer.children) {
-                    row.classList.remove('selected')
+                for (const checkbox of checkboxes) {
+                    if (checkbox.checked) checkbox.click()
                 }
             }
         })
@@ -516,18 +520,40 @@ export default class {
 
     SetupCheckboxes = () => {
         const allCheckbox = this.DataGrid.querySelector('[data-checkbox-group-all]')
+        const Icon = allCheckbox.nextElementSibling
         const checkboxes = this.DataGrid.querySelectorAll('[data-checkbox-group-single]')
         const NumSelectedRows = this.DataGrid.querySelector('num-selected-rows-rui')
         const DataGrid = this
 
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].addEventListener('change', function() {
-                const selectedCount = +allCheckbox.getAttribute('data-checkbox-selected-count')
+                let selectedCount = +allCheckbox.getAttribute('data-checkbox-selected-count')
+
+                if (this.checked) {
+                    DataGrid.RowsContainer.children[i].classList.add('selected')
+                    selectedCount++
+                    allCheckbox.setAttribute('data-checkbox-selected-count', selectedCount)
+                }
+                else {
+                    DataGrid.RowsContainer.children[i].classList.remove('selected')
+                    selectedCount--
+                    allCheckbox.setAttribute('data-checkbox-selected-count', selectedCount)
+                }
+
+                if (selectedCount === 0) {
+                    allCheckbox.checked = false
+                    Icon.className = 'far fa-square icon'
+                }
+                else if (selectedCount === checkboxes.length) {
+                    allCheckbox.checked = true
+                    Icon.className = 'fas fa-check-square icon checked'
+                }
+                else {
+                    allCheckbox.checked = true
+                    Icon.className = 'fas fa-minus-square icon checked'
+                }
 
                 NumSelectedRows.textContent = selectedCount === 1 ? `${selectedCount} row selected` : `${selectedCount} rows selected`
-
-                if (this.checked) DataGrid.RowsContainer.children[i].classList.add('selected')
-                else DataGrid.RowsContainer.children[i].classList.remove('selected')
             })
         }
     }
