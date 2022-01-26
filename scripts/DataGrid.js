@@ -383,62 +383,52 @@ export default class {
             p.textContent = 'Rows per page:'
 
             const RowsPerPage = () => {
-                const container = document.createElement('div')
-                container.className = 'rows-per-page-container'
-                container.tabIndex = 0
+                const options = []
+                
+                for (const val of this.RPPVs) {
+                    if (val === this.RPPDV) {
+                        options.push({
+                            value: val,
+                            textContent: val,
+                            selected: ''
+                        })
+                    }
+                    else {
+                        options.push({
+                            value: val,
+                            textContent: val
+                        })
+                    }
+                }
 
-                    const value = document.createElement('rows-per-page-value-rui')
-                    value.textContent = `${this.RPPDV} `
+                const DataGrid = this
+                return Select({
+                    attrs: {
+                        'data-rows-per-page-value': ''
+                    },
+                    evts: {
+                        change: function() {
+                            const OffsetMin = DataGrid.DataGrid.querySelector('offset-min-rui')
+                            const OffsetMax = DataGrid.DataGrid.querySelector('offset-max-rui')
+                            const NextPageBtn = DataGrid.DataGrid.querySelector('button[title="Go to next page"]')
+                            const newOffsetMaxVal = +OffsetMin.textContent + +this.value - 1
 
-                    const sort = document.createElement('i')
-                    sort.className = 'fas fa-sort-down'
+                            if (newOffsetMaxVal <= DataGrid.NumRows) {
+                                OffsetMax.textContent = newOffsetMaxVal
+                            }
+                            else {
+                                OffsetMax.textContent = DataGrid.NumRows
+                            }
+                            if (+OffsetMax.textContent === DataGrid.NumRows) {
+                                NextPageBtn.disabled = true
+                            }
+                            else NextPageBtn.disabled = false
 
-                    const RowsPerPageOptions = document.createElement('ul')
-                    RowsPerPageOptions.className = 'rows-per-page-options'
-
-                    for (let option of this.RPPVs) {
-                        const RowsPerPageOption = document.createElement('li')
-
-                            const RowsPerPageOptionBtn = document.createElement('button')
-                            RowsPerPageOptionBtn.type = 'button'
-                            RowsPerPageOptionBtn.className = 'rows-per-page-option-btn'
-                            RowsPerPageOptionBtn.className += option === this.RPPDV ? ' selected' : ''
-                            RowsPerPageOptionBtn.textContent = option
-
-                            const DataGrid = this
-                            RowsPerPageOptionBtn.addEventListener('click', function() {
-                                value.textContent = `${option} `
-                                RowsPerPageOptions.querySelector('.selected').classList.remove('selected')
-                                this.classList.add('selected')
-
-                                const OffsetMin = DataGrid.DataGrid.querySelector('offset-min-rui')
-                                const OffsetMax = DataGrid.DataGrid.querySelector('offset-max-rui')
-                                const NextPageBtn = DataGrid.DataGrid.querySelector('button[title="Go to next page"]')
-                                const newOffsetMaxVal = +OffsetMin.textContent + option - 1
-
-                                if (newOffsetMaxVal <= DataGrid.NumRows) {
-                                    OffsetMax.textContent = newOffsetMaxVal
-                                }
-                                else {
-                                    OffsetMax.textContent = DataGrid.NumRows
-                                }
-                                if (+OffsetMax.textContent === DataGrid.NumRows) {
-                                    NextPageBtn.disabled = true
-                                }
-                                else NextPageBtn.disabled = false
-
-                                DataGrid.RetrieveData()
-                            })
-
-                        RowsPerPageOption.appendChild(RowsPerPageOptionBtn)
-                        RowsPerPageOptions.appendChild(RowsPerPageOption)
-                    } //for()
-
-                container.appendChild(value)
-                container.appendChild(sort)
-                container.appendChild(RowsPerPageOptions)
-
-                return container
+                            DataGrid.RetrieveData()
+                        }
+                    },
+                    options
+                })
             } //RowsPerPage()
 
             const DisplayedRows = document.createElement('displayed-rows-rui')
@@ -622,17 +612,17 @@ export default class {
     }
 
     SetupNextPrevBtns = () => {
-        const RowsPerPage = this.DataGrid.querySelector('rows-per-page-value-rui')
+        const RowsPerPage = this.DataGrid.querySelector('[data-rows-per-page-value]')
         const OffsetMin = this.DataGrid.querySelector('offset-min-rui')
         const OffsetMax = this.DataGrid.querySelector('offset-max-rui')
         const DataGrid = this
 
         this.NextPageBtn.addEventListener('click', function() {
-            const newOffsetMinVal = +OffsetMin.textContent + +RowsPerPage.textContent
-            const newOffsetMaxVal = +OffsetMax.textContent + +RowsPerPage.textContent
+            const newOffsetMinVal = +OffsetMin.textContent + +RowsPerPage.value
+            const newOffsetMaxVal = +OffsetMax.textContent + +RowsPerPage.value
 
             if (newOffsetMinVal > DataGrid.NumRows) {
-                if (+RowsPerPage.textContent <= DataGrid.NumRows) {
+                if (+RowsPerPage.value <= DataGrid.NumRows) {
                     OffsetMin.textContent = newOffsetMinVal
                 }
             }
@@ -649,8 +639,8 @@ export default class {
         })
 
         this.PrevPageBtn.addEventListener('click', function() {
-            const newOffsetMinVal = +OffsetMin.textContent - +RowsPerPage.textContent
-            let newOffsetMaxVal = +OffsetMax.textContent - +RowsPerPage.textContent
+            const newOffsetMinVal = +OffsetMin.textContent - +RowsPerPage.value
+            let newOffsetMaxVal = +OffsetMax.textContent - +RowsPerPage.value
             let disabled = false
 
             this.disabled = newOffsetMinVal <= 1
@@ -661,7 +651,7 @@ export default class {
             else OffsetMin.textContent = newOffsetMinVal
 
             if (+OffsetMax.textContent === DataGrid.NumRows) {
-                newOffsetMaxVal = +OffsetMin.textContent + +RowsPerPage.textContent - 1
+                newOffsetMaxVal = +OffsetMin.textContent + +RowsPerPage.value - 1
                 
                 if (newOffsetMaxVal > DataGrid.NumRows) {
                     OffsetMax.textContent = DataGrid.NumRows
@@ -672,10 +662,10 @@ export default class {
             else OffsetMax.textContent = newOffsetMaxVal
 
             if (
-                (+OffsetMax.textContent - +OffsetMin.textContent + 1) < +RowsPerPage.textContent &&
-                +RowsPerPage.textContent <= DataGrid.NumRows
+                (+OffsetMax.textContent - +OffsetMin.textContent + 1) < +RowsPerPage.value &&
+                +RowsPerPage.value <= DataGrid.NumRows
             ) {
-                OffsetMax.textContent = +OffsetMin.textContent + +RowsPerPage.textContent - 1
+                OffsetMax.textContent = +OffsetMin.textContent + +RowsPerPage.value - 1
             }
 
             DataGrid.NextPageBtn.disabled = disabled
@@ -716,7 +706,7 @@ export default class {
 
     RetrieveData = () => {
         const data = {
-            limit: +this.DataGrid.querySelector('rows-per-page-value-rui').textContent,
+            limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
             offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
         }
 
