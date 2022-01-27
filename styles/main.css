@@ -291,7 +291,6 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-content-
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters {
   left: -10.9rem;
-  width: 51rem;
   background-color: var(--grey-md);
   -webkit-box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
           box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
@@ -308,6 +307,7 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-
   display: -ms-flexbox;
   display: flex;
   padding: .8rem;
+  padding-top: 2.4rem;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] {
@@ -341,6 +341,36 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] button:hover, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui [delete-row] button:focus {
   background-color: var(--btn-hover);
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .mr-_5 {
+  margin-right: .5rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .hidden {
+  display: none;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .invisible {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w8 {
+  width: 8rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w15 {
+  width: 15rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w12 {
+  width: 12rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w18 {
+  width: 18rem;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.hide {

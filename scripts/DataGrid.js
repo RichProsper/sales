@@ -25,12 +25,39 @@ export default class {
         this.NumRows = data.numRows
         this.CheckboxId = data.checkboxId
         this.PhpPath = data.phpPath
-        this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
-        this.RPPDV = 25 //RowsPerPageDefaultValue
         this.init()
     }
 
     init = () => {
+        this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
+        this.RPPDV = 25 //RowsPerPageDefaultValue
+        this.Operations = [
+            {
+                value: 'equals',
+                textContent: 'equals'
+            },
+            {
+                value: 'contains',
+                textContent: 'contains'
+            },
+            {
+                value: 'starts with',
+                textContent: 'starts with'
+            },
+            {
+                value: 'endsWith',
+                textContent: 'ends with'
+            },
+            {
+                value: 'isEmpty',
+                textContent: 'is empty'
+            },
+            {
+                value: 'isNotEmpty',
+                textContent: 'is not empty'
+            }
+        ]
+
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateToolbar()
         this.CreateMain()
@@ -192,7 +219,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } //CreateColumnsPanelContainer()
     
-    // TODO
+    // TODO - Change Operators
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -209,25 +236,103 @@ export default class {
             FiltersPanel.className = 'filters hide'
 
                 const PanelContent = document.createElement('panel-content-rui')
+                PanelContent.setAttribute('data-rows', 0)
 
-                    /**
-                     * @param {'show'|'hide'|'disabled'|'invisible'} operators - Display option for operators
-                     */
-                    const CreateFilterRow = (operators = 'show') => {
+                    const SetOperatorVisibility = () => {
+                        const Operators = PanelContent.querySelectorAll('[data-operators]')
+
+                        if (Operators.length === 1) {
+                            Operators[0].className = 'mr-_5 hidden'
+                            return
+                        }
+
+                        for (let i = 0; i < Operators.length; i++) {
+                            if (i === 0) Operators[i].className = 'mr-_5 invisible'
+                            else if (i === 1) {
+                                Operators[i].className = 'mr-_5'
+                                Operators[i].children[0].removeAttribute('disabled')
+                            }
+                            else {
+                                Operators[i].className = 'mr-_5'
+                                Operators[i].children[0].setAttribute('disabled','')
+                            }
+                        }
+                    }
+
+                    const CreateFilterRow = () => {
                         const Row = document.createElement('row-rui')
 
                             const DeleteRow = document.createElement('div')
                             DeleteRow.setAttribute('delete-row', '')
+
                                 const Btn = document.createElement('button')
                                 Btn.type = 'button'
                                 Btn.innerHTML = '&times;'
+                                Btn.addEventListener('click', function(e) {
+                                    const numRows = +PanelContent.getAttribute('data-rows')
+                                    if (numRows > 1) {
+                                        e.stopPropagation()
+                                        this.parentElement.parentElement.remove()
+                                        SetOperatorVisibility()
+                                        PanelContent.setAttribute('data-rows', numRows - 1)
+                                    }
+                                })
+
                             DeleteRow.appendChild(Btn)
 
-                            // TODO Selects
+                            const Operator = Select({
+                                labelText: 'Operators',
+                                attrs: { class: 'w8' },
+                                options: [
+                                    {
+                                        value: 'And',
+                                        textContent: 'And'
+                                    },
+                                    {
+                                        value: 'Or',
+                                        textContent: 'Or'
+                                    }
+                                ]
+                            })
+                            Operator.setAttribute('data-operators', '')
+                            Operator.className = 'mr-_5 hidden'
+                            
+                            const options = []
+                            for (const col of this.Columns) {
+                                options.push({
+                                    value: col,
+                                    textContent: col
+                                })
+                            }
+                            const Column = Select({
+                                labelText: 'Columns',
+                                attrs: { class: 'w15' },
+                                options
+                            })
+                            Column.classList.add('mr-_5')
+
+                            const Operation = Select({
+                                labelText: 'Operations',
+                                attrs: { class: 'w12' },
+                                options: this.Operations
+                            })
+                            Operation.classList.add('mr-_5')
 
                         Row.appendChild(DeleteRow)
+                        Row.appendChild(Operator)
+                        Row.appendChild(Column)
+                        Row.appendChild(Operation)
+                        Row.appendChild( Input({
+                            attrs: {
+                                class: 'w18',
+                                placeholder: 'Filter Value'
+                            }
+                        }) )
 
                         PanelContent.appendChild(Row)
+
+                        const numRows = +PanelContent.getAttribute('data-rows')
+                        PanelContent.setAttribute('data-rows', numRows + 1)
                     }
                     CreateFilterRow()
 
@@ -237,6 +342,10 @@ export default class {
                     AddFilterBtn.type = 'button'
                     AddFilterBtn.className = 'panel-btn'
                     AddFilterBtn.innerHTML = `<i class="fas fa-plus"></i> ADD FILTER`
+                    AddFilterBtn.addEventListener('click', () => {
+                        CreateFilterRow()
+                        SetOperatorVisibility()
+                    })
 
                 PanelFooter.appendChild(AddFilterBtn)
 
@@ -250,8 +359,8 @@ export default class {
                 if ( !FiltersPanel.classList.contains('hide') ) return
 
                 e.stopPropagation()
-
                 FiltersPanel.classList.remove('hide')
+                PanelContent.querySelector('input').focus()
 
                 /**
                  * @param {MouseEvent} e Click event
@@ -403,9 +512,7 @@ export default class {
 
                 const DataGrid = this
                 return Select({
-                    attrs: {
-                        'data-rows-per-page-value': ''
-                    },
+                    attrs: { 'data-rows-per-page-value': '' },
                     evts: {
                         change: function() {
                             const OffsetMin = DataGrid.DataGrid.querySelector('offset-min-rui')
@@ -467,8 +574,8 @@ export default class {
     }
 
     SizeColumns = () => {
-        const HCols = this.DataGrid.querySelectorAll('hcol-rui')
-        const Rows = this.DataGrid.querySelectorAll('row-rui')
+        const HCols = this.HeadingsContainer.querySelectorAll('hcol-rui')
+        const Rows = this.RowsContainer.querySelectorAll('row-rui')
 
         for (const row of Rows) {
             for (let i = 1; i < row.children.length; i++) {
