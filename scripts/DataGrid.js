@@ -280,26 +280,39 @@ export default class {
 
                             DeleteRow.appendChild(Btn)
 
+                            const opOptions = [
+                                {
+                                    value: 'And',
+                                    textContent: 'And'
+                                },
+                                {
+                                    value: 'Or',
+                                    textContent: 'Or',
+                                }
+                            ]
+                            if (PanelContent.children.length > 0) {
+                                const PrevOp = PanelContent.lastElementChild.children[1].children[0]
+                                console.log(PrevOp)
+                                if (PrevOp.value === 'And') opOptions[0].selected = ''
+                                else if (PrevOp.value === 'Or') opOptions[1].selected = ''
+                            }
                             const Operator = Select({
                                 labelText: 'Operators',
                                 attrs: { class: 'w8' },
-                                options: [
-                                    {
-                                        value: 'And',
-                                        textContent: 'And'
-                                    },
-                                    {
-                                        value: 'Or',
-                                        textContent: 'Or'
+                                evts: {
+                                    change: function() {
+                                        const Ops = PanelContent.querySelectorAll('[data-operators]')
+                                        for (const Op of Ops) Op.children[0].value = this.value
                                     }
-                                ]
+                                },
+                                options: opOptions
                             })
                             Operator.setAttribute('data-operators', '')
                             Operator.className = 'mr-_5 hidden'
                             
-                            const options = []
+                            const colOptions = []
                             for (const col of this.Columns) {
-                                options.push({
+                                colOptions.push({
                                     value: col,
                                     textContent: col
                                 })
@@ -307,10 +320,11 @@ export default class {
                             const Column = Select({
                                 labelText: 'Columns',
                                 attrs: { class: 'w15' },
-                                options
+                                options: colOptions
                             })
                             Column.classList.add('mr-_5')
 
+                            // TODO isEmpty & isNotEmpty
                             const Operation = Select({
                                 labelText: 'Operations',
                                 attrs: { class: 'w12' },
