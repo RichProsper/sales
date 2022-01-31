@@ -153,9 +153,9 @@ export default class {
 
                 const PanelContent = document.createElement('panel-content-rui')
                 const Datagrid = this
-                for (let i = 0; i < this.Columns.length; i++) {
+                for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     PanelContent.appendChild( Switch({
-                        labelText: this.Columns[i],
+                        labelText: Object.keys(this.Columns)[i],
                         attrs: { checked: '' },
                         evts: {
                             change: function() {
@@ -331,7 +331,7 @@ export default class {
                             Operator.className = 'mr-_5 hidden'
                             
                             const colOptions = []
-                            for (const col of this.Columns) {
+                            for (const col of Object.keys(this.Columns)) {
                                 colOptions.push({
                                     value: col,
                                     textContent: col
@@ -448,13 +448,13 @@ export default class {
                 }) )
             Headings.appendChild(HCol)
 
-                for (let i = 0; i < this.Columns.length; i++) {
+                for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const HCol = document.createElement('hcol-rui')
                     HCol.style.minWidth = '12rem'
                     HCol.style.maxWidth = '12rem'
 
                         const HeadingTitle = document.createElement('heading-title-rui')
-                        HeadingTitle.textContent = this.Columns[i]
+                        HeadingTitle.textContent = Object.keys(this.Columns)[i]
 
                         const Resizable = document.createElement('resizable-rui')
                         Resizable.setAttribute('data-colindex', i)
