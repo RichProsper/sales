@@ -361,12 +361,12 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-
   width: 8rem;
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w15 {
-  width: 15rem;
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w14 {
+  width: 14rem;
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w12 {
-  width: 12rem;
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w17 {
+  width: 17rem;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui .w18 {

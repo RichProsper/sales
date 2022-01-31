@@ -33,27 +33,47 @@ export default class {
         this.RPPDV = 25 //RowsPerPageDefaultValue
         this.Operations = [
             {
-                value: 'equals',
-                textContent: 'equals'
+                value: '=',
+                textContent: 'equal'
             },
             {
-                value: 'contains',
-                textContent: 'contains'
+                value: '!=',
+                textContent: 'not equal'
             },
             {
-                value: 'starts with',
-                textContent: 'starts with'
+                value: '>',
+                textContent: 'greater than'
             },
             {
-                value: 'endsWith',
-                textContent: 'ends with'
+                value: '>=',
+                textContent: 'greater than or equal'
             },
             {
-                value: 'isEmpty',
+                value: '<',
+                textContent: 'less than'
+            },
+            {
+                value: '<=',
+                textContent: 'less than or equal'
+            },
+            {
+                value: 'LIKE %${q}%',
+                textContent: 'contain'
+            },
+            {
+                value: 'LIKE %${q}',
+                textContent: 'start with'
+            },
+            {
+                value: 'LIKE ${q}%',
+                textContent: 'end with'
+            },
+            {
+                value: '${column} IS NULL OR ${column} = ""',
                 textContent: 'is empty'
             },
             {
-                value: 'isNotEmpty',
+                value: '${column} IS NOT NULL AND ${column} != ""',
                 textContent: 'is not empty'
             }
         ]
@@ -219,7 +239,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } //CreateColumnsPanelContainer()
     
-    // TODO - Change Operators
+    // TODO
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -282,11 +302,11 @@ export default class {
 
                             const opOptions = [
                                 {
-                                    value: 'And',
+                                    value: 'AND',
                                     textContent: 'And'
                                 },
                                 {
-                                    value: 'Or',
+                                    value: 'OR',
                                     textContent: 'Or',
                                 }
                             ]
@@ -319,7 +339,7 @@ export default class {
                             }
                             const Column = Select({
                                 labelText: 'Columns',
-                                attrs: { class: 'w15' },
+                                attrs: { class: 'w14' },
                                 options: colOptions
                             })
                             Column.classList.add('mr-_5')
@@ -327,7 +347,7 @@ export default class {
                             // TODO isEmpty & isNotEmpty
                             const Operation = Select({
                                 labelText: 'Operations',
-                                attrs: { class: 'w12' },
+                                attrs: { class: 'w17' },
                                 options: this.Operations
                             })
                             Operation.classList.add('mr-_5')
