@@ -351,9 +351,11 @@ export default class {
                                     change: function() {
                                         if (this.value === '${column} IS NULL OR ${column} = ""' || this.value === '${column} IS NOT NULL AND ${column} != ""') {
                                             this.parentElement.nextElementSibling.classList.add('hidden')
+                                            this.parentElement.parentElement.setAttribute('data-has-query', '')
                                         }
                                         else {
                                             this.parentElement.nextElementSibling.classList.remove('hidden')
+                                            this.parentElement.parentElement.removeAttribute('data-has-query')
                                         }
                                     }
                                 },
