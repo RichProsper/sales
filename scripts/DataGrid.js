@@ -312,7 +312,6 @@ export default class {
                             ]
                             if (PanelContent.children.length > 0) {
                                 const PrevOp = PanelContent.lastElementChild.children[1].children[0]
-                                console.log(PrevOp)
                                 if (PrevOp.value === 'And') opOptions[0].selected = ''
                                 else if (PrevOp.value === 'Or') opOptions[1].selected = ''
                             }
@@ -348,6 +347,16 @@ export default class {
                             const Operation = Select({
                                 labelText: 'Operations',
                                 attrs: { class: 'w17' },
+                                evts: {
+                                    change: function() {
+                                        if (this.value === '${column} IS NULL OR ${column} = ""' || this.value === '${column} IS NOT NULL AND ${column} != ""') {
+                                            this.parentElement.nextElementSibling.classList.add('hidden')
+                                        }
+                                        else {
+                                            this.parentElement.nextElementSibling.classList.remove('hidden')
+                                        }
+                                    }
+                                },
                                 options: this.Operations
                             })
                             Operation.classList.add('mr-_5')
