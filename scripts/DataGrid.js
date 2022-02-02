@@ -57,26 +57,27 @@ export default class {
                 textContent: 'less than or equal'
             },
             {
-                value: 'LIKE %${q}%',
+                value: 'contain',
                 textContent: 'contain'
             },
             {
-                value: 'LIKE %${q}',
+                value: 'startWith',
                 textContent: 'start with'
             },
             {
-                value: 'LIKE ${q}%',
+                value: 'endWith',
                 textContent: 'end with'
             },
             {
-                value: '${column} IS NULL OR ${column} = ""',
+                value: 'isEmpty',
                 textContent: 'is empty'
             },
             {
-                value: '${column} IS NOT NULL AND ${column} != ""',
+                value: 'isNotEmpty',
                 textContent: 'is not empty'
             }
         ]
+        this.Timer = null
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateToolbar()
@@ -237,9 +238,8 @@ export default class {
         ColumnsPanelContainer.appendChild(ColumnsPanel)
 
         this.Toolbar.appendChild(ColumnsPanelContainer)
-    } //CreateColumnsPanelContainer()
+    } // CreateColumnsPanelContainer()
     
-    // TODO
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -280,6 +280,7 @@ export default class {
                     }
 
                     const CreateFilterRow = () => {
+                        const DataGrid = this
                         const Row = document.createElement('row-rui')
 
                             const DeleteRow = document.createElement('div')
@@ -292,9 +293,12 @@ export default class {
                                     const numRows = +PanelContent.getAttribute('data-rows')
                                     if (numRows > 1) {
                                         e.stopPropagation()
+                                        // Remove row
                                         this.parentElement.parentElement.remove()
                                         SetOperatorVisibility()
                                         PanelContent.setAttribute('data-rows', numRows - 1)
+
+                                        DataGrid.RetrieveData()
                                     }
                                 })
 
@@ -312,8 +316,8 @@ export default class {
                             ]
                             if (PanelContent.children.length > 0) {
                                 const PrevOp = PanelContent.lastElementChild.children[1].children[0]
-                                if (PrevOp.value === 'And') opOptions[0].selected = ''
-                                else if (PrevOp.value === 'Or') opOptions[1].selected = ''
+                                if (PrevOp.value === 'AND') opOptions[0].selected = ''
+                                else if (PrevOp.value === 'OR') opOptions[1].selected = ''
                             }
                             const Operator = Select({
                                 labelText: 'Operators',
@@ -322,6 +326,8 @@ export default class {
                                     change: function() {
                                         const Ops = PanelContent.querySelectorAll('[data-operators]')
                                         for (const Op of Ops) Op.children[0].value = this.value
+
+                                        DataGrid.RetrieveData()
                                     }
                                 },
                                 options: opOptions
@@ -339,24 +345,31 @@ export default class {
                             const Column = Select({
                                 labelText: 'Columns',
                                 attrs: { class: 'w14' },
+                                evts: {
+                                    change: this.RetrieveData
+                                },
                                 options: colOptions
                             })
                             Column.classList.add('mr-_5')
 
-                            // TODO isEmpty & isNotEmpty
                             const Operation = Select({
                                 labelText: 'Operations',
                                 attrs: { class: 'w17' },
                                 evts: {
                                     change: function() {
-                                        if (this.value === '${column} IS NULL OR ${column} = ""' || this.value === '${column} IS NOT NULL AND ${column} != ""') {
-                                            this.parentElement.nextElementSibling.classList.add('hidden')
+                                        if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
+                                            // Filter Value Input Element
+                                            this.parentElement.nextElementSibling.classList.add('invisible')
+                                            this.parentElement.nextElementSibling.children[0].value = null
+                                            // Row Element
                                             this.parentElement.parentElement.setAttribute('data-has-query', '')
                                         }
                                         else {
-                                            this.parentElement.nextElementSibling.classList.remove('hidden')
+                                            this.parentElement.nextElementSibling.classList.remove('invisible')
                                             this.parentElement.parentElement.removeAttribute('data-has-query')
                                         }
+
+                                        DataGrid.RetrieveData()
                                     }
                                 },
                                 options: this.Operations
@@ -371,6 +384,17 @@ export default class {
                             attrs: {
                                 class: 'w18',
                                 placeholder: 'Filter Value'
+                            },
+                            evts: {
+                                input: function() {
+                                    clearTimeout(DataGrid.Timer)
+                                    DataGrid.Timer = setTimeout(() => {
+                                        if (this.value) this.parentElement.parentElement.setAttribute('data-has-query', '')
+                                        else this.parentElement.parentElement.removeAttribute('data-has-query')
+
+                                        DataGrid.RetrieveData()
+                                    }, 1000)
+                                }
                             }
                         }) )
 
@@ -378,7 +402,7 @@ export default class {
 
                         const numRows = +PanelContent.getAttribute('data-rows')
                         PanelContent.setAttribute('data-rows', numRows + 1)
-                    }
+                    } // CreateFilterRow()
                     CreateFilterRow()
 
                 const PanelFooter = document.createElement('panel-footer-rui')
@@ -424,7 +448,7 @@ export default class {
         FiltersPanelContainer.appendChild(FiltersPanel)
 
         this.Toolbar.appendChild(FiltersPanelContainer)
-    }
+    } // CreateFiltersPanelContainer()
 
     // TODO
     CreateSortsPanelContainer = () => {
@@ -856,8 +880,49 @@ export default class {
         )
     }
 
+    RandomString = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        let str = ''
+        const numChars = Math.floor(Math.random() * (12 - 3 + 1) + 3)
+
+        for (let i = 0; i < numChars; i++) str += chars[ Math.floor(Math.random() * 26) ]
+
+        return str
+    }
+
+    // TODO - Fix quoting error
+    GetFilterString = () => {
+        let filterString = null
+        const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
+
+        if (Rows.length > 0 ) filterString = 'WHERE '
+
+        for (let i = 0; i < Rows.length; i++) {
+            const column = Rows[i].children[2].children[0].value
+            const operation = Rows[i].children[3].children[0].value
+            const filter = Rows[i].children[4].children[0].value
+
+            if (i > 0) {
+                // Operators value
+                filterString += `${Rows[i].children[1].children[0].value} `
+            }
+
+            filterString += `${column} `
+
+            if (operation === 'contain') filterString += `LIKE '%${filter}%' `
+            else if (operation === 'startWith') filterString += `LIKE '%${filter}' `
+            else if (operation === 'endWith') filterString += `LIKE '${filter}%' `
+            else if (operation === 'isEmpty') filterString += `IS NULL OR ${column} = ''`
+            else if (operation === 'isNotEmpty') filterString += `IS NOT NULL AND ${column} != ''`
+            else filterString += `${operation} '${filter}' `
+        }
+
+        return filterString
+    }
+
     RetrieveData = () => {
         const data = {
+            filterString: this.GetFilterString(),
             limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
             offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
         }

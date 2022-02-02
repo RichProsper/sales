@@ -19,16 +19,33 @@
     else if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $rules = json_decode( file_get_contents("php://input") );
 
-        $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT :offset, :limit");
-        $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
-        $stmt->execute();
-        $stmt->setFetchMode(PDO::FETCH_ASSOC);
-        $rows = $stmt->fetchAll();
+        if ($rules->filterString) {
+            $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers :filterString LIMIT :offset, :limit");
+            $stmt->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
+            $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
+            $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll();
 
-        $sql = "SELECT COUNT(cId) FROM customers";
-        $numRows = $conn->query($sql);
-        $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+            $sql = $conn->prepare("SELECT COUNT(cId) FROM customers :filterString");
+            $sql->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
+            $sql->execute();
+            $sql->setFetchMode(PDO::FETCH_ASSOC);
+            $numRows = $sql->fetchAll();
+        }
+        else {
+            $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT :offset, :limit");
+            $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
+            $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll();
+
+            $sql = "SELECT COUNT(cId) FROM customers";
+            $numRows = $conn->query($sql);
+            $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+        }
 
         $customer = new stdClass;
         $customer->rows = $rows;
