@@ -897,25 +897,13 @@ export default class {
 
         for (let i = 0; i < Rows.length; i++) {
             const filter = {
-                operator: Rows[i].children[1].children[0].value,
+                operator: false,
                 column: Rows[i].children[2].children[0].value,
                 operation: Rows[i].children[3].children[0].value,
                 filter: Rows[i].children[4].children[0].value
             }
 
-            if (i > 0) {
-                // Operators value
-                filterString += `${Rows[i].children[1].children[0].value} `
-            }
-
-            filterString += `${column} `
-
-            if (operation === 'contain') filterString += `LIKE "%${filter}%" `
-            else if (operation === 'startWith') filterString += `LIKE "%${filter}" `
-            else if (operation === 'endWith') filterString += `LIKE "${filter}%" `
-            else if (operation === 'isEmpty') filterString += `IS NULL OR ${column} = ""`
-            else if (operation === 'isNotEmpty') filterString += `IS NOT NULL AND ${column} != ""`
-            else filterString += `${operation} "${filter}" `
+            if (i > 0) filter.operator = Rows[i].children[1].children[0].value
         }
 
         return filters
