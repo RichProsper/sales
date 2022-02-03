@@ -892,15 +892,16 @@ export default class {
 
     // TODO - Fix quoting error
     GetFilterString = () => {
-        let filterString = null
+        const filters = []
         const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
 
-        if (Rows.length > 0 ) filterString = 'WHERE '
-
         for (let i = 0; i < Rows.length; i++) {
-            const column = Rows[i].children[2].children[0].value
-            const operation = Rows[i].children[3].children[0].value
-            const filter = Rows[i].children[4].children[0].value
+            const filter = {
+                operator: Rows[i].children[1].children[0].value,
+                column: Rows[i].children[2].children[0].value,
+                operation: Rows[i].children[3].children[0].value,
+                filter: Rows[i].children[4].children[0].value
+            }
 
             if (i > 0) {
                 // Operators value
@@ -909,15 +910,15 @@ export default class {
 
             filterString += `${column} `
 
-            if (operation === 'contain') filterString += `LIKE '%${filter}%' `
-            else if (operation === 'startWith') filterString += `LIKE '%${filter}' `
-            else if (operation === 'endWith') filterString += `LIKE '${filter}%' `
-            else if (operation === 'isEmpty') filterString += `IS NULL OR ${column} = ''`
-            else if (operation === 'isNotEmpty') filterString += `IS NOT NULL AND ${column} != ''`
-            else filterString += `${operation} '${filter}' `
+            if (operation === 'contain') filterString += `LIKE "%${filter}%" `
+            else if (operation === 'startWith') filterString += `LIKE "%${filter}" `
+            else if (operation === 'endWith') filterString += `LIKE "${filter}%" `
+            else if (operation === 'isEmpty') filterString += `IS NULL OR ${column} = ""`
+            else if (operation === 'isNotEmpty') filterString += `IS NOT NULL AND ${column} != ""`
+            else filterString += `${operation} "${filter}" `
         }
 
-        return filterString
+        return filters
     }
 
     RetrieveData = () => {
