@@ -891,7 +891,7 @@ export default class {
     }
 
     // TODO - Fix quoting error
-    GetFilterString = () => {
+    GetFilters = () => {
         const filters = []
         const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
 
@@ -911,7 +911,7 @@ export default class {
 
     RetrieveData = () => {
         const data = {
-            filterString: this.GetFilterString(),
+            filters: this.GetFilters(),
             limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
             offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
         }

@@ -19,7 +19,17 @@
     else if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $rules = json_decode( file_get_contents("php://input") );
 
-        if ($rules->filterString) {
+        if (count($rules->filters) > 0) {
+            $sql = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE ";
+
+            for ($i = 0; $i < count($rules->filters); $i++) {
+                if ($rules->filters[$i]->operator) {
+                    $sql .= $rules->filters[$i]->operator . " ";
+                }
+
+                // TODO
+            }
+
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers :filterString LIMIT :offset, :limit");
             $stmt->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
             $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
@@ -28,11 +38,11 @@
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $rows = $stmt->fetchAll();
 
-            $sql = $conn->prepare("SELECT COUNT(cId) FROM customers :filterString");
-            $sql->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
-            $sql->execute();
-            $sql->setFetchMode(PDO::FETCH_ASSOC);
-            $numRows = $sql->fetchAll();
+            $sqlCount = $conn->prepare("SELECT COUNT(cId) FROM customers :filterString");
+            $sqlCount->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
+            $sqlCount->execute();
+            $sqlCount->setFetchMode(PDO::FETCH_ASSOC);
+            $numRows = $sqlCount->fetchAll();
         }
         else {
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT :offset, :limit");
