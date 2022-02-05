@@ -357,10 +357,11 @@ export default class {
                                 attrs: { class: 'w17' },
                                 evts: {
                                     change: function() {
+                                        // Filter Value Input Element
+                                        this.parentElement.nextElementSibling.children[0].value = null
+
                                         if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
-                                            // Filter Value Input Element
                                             this.parentElement.nextElementSibling.classList.add('invisible')
-                                            this.parentElement.nextElementSibling.children[0].value = null
                                             // Row Element
                                             this.parentElement.parentElement.setAttribute('data-has-query', '')
                                         }
@@ -890,7 +891,6 @@ export default class {
         return str
     }
 
-    // TODO - Fix quoting error
     GetFilters = () => {
         const filters = []
         const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
@@ -904,6 +904,8 @@ export default class {
             }
 
             if (i > 0) filter.operator = Rows[i].children[1].children[0].value
+
+            filters.push(filter)
         }
 
         return filters

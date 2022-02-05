@@ -1,4 +1,4 @@
-<?php
+<?php    
     require_once 'db.php';
     $conn = db::getDbConnection();
 
@@ -18,31 +18,93 @@
     }
     else if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $rules = json_decode( file_get_contents("php://input") );
+        $rows = null;
+        $numRows = null;
 
         if (count($rules->filters) > 0) {
-            $sql = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE ";
+            $stmtStr = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE ";
+            $sqlCountStr = "SELECT COUNT(cId) FROM customers WHERE ";
 
-            for ($i = 0; $i < count($rules->filters); $i++) {
-                if ($rules->filters[$i]->operator) {
-                    $sql .= $rules->filters[$i]->operator . " ";
+            $sql = "";
+            foreach ($rules->filters as $i => $obj) {
+                if ($obj->operator) {
+                    $sql .= ":operator" . $i . " ";
                 }
 
-                // TODO
+                $sql .= ":column" . $i . " ";
+                
+                if ($obj->operation === 'contain') {
+                    $sql .= "LIKE '%:filter" . $i . "%' ";
+                }
+                elseif ($obj->operation === 'startWith') {
+                    $sql .= "LIKE '%:filter" . $i . "' ";
+                }
+                elseif ($obj->operation === 'endWith') {
+                    $sql .= "LIKE ':filter" . $i . "%' ";
+                }
+                elseif ($obj->operation === 'isEmpty') {
+                    $sql .= "IS NULL OR :col" . $i . " = '' ";
+                }
+                elseif ($obj->operation === 'isNotEmpty') {
+                    $sql .= "IS NOT NULL AND :col" . $i . " != '' ";
+                }
+                else {
+                    $sql .= ":operation" . $i . " ':filter" . $i . "' ";
+                }
             }
 
-            $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers :filterString LIMIT :offset, :limit");
-            $stmt->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
-            $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
-            $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
+            $stmt = $conn->prepare($stmtStr . $sql . "LIMIT :offset, :limit");
+            // $sqlCount = $conn->prepare($sqlCountStr . $sql);
+
+            // ! FIX Uncaught PDOException: SQLSTATE[HY093]
+
+            foreach ($rules->filters as $i => $obj) {
+                if ($obj->operator) {
+                    $stmt->bindValue(':operator' . $i, $obj->operator);
+                    echo "operator$i, ";
+                }
+
+                $stmt->bindValue(':column' . $i, $obj->column);
+                echo "column$i, ";
+
+                if ($obj->operation === 'contain') {
+                    $stmt->bindValue(':filter' . $i, $obj->filter);
+                    echo "contain$i, ";
+                }
+                elseif ($obj->operation === 'startWith') {
+                    $stmt->bindValue(':filter' . $i, $obj->filter);
+                    echo "startWith$i, ";
+                }
+                elseif ($obj->operation === 'endWith') {
+                    $stmt->bindValue(':filter' . $i, $obj->filter);
+                    echo "endWith$i, ";
+                }
+                elseif ($obj->operation === 'isEmpty') {
+                    $stmt->bindValue(':col' . $i, $obj->column);
+                    echo "isEmpty$i, ";
+                }
+                elseif ($obj->operation === 'isNotEmpty') {
+                    $stmt->bindValue(':col' . $i, $obj->column);
+                    echo "isNotEmpty$i, ";
+                }
+                else {
+                    $stmt->bindValue(':operation' . $i, $obj->operation);
+                    $stmt->bindValue(':filter' . $i, $obj->filter);
+                    echo "operationfilter$i, ";
+                }
+            }
+
+            $stmt->bindValue(':limit', $rules->limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $rules->offset, PDO::PARAM_INT);
+            echo "<br><br>";
+            echo var_dump($stmt) . "<br>";
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $rows = $stmt->fetchAll();
 
-            $sqlCount = $conn->prepare("SELECT COUNT(cId) FROM customers :filterString");
-            $sqlCount->bindParam(':filterString', $rules->filterString, PDO::PARAM_STR);
-            $sqlCount->execute();
-            $sqlCount->setFetchMode(PDO::FETCH_ASSOC);
-            $numRows = $sqlCount->fetchAll();
+            // $sqlCount->execute();
+            // $sqlCount->setFetchMode(PDO::FETCH_ASSOC);
+            // $numRows = $sqlCount->fetchAll();
         }
         else {
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT :offset, :limit");
@@ -57,10 +119,10 @@
             $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
         }
 
-        $customer = new stdClass;
-        $customer->rows = $rows;
-        $customer->numRows = (int)$numRows[0]["COUNT(cId)"];
-        echo json_encode($customer);
+        // $customer = new stdClass;
+        // $customer->rows = $rows;
+        // $customer->numRows = (int)$numRows[0]["COUNT(cId)"];
+        // echo json_encode($customer);
     }
 
     $conn = null;
