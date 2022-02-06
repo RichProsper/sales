@@ -938,6 +938,8 @@ export default class {
                 this.SizeColumns()
                 this.HideColumns()
                 this.SetupCheckboxes()
+
+                this.Pagination.querySelector('num-rows-rui').textContent = this.NumRows
             }
         )
         .catch(e => console.error(e))
