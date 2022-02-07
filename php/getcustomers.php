@@ -36,10 +36,10 @@
                     $sql .= "LIKE '%" . $obj->filterValue . "%' ";
                 }
                 elseif ($obj->operation === "startWith") {
-                    $sql .= "LIKE '%" . $obj->filterValue . "' ";
+                    $sql .= "LIKE '" . $obj->filterValue . "%' ";
                 }
                 elseif ($obj->operation === "endWith") {
-                    $sql .= "LIKE '" . $obj->filterValue . "%' ";
+                    $sql .= "LIKE '%" . $obj->filterValue . "' ";
                 }
                 elseif ($obj->operation === "isEmpty") {
                     $sql .= "IS NULL OR " . $obj->column . " = '' ";

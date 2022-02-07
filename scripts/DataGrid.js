@@ -249,7 +249,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
     
-    // TODO: Fix Next Button, Add Indicator, Columns that have 'selects', Limit RetrieveData calls
+    // TODO: Fix Next Button, Add Indicator, Columns that have 'selects'
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -337,7 +337,17 @@ export default class {
                                         const Ops = PanelContent.querySelectorAll('[data-operators]')
                                         for (const Op of Ops) Op.children[0].value = this.value
 
-                                        DataGrid.RetrieveData()
+                                        // When to call RetrieveData
+                                        const operation = this.parentElement.nextElementSibling.nextElementSibling.children[0]
+
+                                        if (operation.value === 'isEmpty' || operation.value === 'isNotEmpty') {
+                                            DataGrid.RetrieveData()
+                                            return
+                                        }
+
+                                        const filterValue = operation.parentElement.nextElementSibling.children[0]
+
+                                        if (filterValue.value) DataGrid.RetrieveData()
                                     }
                                 },
                                 options: opOptions
@@ -356,7 +366,18 @@ export default class {
                                 labelText: 'Columns',
                                 attrs: { class: 'w14' },
                                 evts: {
-                                    change: this.RetrieveData
+                                    change: function() {
+                                        const operation = this.parentElement.nextElementSibling.children[0]
+
+                                        if (operation.value === 'isEmpty' || operation.value === 'isNotEmpty') {
+                                            DataGrid.RetrieveData()
+                                            return
+                                        }
+
+                                        const filterValue = operation.parentElement.nextElementSibling.children[0]
+
+                                        if (filterValue.value) DataGrid.RetrieveData()
+                                    }
                                 },
                                 options: colOptions
                             })
@@ -364,23 +385,32 @@ export default class {
 
                             const Operation = Select({
                                 labelText: 'Operations',
-                                attrs: { class: 'w17' },
+                                attrs: {
+                                    class: 'w17',
+                                    'data-value': this.Operations[0].value
+                                },
                                 evts: {
                                     change: function() {
-                                        // Filter Value Input Element
-                                        this.parentElement.nextElementSibling.children[0].value = null
+                                        const filterValue = this.parentElement.nextElementSibling.children[0]
 
                                         if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
-                                            this.parentElement.nextElementSibling.classList.add('invisible')
+                                            filterValue.parentElement.classList.add('invisible')
+                                            filterValue.value = null
                                             // Row Element
                                             this.parentElement.parentElement.setAttribute('data-has-query', '')
+                                            DataGrid.RetrieveData()
                                         }
-                                        else {
-                                            this.parentElement.nextElementSibling.classList.remove('invisible')
+                                        else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
+                                        {
+                                            filterValue.parentElement.classList.remove('invisible')
                                             this.parentElement.parentElement.removeAttribute('data-has-query')
+                                            DataGrid.RetrieveData()
+                                        }
+                                        else if (filterValue.value) {
+                                            DataGrid.RetrieveData()
                                         }
 
-                                        DataGrid.RetrieveData()
+                                        this.setAttribute('data-value', this.value)
                                     }
                                 },
                                 options: this.Operations
@@ -927,7 +957,6 @@ export default class {
             limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
             offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
         }
-        console.log(data)
 
         fetch(this.PhpPath, {
             method: 'POST',
