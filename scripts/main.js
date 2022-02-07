@@ -18,12 +18,14 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         customer => {
             const columns = {
                 Title: {
+                    dbName: 'title',
                     formElement: {
                         name: 'select',
                         options: ['Dr.', 'Miss', 'Mr.', 'Mrs.', 'Ms.', 'Prof.', 'Rev.']
                     }
                 },
                 'First Name': {
+                    dbName: 'fname',
                     formElement: {
                         name: 'input',
                         type: 'text',
@@ -31,6 +33,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 'Last Name': {
+                    dbName: 'lname',
                     formElement: {
                         name: 'input',
                         type: 'text',
@@ -38,6 +41,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 Email: {
+                    dbName: 'email',
                     formElement: {
                         name: 'input',
                         type: 'text',
@@ -45,6 +49,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 Parish: {
+                    dbName: 'parish',
                     formElement: {
                         name: 'select',
                         options: [
@@ -55,11 +60,13 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 Address: {
+                    dbName: 'address',
                     formElement: {
                         name: 'textarea'
                     }
                 },
                 'Home Number': {
+                    dbName: 'homeNo',
                     formElement: {
                         name: 'input',
                         type: 'text',
@@ -67,6 +74,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 'Cell Number': {
+                    dbName: 'cellNo',
                     formElement: {
                         name: 'input',
                         type: 'text',
@@ -74,6 +82,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     }
                 },
                 'Other Numbers': {
+                    dbName: 'otherNos',
                     formElement: {
                         multiple: true,
                         name: 'input',

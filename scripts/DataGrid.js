@@ -13,6 +13,15 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {String} phpPath The path of the php script that retrieves the data
  */
 
+/**
+ * Filter
+ * @typedef {Object} Filter
+ * @property {false|'AND'|'OR'} operator The operator
+ * @property {String} column The column
+ * @property {String} operation The operation
+ * @property {String} filterValue The filter value
+ */
+
 export default class {
     /**
      * @param {String} gridId The Grid Id
@@ -240,6 +249,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
     
+    // TODO: Fix Next Button, Add Indicator, Columns that have 'selects', Limit RetrieveData calls
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -336,9 +346,9 @@ export default class {
                             Operator.className = 'mr-_5 hidden'
                             
                             const colOptions = []
-                            for (const col of Object.keys(this.Columns)) {
+                            for (const col in this.Columns) {
                                 colOptions.push({
-                                    value: col,
+                                    value: this.Columns[col].dbName,
                                     textContent: col
                                 })
                             }
@@ -892,15 +902,15 @@ export default class {
     }
 
     GetFilters = () => {
-        const filters = []
         const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
+        const filters = []
 
         for (let i = 0; i < Rows.length; i++) {
             const filter = {
                 operator: false,
                 column: Rows[i].children[2].children[0].value,
                 operation: Rows[i].children[3].children[0].value,
-                filter: Rows[i].children[4].children[0].value
+                filterValue: Rows[i].children[4].children[0].value
             }
 
             if (i > 0) filter.operator = Rows[i].children[1].children[0].value
@@ -917,6 +927,7 @@ export default class {
             limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
             offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
         }
+        console.log(data)
 
         fetch(this.PhpPath, {
             method: 'POST',

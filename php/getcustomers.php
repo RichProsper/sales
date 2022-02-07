@@ -22,8 +22,10 @@
         $numRows = null;
 
         if (count($rules->filters) > 0) {
+            $filtersArr = db::sanitizeFilters($rules->filters);
             $sql = "";
-            foreach ($rules->filters as $i => $obj) {
+
+            foreach ($filtersArr as $i => $obj) {
                 if ($obj->operator) {
                     $sql .= $obj->operator . " ";
                 }
@@ -31,40 +33,34 @@
                 $sql .= $obj->column . " ";
                 
                 if ($obj->operation === "contain") {
-                    $sql .= "LIKE '%" . $obj->filter . "%' ";
+                    $sql .= "LIKE '%" . $obj->filterValue . "%' ";
                 }
                 elseif ($obj->operation === "startWith") {
-                    $sql .= "LIKE '%" . $obj->filter . "' ";
+                    $sql .= "LIKE '%" . $obj->filterValue . "' ";
                 }
                 elseif ($obj->operation === "endWith") {
-                    $sql .= "LIKE '" . $obj->filter . "%' ";
+                    $sql .= "LIKE '" . $obj->filterValue . "%' ";
                 }
                 elseif ($obj->operation === "isEmpty") {
-                    // $sql .= "IS NULL OR " . $obj->column . " = '' ";
-                    $sql .= "IS NULL ";
+                    $sql .= "IS NULL OR " . $obj->column . " = '' ";
                 }
                 elseif ($obj->operation === "isNotEmpty") {
-                    // $sql .= "IS NOT NULL AND " . $obj->column . " != '' ";
-                    $sql .= "IS NOT NULL ";
+                    $sql .= "IS NOT NULL AND " . $obj->column . " != '' ";
                 }
                 else {
-                    $sql .= $obj->operation . " '" . $obj->filter . "' ";
+                    $sql .= $obj->operation . " '" . $obj->filterValue . "' ";
                 }
             }
 
-            // $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE :sql LIMIT :offset, :limit");
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE " . $sql . " LIMIT :offset, :limit");
-            // $sqlCount = $conn->prepare("SELECT COUNT(cId) FROM customers WHERE :sql");
             $sqlCount = $conn->prepare("SELECT COUNT(cId) FROM customers WHERE " . $sql);
 
-            // $stmt->bindParam(':sql', $sql, PDO::PARAM_STR);
             $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
             $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $rows = $stmt->fetchAll();
 
-            // $sqlCount->bindParam(':sql', $sql, PDO::PARAM_STR);
             $sqlCount->execute();
             $sqlCount->setFetchMode(PDO::FETCH_ASSOC);
             $numRows = $sqlCount->fetchAll();
