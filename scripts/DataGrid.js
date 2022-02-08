@@ -249,11 +249,12 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
     
-    // TODO: Fix Next Button, Add Indicator, Columns that have 'selects'
+    // TODO: Fix Next Button, Columns that have 'selects'
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
             FiltersBtn.type = 'button'
+            FiltersBtn.value = 0
             FiltersBtn.className = 'toolbar-btn'
             FiltersBtn.innerHTML = `<i class="fas fa-filter"></i> Filters`
 
@@ -303,8 +304,16 @@ export default class {
                                     const numRows = +PanelContent.getAttribute('data-rows')
                                     if (numRows > 1) {
                                         e.stopPropagation()
-                                        // Remove row
-                                        this.parentElement.parentElement.remove()
+
+                                        const row = this.parentElement.parentElement
+                                        if ( row.hasAttribute('data-has-query') ) {
+                                            FiltersBtn.value = +FiltersBtn.value - 1
+
+                                            if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                                            else Indicator.classList.add('hide')
+                                        }
+
+                                        row.remove()
                                         SetOperatorVisibility()
                                         PanelContent.setAttribute('data-rows', numRows - 1)
 
@@ -338,16 +347,8 @@ export default class {
                                         for (const Op of Ops) Op.children[0].value = this.value
 
                                         // When to call RetrieveData
-                                        const operation = this.parentElement.nextElementSibling.nextElementSibling.children[0]
-
-                                        if (operation.value === 'isEmpty' || operation.value === 'isNotEmpty') {
-                                            DataGrid.RetrieveData()
-                                            return
-                                        }
-
-                                        const filterValue = operation.parentElement.nextElementSibling.children[0]
-
-                                        if (filterValue.value) DataGrid.RetrieveData()
+                                        const row = this.parentElement.parentElement
+                                        if ( row.hasAttribute('data-has-query') ) DataGrid.RetrieveData()
                                     }
                                 },
                                 options: opOptions
@@ -367,16 +368,8 @@ export default class {
                                 attrs: { class: 'w14' },
                                 evts: {
                                     change: function() {
-                                        const operation = this.parentElement.nextElementSibling.children[0]
-
-                                        if (operation.value === 'isEmpty' || operation.value === 'isNotEmpty') {
-                                            DataGrid.RetrieveData()
-                                            return
-                                        }
-
-                                        const filterValue = operation.parentElement.nextElementSibling.children[0]
-
-                                        if (filterValue.value) DataGrid.RetrieveData()
+                                        const row = this.parentElement.parentElement
+                                        if ( row.hasAttribute('data-has-query') ) DataGrid.RetrieveData()
                                     }
                                 },
                                 options: colOptions
@@ -396,14 +389,19 @@ export default class {
                                         if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
                                             filterValue.parentElement.classList.add('invisible')
                                             filterValue.value = null
+
                                             // Row Element
                                             this.parentElement.parentElement.setAttribute('data-has-query', '')
+
+                                            FiltersBtn.value = +FiltersBtn.value + 1
                                             DataGrid.RetrieveData()
                                         }
                                         else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
                                         {
                                             filterValue.parentElement.classList.remove('invisible')
                                             this.parentElement.parentElement.removeAttribute('data-has-query')
+
+                                            FiltersBtn.value = +FiltersBtn.value - 1
                                             DataGrid.RetrieveData()
                                         }
                                         else if (filterValue.value) {
@@ -411,6 +409,9 @@ export default class {
                                         }
 
                                         this.setAttribute('data-value', this.value)
+
+                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                                        else Indicator.classList.add('hide')
                                     }
                                 },
                                 options: this.Operations
@@ -430,8 +431,17 @@ export default class {
                                 input: function() {
                                     clearTimeout(DataGrid.Timer)
                                     DataGrid.Timer = setTimeout(() => {
-                                        if (this.value) this.parentElement.parentElement.setAttribute('data-has-query', '')
-                                        else this.parentElement.parentElement.removeAttribute('data-has-query')
+                                        if (this.value) {
+                                            this.parentElement.parentElement.setAttribute('data-has-query', '')
+                                            FiltersBtn.value = +FiltersBtn.value + 1
+                                        }
+                                        else {
+                                            this.parentElement.parentElement.removeAttribute('data-has-query')
+                                            FiltersBtn.value = +FiltersBtn.value - 1
+                                        }
+
+                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                                        else Indicator.classList.add('hide')
 
                                         DataGrid.RetrieveData()
                                     }, 1000)
