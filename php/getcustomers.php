@@ -30,26 +30,28 @@
                     $sql .= $obj->operator . " ";
                 }
 
-                $sql .= $obj->column . " ";
+                $sql .= "(" . $obj->column . " ";
                 
                 if ($obj->operation === "contain") {
-                    $sql .= "LIKE '%" . $obj->filterValue . "%' ";
+                    $sql .= "LIKE '%" . $obj->filterValue . "%'";
                 }
                 elseif ($obj->operation === "startWith") {
-                    $sql .= "LIKE '" . $obj->filterValue . "%' ";
+                    $sql .= "LIKE '" . $obj->filterValue . "%'";
                 }
                 elseif ($obj->operation === "endWith") {
-                    $sql .= "LIKE '%" . $obj->filterValue . "' ";
+                    $sql .= "LIKE '%" . $obj->filterValue . "'";
                 }
                 elseif ($obj->operation === "isEmpty") {
-                    $sql .= "IS NULL OR " . $obj->column . " = '' ";
+                    $sql .= "IS NULL OR " . $obj->column . " = ''";
                 }
                 elseif ($obj->operation === "isNotEmpty") {
-                    $sql .= "IS NOT NULL AND " . $obj->column . " != '' ";
+                    $sql .= "IS NOT NULL AND " . $obj->column . " != ''";
                 }
                 else {
-                    $sql .= $obj->operation . " '" . $obj->filterValue . "' ";
+                    $sql .= $obj->operation . " '" . $obj->filterValue . "'";
                 }
+
+                $sql .= ") ";
             }
 
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE " . $sql . " LIMIT :offset, :limit");

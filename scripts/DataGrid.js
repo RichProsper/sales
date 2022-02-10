@@ -13,15 +13,6 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {String} phpPath The path of the php script that retrieves the data
  */
 
-/**
- * Filter
- * @typedef {Object} Filter
- * @property {false|'AND'|'OR'} operator The operator
- * @property {String} column The column
- * @property {String} operation The operation
- * @property {String} filterValue The filter value
- */
-
 export default class {
     /**
      * @param {String} gridId The Grid Id
@@ -249,7 +240,6 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
     
-    // TODO: Fix Next Button, Columns that have 'selects'
     CreateFiltersPanelContainer = () => {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
@@ -317,7 +307,7 @@ export default class {
                                         SetOperatorVisibility()
                                         PanelContent.setAttribute('data-rows', numRows - 1)
 
-                                        DataGrid.RetrieveData()
+                                        DataGrid.FilterRetrieveData()
                                     }
                                 })
 
@@ -346,9 +336,9 @@ export default class {
                                         const Ops = PanelContent.querySelectorAll('[data-operators]')
                                         for (const Op of Ops) Op.children[0].value = this.value
 
-                                        // When to call RetrieveData
+                                        // When to call FilterRetrieveData
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-query') ) DataGrid.RetrieveData()
+                                        if ( row.hasAttribute('data-has-query') ) DataGrid.FilterRetrieveData()
                                     }
                                 },
                                 options: opOptions
@@ -369,7 +359,7 @@ export default class {
                                 evts: {
                                     change: function() {
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-query') ) DataGrid.RetrieveData()
+                                        if ( row.hasAttribute('data-has-query') ) DataGrid.FilterRetrieveData()
                                     }
                                 },
                                 options: colOptions
@@ -394,7 +384,7 @@ export default class {
                                             this.parentElement.parentElement.setAttribute('data-has-query', '')
 
                                             FiltersBtn.value = +FiltersBtn.value + 1
-                                            DataGrid.RetrieveData()
+                                            DataGrid.FilterRetrieveData()
                                         }
                                         else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
                                         {
@@ -402,10 +392,10 @@ export default class {
                                             this.parentElement.parentElement.removeAttribute('data-has-query')
 
                                             FiltersBtn.value = +FiltersBtn.value - 1
-                                            DataGrid.RetrieveData()
+                                            DataGrid.FilterRetrieveData()
                                         }
                                         else if (filterValue.value) {
-                                            DataGrid.RetrieveData()
+                                            DataGrid.FilterRetrieveData()
                                         }
 
                                         this.setAttribute('data-value', this.value)
@@ -432,8 +422,10 @@ export default class {
                                     clearTimeout(DataGrid.Timer)
                                     DataGrid.Timer = setTimeout(() => {
                                         if (this.value) {
-                                            this.parentElement.parentElement.setAttribute('data-has-query', '')
-                                            FiltersBtn.value = +FiltersBtn.value + 1
+                                            if ( !this.parentElement.parentElement.hasAttribute('data-has-query') ) {
+                                                this.parentElement.parentElement.setAttribute('data-has-query', '')
+                                                FiltersBtn.value = +FiltersBtn.value + 1
+                                            }
                                         }
                                         else {
                                             this.parentElement.parentElement.removeAttribute('data-has-query')
@@ -443,7 +435,7 @@ export default class {
                                         if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
                                         else Indicator.classList.add('hide')
 
-                                        DataGrid.RetrieveData()
+                                        DataGrid.FilterRetrieveData()
                                     }, 1000)
                                 }
                             }
@@ -839,9 +831,9 @@ export default class {
     }
 
     SetupNextPrevBtns = () => {
-        const RowsPerPage = this.DataGrid.querySelector('[data-rows-per-page-value]')
-        const OffsetMin = this.DataGrid.querySelector('offset-min-rui')
-        const OffsetMax = this.DataGrid.querySelector('offset-max-rui')
+        const RowsPerPage = this.Pagination.querySelector('[data-rows-per-page-value]')
+        const OffsetMin = this.Pagination.querySelector('offset-min-rui')
+        const OffsetMax = this.Pagination.querySelector('offset-max-rui')
         const DataGrid = this
 
         this.NextPageBtn.addEventListener('click', function() {
@@ -918,29 +910,7 @@ export default class {
         }
         return -1
     }
-
-    /**
-     * The object version of Array.filter()
-     * @param {Object} obj Object to filter
-     * @param {Function} callback Function to test elements
-     * @returns {Object} Filtered object
-     */
-    ObjectFilter = (obj, callback) => {
-        return Object.fromEntries(
-            Object.entries(obj).filter( ([key, val]) => callback(key, val) )
-        )
-    }
-
-    RandomString = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-        let str = ''
-        const numChars = Math.floor(Math.random() * (12 - 3 + 1) + 3)
-
-        for (let i = 0; i < numChars; i++) str += chars[ Math.floor(Math.random() * 26) ]
-
-        return str
-    }
-
+    
     GetFilters = () => {
         const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
         const filters = []
@@ -964,8 +934,8 @@ export default class {
     RetrieveData = () => {
         const data = {
             filters: this.GetFilters(),
-            limit: +this.DataGrid.querySelector('[data-rows-per-page-value]').value,
-            offset: +this.DataGrid.querySelector('offset-min-rui').textContent - 1
+            limit: +this.Pagination.querySelector('[data-rows-per-page-value]').value,
+            offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
         }
 
         fetch(this.PhpPath, {
@@ -981,17 +951,36 @@ export default class {
              */
             entity => {
                 this.Rows = entity.rows
-                this.NumRows = entity.numRows
+
+                if (this.NumRows !== entity.numRows) {
+                    this.NumRows = entity.numRows
+                    this.Pagination.querySelector('num-rows-rui').textContent = this.NumRows
+
+                    if (entity.numRows === 0) {
+                        this.Pagination.querySelector('offset-min-rui').textContent = 0
+                        this.Pagination.querySelector('offset-max-rui').textContent = 0
+                    }
+                    if (entity.numRows <= +this.Pagination.querySelector('[data-rows-per-page-value]').value) {
+                        this.NextPageBtn.disabled = true
+                        this.Pagination.querySelector('offset-max-rui').textContent = entity.numRows
+                    }
+                }
                 
                 this.ResetRowsSelected()
                 this.CreateRows()
                 this.SizeColumns()
                 this.HideColumns()
                 this.SetupCheckboxes()
-
-                this.Pagination.querySelector('num-rows-rui').textContent = this.NumRows
             }
         )
         .catch(e => console.error(e))
+    }
+
+    FilterRetrieveData = () => {
+        this.Pagination.querySelector('offset-min-rui').textContent = 1
+        this.Pagination.querySelector('offset-max-rui').textContent = this.Pagination.querySelector('[data-rows-per-page-value]').value
+        this.PrevPageBtn.disabled = true
+        this.NextPageBtn.disabled = false
+        this.RetrieveData()
     }
 } // class{}
