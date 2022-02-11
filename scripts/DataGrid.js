@@ -122,10 +122,8 @@ export default class {
             ColumnsBtn.value = 0
             ColumnsBtn.className = 'toolbar-btn'
             ColumnsBtn.innerHTML = `<i class="fas fa-columns"></i> Columns`
-
                 const Indicator = document.createElement('indicator-rui')
                 Indicator.className = 'hide'
-
             ColumnsBtn.appendChild(Indicator)
 
             const ColumnsPanel = document.createElement('toolbar-panel-rui')
@@ -215,6 +213,9 @@ export default class {
                 // Click the filters btn to close it if it's panel is open
                 if ( !this.Toolbar.querySelector('toolbar-panel-rui.filters').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[1].click()
 
+                // Click the sorts btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.sorts').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[2].click()
+
                 if ( !ColumnsPanel.classList.contains('hide') ) return
 
                 e.stopPropagation()
@@ -247,10 +248,8 @@ export default class {
             FiltersBtn.value = 0
             FiltersBtn.className = 'toolbar-btn'
             FiltersBtn.innerHTML = `<i class="fas fa-filter"></i> Filters`
-
                 const Indicator = document.createElement('indicator-rui')
                 Indicator.className = 'hide'
-
             FiltersBtn.appendChild(Indicator)
 
             const FiltersPanel = document.createElement('toolbar-panel-rui')
@@ -465,8 +464,11 @@ export default class {
             FiltersPanel.appendChild(PanelFooter)
 
             FiltersBtn.addEventListener('click', e => {
-                 // Click the columns btn to close it if it's panel is open
-                 if ( !this.Toolbar.querySelector('toolbar-panel-rui.columns').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[0].click()
+                // Click the columns btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.columns').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[0].click()
+
+                 // Click the sorts btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.sorts').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[2].click()
 
                 if ( !FiltersPanel.classList.contains('hide') ) return
 
@@ -498,9 +500,64 @@ export default class {
         const SortsPanelContainer = document.createElement('toolbar-panel-container-rui')
             const SortsBtn = document.createElement('button')
             SortsBtn.type = 'button'
+            SortsBtn.value = 0
             SortsBtn.className = 'toolbar-btn'
             SortsBtn.innerHTML = `<i class="fas fa-sort"></i> Sorts`
+                const Indicator = document.createElement('indicator-rui')
+                Indicator.className = 'hide'
+            SortsBtn.appendChild(Indicator)
+
+            const SortsPanel = document.createElement('toolbar-panel-rui')
+            SortsPanel.className = 'sorts hide'
+
+                const PanelContent = document.createElement('panel-content-rui')
+                PanelContent.setAttribute('data-rows', 0)
+
+                    const CreateSortRow = () => {
+
+                    }
+                    CreateSortRow()
+
+                const PanelFooter = document.createElement('panel-footer-rui')
+
+                    const AddSortBtn = document.createElement('button')
+                    AddSortBtn.type = 'button'
+                    AddSortBtn.className = 'panel-btn'
+                    AddSortBtn.innerHTML = `<i class="fas fa-plus"></i> ADD SORT`
+                    AddSortBtn.addEventListener('click', CreateSortRow)
+
+                PanelFooter.appendChild(AddSortBtn)
+
+            SortsPanel.appendChild(PanelContent)
+            SortsPanel.appendChild(PanelFooter)
+
+            SortsBtn.addEventListener('click', e => {
+                // Click the columns btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.columns').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[0].click()
+
+                 // Click the filters btn to close it if it's panel is open
+                if ( !this.Toolbar.querySelector('toolbar-panel-rui.filters').classList.contains('hide') ) this.Toolbar.querySelectorAll('.toolbar-btn')[1].click()
+
+                if ( !SortsPanel.classList.contains('hide') ) return
+
+                e.stopPropagation()
+                SortsPanel.classList.remove('hide')
+
+                /**
+                 * @param {MouseEvent} e Click event
+                 */
+                const cleanup = e => {
+                    if (this.ElemIsDescendantOf(e.target, SortsPanel) === -1) {
+                        SortsPanel.classList.add('hide')
+                        window.removeEventListener('click', cleanup)
+                    }
+                }
+
+                window.addEventListener('click', cleanup)
+            })
+
         SortsPanelContainer.appendChild(SortsBtn)
+        SortsPanelContainer.appendChild(SortsPanel)
 
         this.Toolbar.appendChild(SortsPanelContainer)
     }

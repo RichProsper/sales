@@ -57,6 +57,10 @@ toolbar-rui {
             position: absolute;
             top: 3.5rem;
             border-radius: .4rem;
+            background-color: var(--grey-md);
+            box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
+                        0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
+                        0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
             z-index: 2;
             
             %panel-footer-rui {
@@ -79,10 +83,6 @@ toolbar-rui {
             &.columns {
                 left: -.5rem;
                 width: 30rem;
-                background-color: var(--grey-md);
-                box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
-                            0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
-                            0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
 
                 panel-header-rui {
                     display: block;
@@ -112,10 +112,6 @@ toolbar-rui {
             }
             &.filters {
                 left: -10.9rem;
-                background-color: var(--grey-md);
-                box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
-                            0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
-                            0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
 
                 panel-content-rui {
                     display: block;
@@ -176,6 +172,18 @@ toolbar-rui {
                             width: 18rem;
                         }
                     }
+                }
+                panel-footer-rui {
+                    @extend %panel-footer-rui;
+                }
+            }
+            &.sorts {
+                left: -19.2rem;
+
+                panel-content-rui {
+                    display: block;
+                    max-height: 40rem;
+                    overflow: auto;
                 }
                 panel-footer-rui {
                     @extend %panel-footer-rui;
