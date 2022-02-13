@@ -510,24 +510,101 @@ export default class {
             const SortsPanel = document.createElement('toolbar-panel-rui')
             SortsPanel.className = 'sorts hide'
 
-                const PanelContent = document.createElement('panel-content-rui')
-                PanelContent.setAttribute('data-rows', 0)
+                const PanelHeader = document.createElement('panel-header-rui')
+                PanelHeader.appendChild( Input({
+                    attrs: {
+                        type: 'text',
+                        placeholder: 'Find Column'
+                    },
+                    evts: {
+                        input: function() {
+                            // const switches = ColumnsPanel.querySelectorAll('label[data-switch-container]')
+                            // const filter = this.value.trim().toLowerCase()
 
-                    const CreateSortRow = () => {
+                            // for (const switch_ of switches) {
+                            //     const coltxt = switch_.children[1].textContent.trim().toLowerCase()
 
+                            //     if (coltxt.indexOf(filter) > -1) switch_.classList.remove('hide')
+                            //     else switch_.classList.add('hide')
+                            // }
+                        }
                     }
-                    CreateSortRow()
+                }) )
+
+                const PanelContent = document.createElement('panel-content-rui')
+                
+                const orderOptions = []
+                const colOptions = []
+
+                for (let i = 0; i < Object.keys(this.Columns).length; i++) {
+                    orderOptions.push({
+                        value: i + 1,
+                        textContent: i + 1
+                    })
+                }
+                for (const col in this.Columns) {
+                    colOptions.push({
+                        value: this.Columns[col].dbName,
+                        textContent: col
+                    })
+                }
+                for (const col in this.Columns) {
+                    const Row = document.createElement('row-rui')
+
+                        const Order =  Select({
+                            labelText: 'Order',
+                            attrs: { class: 'w7' },
+                            options: orderOptions
+                        })
+                        Order.classList.add('mr-_5')
+
+                        const Column =  Select({
+                            labelText: 'Column',
+                            attrs: { class: 'w14' },
+                            options: colOptions
+                        })
+                        Column.classList.add('mr-_5')
+
+                        const Direction = Select({
+                            labelText: 'Direction',
+                            attrs: { class: 'w10' },
+                            options: [
+                                {
+                                    value: 'unset',
+                                    textContent: 'Unset'
+                                },
+                                {
+                                    value: 'asc',
+                                    textContent: 'Ascending'
+                                },
+                                {
+                                    value: 'desc',
+                                    textContent: 'Descending'
+                                }
+                            ]
+                        })
+                        Direction.classList.add('mr-_5')
+
+                    Row.appendChild(Order)
+                    Row.appendChild(Column)
+                    Row.appendChild(Direction)
+
+                    PanelContent.appendChild(Row)
+                }
 
                 const PanelFooter = document.createElement('panel-footer-rui')
 
-                    const AddSortBtn = document.createElement('button')
-                    AddSortBtn.type = 'button'
-                    AddSortBtn.className = 'panel-btn'
-                    AddSortBtn.innerHTML = `<i class="fas fa-plus"></i> ADD SORT`
-                    AddSortBtn.addEventListener('click', CreateSortRow)
+                    const ResetBtn = document.createElement('button')
+                    ResetBtn.type = 'button'
+                    ResetBtn.className = 'panel-btn'
+                    ResetBtn.textContent = 'RESET'
+                    ResetBtn.addEventListener('click', function() {
+                        // 
+                    })
 
-                PanelFooter.appendChild(AddSortBtn)
+                PanelFooter.appendChild(ResetBtn)
 
+            SortsPanel.appendChild(PanelHeader)
             SortsPanel.appendChild(PanelContent)
             SortsPanel.appendChild(PanelFooter)
 

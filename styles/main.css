@@ -234,6 +234,18 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui {
   z-index: 2;
 }
 
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-header-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-header-rui {
+  display: block;
+  padding: .8rem;
+  padding-top: 2.4rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui {
+  display: block;
+  max-height: 40rem;
+  overflow: auto;
+}
+
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-footer-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-footer-rui {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -257,12 +269,6 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-footer-r
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns {
   left: -.5rem;
   width: 30rem;
-}
-
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-header-rui {
-  display: block;
-  padding: .8rem;
-  padding-top: 2.4rem;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-content-rui {
@@ -291,12 +297,6 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-content-
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters {
   left: -10.9rem;
-}
-
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui {
-  display: block;
-  max-height: 40rem;
-  overflow: auto;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.filters panel-content-rui row-rui {
@@ -374,10 +374,27 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts {
   left: -19.2rem;
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui {
-  display: block;
-  max-height: 40rem;
-  overflow: auto;
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 2.4rem .8rem .8rem 1.6rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui .mr-_5 {
+  margin-right: .5rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui .w7 {
+  width: 7rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui .w10 {
+  width: 10rem;
+}
+
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui .w14 {
+  width: 14rem;
 }
 
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.hide {

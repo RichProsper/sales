@@ -63,6 +63,16 @@ toolbar-rui {
                         0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
             z-index: 2;
             
+            %panel-header-rui {
+                display: block;
+                padding: .8rem;
+                padding-top: 2.4rem;
+            }
+            %panel-content-rui {
+                display: block;
+                max-height: 40rem;
+                overflow: auto;
+            }
             %panel-footer-rui {
                 display: flex;
                 justify-content: space-between;
@@ -85,9 +95,7 @@ toolbar-rui {
                 width: 30rem;
 
                 panel-header-rui {
-                    display: block;
-                    padding: .8rem;
-                    padding-top: 2.4rem;
+                    @extend %panel-header-rui;
                 }
                 panel-content-rui {
                     display: flex;
@@ -114,9 +122,7 @@ toolbar-rui {
                 left: -10.9rem;
 
                 panel-content-rui {
-                    display: block;
-                    max-height: 40rem;
-                    overflow: auto;
+                    @extend %panel-content-rui;
 
                     row-rui  {
                         display: flex;
@@ -180,10 +186,29 @@ toolbar-rui {
             &.sorts {
                 left: -19.2rem;
 
+                panel-header-rui {
+                    @extend %panel-header-rui;
+                }
                 panel-content-rui {
-                    display: block;
-                    max-height: 40rem;
-                    overflow: auto;
+                    @extend %panel-content-rui;
+
+                    row-rui {
+                        display: flex;
+                        padding: 2.4rem .8rem .8rem 1.6rem;
+
+                        .mr-_5 {
+                            margin-right: .5rem;
+                        }
+                        .w7 {
+                            width: 7rem;
+                        }
+                        .w10 {
+                            width: 10rem;
+                        }
+                        .w14 {
+                            width: 14rem;
+                        }
+                    }
                 }
                 panel-footer-rui {
                     @extend %panel-footer-rui;
