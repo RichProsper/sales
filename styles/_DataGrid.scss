@@ -196,17 +196,25 @@ toolbar-rui {
                         display: flex;
                         padding: 2.4rem .8rem .8rem 1.6rem;
 
+                        &.hide {
+                            display: none;
+                        }
                         .mr-_5 {
                             margin-right: .5rem;
                         }
                         .w7 {
                             width: 7rem;
                         }
-                        .w10 {
-                            width: 10rem;
+                        [data-column] {
+                            line-height: calc(4rem - .1rem);
+                            width: 12rem;
+                            border-bottom: .1rem solid currentColor;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
-                        .w14 {
-                            width: 14rem;
+                        .w12 {
+                            width: 12rem;
                         }
                     }
                 }

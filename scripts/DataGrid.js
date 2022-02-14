@@ -312,21 +312,6 @@ export default class {
 
                             DeleteRow.appendChild(Btn)
 
-                            const opOptions = [
-                                {
-                                    value: 'AND',
-                                    textContent: 'And'
-                                },
-                                {
-                                    value: 'OR',
-                                    textContent: 'Or',
-                                }
-                            ]
-                            if (PanelContent.children.length > 0) {
-                                const PrevOp = PanelContent.lastElementChild.children[1].children[0]
-                                if (PrevOp.value === 'AND') opOptions[0].selected = ''
-                                else if (PrevOp.value === 'OR') opOptions[1].selected = ''
-                            }
                             const Operator = Select({
                                 labelText: 'Operators',
                                 attrs: { class: 'w8' },
@@ -340,10 +325,24 @@ export default class {
                                         if ( row.hasAttribute('data-has-query') ) DataGrid.FilterRetrieveData()
                                     }
                                 },
-                                options: opOptions
+                                options: [
+                                    {
+                                        value: 'AND',
+                                        textContent: 'And'
+                                    },
+                                    {
+                                        value: 'OR',
+                                        textContent: 'Or',
+                                    }
+                                ]
                             })
                             Operator.setAttribute('data-operators', '')
                             Operator.className = 'mr-_5 hidden'
+                            if (PanelContent.children.length > 0) {
+                                const PrevOp = PanelContent.lastElementChild.children[1].children[0]
+                                if (PrevOp.value === 'AND') Operator.children[0].value = 'AND'
+                                else Operator.children[0].value = 'OR'
+                            }
                             
                             const colOptions = []
                             for (const col in this.Columns) {
@@ -518,60 +517,89 @@ export default class {
                     },
                     evts: {
                         input: function() {
-                            // const switches = ColumnsPanel.querySelectorAll('label[data-switch-container]')
-                            // const filter = this.value.trim().toLowerCase()
+                            const rows = SortsPanel.querySelectorAll('row-rui')
+                            const filter = this.value.trim().toLowerCase()
 
-                            // for (const switch_ of switches) {
-                            //     const coltxt = switch_.children[1].textContent.trim().toLowerCase()
+                            for (const row of rows) {
+                                const coltxt = row.children[1].textContent.trim().toLowerCase()
 
-                            //     if (coltxt.indexOf(filter) > -1) switch_.classList.remove('hide')
-                            //     else switch_.classList.add('hide')
-                            // }
+                                if (coltxt.indexOf(filter) > -1) row.classList.remove('hide')
+                                else row.classList.add('hide')
+                            }
                         }
                     }
                 }) )
 
                 const PanelContent = document.createElement('panel-content-rui')
-                
-                const orderOptions = []
-                const colOptions = []
 
+                const orderOptions = []
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     orderOptions.push({
                         value: i + 1,
-                        textContent: i + 1
+                        textContent: i + 1,
+                        disabled: ''
                     })
                 }
-                for (const col in this.Columns) {
-                    colOptions.push({
-                        value: this.Columns[col].dbName,
-                        textContent: col
-                    })
-                }
-                for (const col in this.Columns) {
+                
+                for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const Row = document.createElement('row-rui')
 
                         const Order =  Select({
                             labelText: 'Order',
-                            attrs: { class: 'w7' },
+                            attrs: {
+                                class: 'w7',
+                                disabled: ''
+                            },
                             options: orderOptions
                         })
                         Order.classList.add('mr-_5')
 
-                        const Column =  Select({
-                            labelText: 'Column',
-                            attrs: { class: 'w14' },
-                            options: colOptions
-                        })
-                        Column.classList.add('mr-_5')
+                        const Column =  document.createElement('span')
+                        Column.textContent = Object.keys(this.Columns)[i]
+                        Column.title = Object.keys(this.Columns)[i]
+                        Column.setAttribute('data-column', '')
+                        Column.className = 'mr-_5'
 
                         const Direction = Select({
                             labelText: 'Direction',
-                            attrs: { class: 'w10' },
+                            attrs: { class: 'w12' },
+                            evts: {
+                                change: function() {
+                                    const row = this.parentElement.parentElement
+                                    const order = row.children[0].children[0]
+
+                                    if (this.value === 'asc' || this.value === 'desc') {
+                                        row.setAttribute('data-has-sort', '')
+                                        order.disabled = false
+
+                                        SortsBtn.value = +SortsBtn.value + 1
+                                        if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
+                                        else Indicator.classList.add('hide')
+
+                                        for (let x = 0; x < +SortsBtn.value; x++) {
+                                            order.children[x].disabled = false
+                                        }
+                                        order.value = SortsBtn.value
+                                    }
+                                    else {
+                                        row.removeAttribute('data-has-sort')
+                                        order.disabled = true
+                                        order.value = null
+
+                                        for (let x = 0; x < +SortsBtn.value; x++) {
+                                            order.children[x].disabled = true
+                                        }
+
+                                        SortsBtn.value = +SortsBtn.value - 1
+                                        if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
+                                        else Indicator.classList.add('hide')
+                                    }
+                                }
+                            },
                             options: [
                                 {
-                                    value: 'unset',
-                                    textContent: 'Unset'
+                                    value: 'unsorted',
+                                    textContent: 'Unsorted'
                                 },
                                 {
                                     value: 'asc',
@@ -597,7 +625,7 @@ export default class {
                     const ResetBtn = document.createElement('button')
                     ResetBtn.type = 'button'
                     ResetBtn.className = 'panel-btn'
-                    ResetBtn.textContent = 'RESET'
+                    ResetBtn.textContent = 'RESET ALL'
                     ResetBtn.addEventListener('click', function() {
                         // 
                     })
