@@ -389,7 +389,7 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-ru
   margin-right: .5rem;
 }
 
-toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui .w7 {
+toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-content-rui row-rui [data-order] {
   width: 7rem;
 }
 

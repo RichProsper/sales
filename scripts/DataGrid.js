@@ -547,8 +547,13 @@ export default class {
                         const Order =  Select({
                             labelText: 'Order',
                             attrs: {
-                                class: 'w7',
+                                'data-order': '',
                                 disabled: ''
+                            },
+                            evts: {
+                                change: function() {
+                                    // TODO this
+                                }
                             },
                             options: orderOptions
                         })
@@ -576,23 +581,37 @@ export default class {
                                         if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
                                         else Indicator.classList.add('hide')
 
-                                        for (let x = 0; x < +SortsBtn.value; x++) {
-                                            order.children[x].disabled = false
+                                        const _orders = SortsPanel.querySelectorAll('[data-has-sort] [data-order]')
+
+                                        for (const _order of _orders) {
+                                            for (let j = 0; j < +SortsBtn.value; j++) {
+                                                _order.children[j].disabled = false
+                                            }
                                         }
+
                                         order.value = SortsBtn.value
                                     }
                                     else {
                                         row.removeAttribute('data-has-sort')
                                         order.disabled = true
+                                        let orderValue = +order.value
                                         order.value = null
 
-                                        for (let x = 0; x < +SortsBtn.value; x++) {
-                                            order.children[x].disabled = true
+                                        for (let j = 0; j < +SortsBtn.value; j++) {
+                                            order.children[j].disabled = true
                                         }
 
                                         SortsBtn.value = +SortsBtn.value - 1
                                         if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
                                         else Indicator.classList.add('hide')
+
+                                        const _orders = SortsPanel.querySelectorAll('[data-has-sort] [data-order]')
+
+                                        for (const _order of _orders) {
+                                            if (+_order.value > orderValue) _order.value = +_order.value - 1
+
+                                            _order.children[+SortsBtn.value].disabled = true
+                                        }
                                     }
                                 }
                             },
