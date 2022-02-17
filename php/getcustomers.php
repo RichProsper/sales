@@ -3,12 +3,10 @@
     $conn = db::getDbConnection();
 
     if ($_SERVER["REQUEST_METHOD"] === "GET") {
-        $sql = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT 25";
-        $customers = $conn->query($sql);
+        $customers = $conn->query("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT 25");
         $customers = $customers->fetchAll(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT COUNT(cId) FROM customers";
-        $numRows = $conn->query($sql);
+        $numRows = $conn->query("SELECT COUNT(cId) FROM customers");
         $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
         
         $customer = new stdClass;
@@ -55,17 +53,14 @@
             }
 
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers WHERE " . $sql . " LIMIT :offset, :limit");
-            $sqlCount = $conn->prepare("SELECT COUNT(cId) FROM customers WHERE " . $sql);
-
             $stmt->bindParam(':limit', $rules->limit, PDO::PARAM_INT);
             $stmt->bindParam(':offset', $rules->offset, PDO::PARAM_INT);
             $stmt->execute();
             $stmt->setFetchMode(PDO::FETCH_ASSOC);
             $rows = $stmt->fetchAll();
 
-            $sqlCount->execute();
-            $sqlCount->setFetchMode(PDO::FETCH_ASSOC);
-            $numRows = $sqlCount->fetchAll();
+            $numRows = $conn->query("SELECT COUNT(cId) FROM customers WHERE " . $sql);
+            $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
         }
         else {
             $stmt = $conn->prepare("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT :offset, :limit");
@@ -83,7 +78,6 @@
         $customer = new stdClass;
         $customer->rows = $rows;
         $customer->numRows = (int)$numRows[0]["COUNT(cId)"];
-        // $customer->numRows = 66;
         echo json_encode($customer);
     }
 

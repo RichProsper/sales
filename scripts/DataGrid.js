@@ -28,7 +28,7 @@ export default class {
         this.init()
     }
 
-    init = () => {
+    init() {
         this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
         this.RPPDV = 25 //RowsPerPageDefaultValue
         this.Operations = [
@@ -92,7 +92,7 @@ export default class {
         this.SetupNextPrevBtns()
     }
 
-    CreateToolbar = () => {
+    CreateToolbar() {
         this.Toolbar = document.createElement('toolbar-rui')
 
             const NewBtn = document.createElement('button')
@@ -114,7 +114,7 @@ export default class {
         this.DataGrid.appendChild(this.Toolbar)
     }
 
-    CreateColumnsPanelContainer = () => {
+    CreateColumnsPanelContainer() {
         const ColumnsPanelContainer = document.createElement('toolbar-panel-container-rui')
 
             const ColumnsBtn = document.createElement('button')
@@ -241,7 +241,7 @@ export default class {
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
     
-    CreateFiltersPanelContainer = () => {
+    CreateFiltersPanelContainer() {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
             const FiltersBtn = document.createElement('button')
             FiltersBtn.type = 'button'
@@ -295,7 +295,7 @@ export default class {
                                         e.stopPropagation()
 
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-query') ) {
+                                        if ( row.hasAttribute('data-has-filter') ) {
                                             FiltersBtn.value = +FiltersBtn.value - 1
 
                                             if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
@@ -322,7 +322,7 @@ export default class {
 
                                         // When to call FilterRetrieveData
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-query') ) DataGrid.FilterRetrieveData()
+                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterRetrieveData()
                                     }
                                 },
                                 options: [
@@ -357,7 +357,7 @@ export default class {
                                 evts: {
                                     change: function() {
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-query') ) DataGrid.FilterRetrieveData()
+                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterRetrieveData()
                                     }
                                 },
                                 options: colOptions
@@ -373,21 +373,23 @@ export default class {
                                 evts: {
                                     change: function() {
                                         const filterValue = this.parentElement.nextElementSibling.children[0]
+                                        const row = this.parentElement.parentElement
 
                                         if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
                                             filterValue.parentElement.classList.add('invisible')
                                             filterValue.value = null
 
-                                            // Row Element
-                                            this.parentElement.parentElement.setAttribute('data-has-query', '')
-
-                                            FiltersBtn.value = +FiltersBtn.value + 1
+                                            if (!row.hasAttribute('data-has-filter')) {
+                                                row.setAttribute('data-has-filter', '')
+                                                FiltersBtn.value = +FiltersBtn.value + 1
+                                            }
+                                            
                                             DataGrid.FilterRetrieveData()
                                         }
                                         else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
                                         {
                                             filterValue.parentElement.classList.remove('invisible')
-                                            this.parentElement.parentElement.removeAttribute('data-has-query')
+                                            row.removeAttribute('data-has-filter')
 
                                             FiltersBtn.value = +FiltersBtn.value - 1
                                             DataGrid.FilterRetrieveData()
@@ -420,13 +422,13 @@ export default class {
                                     clearTimeout(DataGrid.Timer)
                                     DataGrid.Timer = setTimeout(() => {
                                         if (this.value) {
-                                            if ( !this.parentElement.parentElement.hasAttribute('data-has-query') ) {
-                                                this.parentElement.parentElement.setAttribute('data-has-query', '')
+                                            if ( !this.parentElement.parentElement.hasAttribute('data-has-filter') ) {
+                                                this.parentElement.parentElement.setAttribute('data-has-filter', '')
                                                 FiltersBtn.value = +FiltersBtn.value + 1
                                             }
                                         }
                                         else {
-                                            this.parentElement.parentElement.removeAttribute('data-has-query')
+                                            this.parentElement.parentElement.removeAttribute('data-has-filter')
                                             FiltersBtn.value = +FiltersBtn.value - 1
                                         }
 
@@ -494,8 +496,7 @@ export default class {
         this.Toolbar.appendChild(FiltersPanelContainer)
     } // CreateFiltersPanelContainer()
 
-    // TODO
-    CreateSortsPanelContainer = () => {
+    CreateSortsPanelContainer() {
         const SortsPanelContainer = document.createElement('toolbar-panel-container-rui')
             const SortsBtn = document.createElement('button')
             SortsBtn.type = 'button'
@@ -532,6 +533,21 @@ export default class {
 
                 const PanelContent = document.createElement('panel-content-rui')
 
+                /**
+                 * @param {HTMLElement} row The row
+                 * @param {HTMLSelectElement} order The select element that controls the order
+                 */
+                const unsort = (row, order) => {
+                    row.removeAttribute('data-has-sort')
+                    order.disabled = true
+                    order.value = null
+                    order.removeAttribute('data-value')
+
+                    for (let j = 0; j < +SortsBtn.value; j++) {
+                        order.children[j].disabled = true
+                    }
+                }
+
                 const orderOptions = []
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     orderOptions.push({
@@ -541,6 +557,7 @@ export default class {
                     })
                 }
                 
+                const DataGrid = this
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const Row = document.createElement('row-rui')
 
@@ -552,7 +569,12 @@ export default class {
                             },
                             evts: {
                                 change: function() {
-                                    // TODO this
+                                    const order = SortsPanel.querySelector(`[data-value="${this.value}"]`)
+                                    order.value = this.getAttribute('data-value')
+                                    order.setAttribute('data-value', this.getAttribute('data-value'))
+
+                                    this.setAttribute('data-value', this.value)
+                                    DataGrid.RetrieveData()
                                 }
                             },
                             options: orderOptions
@@ -567,13 +589,18 @@ export default class {
 
                         const Direction = Select({
                             labelText: 'Direction',
-                            attrs: { class: 'w12' },
+                            attrs: {
+                                'data-direction': '',
+                                class: 'w12'
+                            },
                             evts: {
                                 change: function() {
                                     const row = this.parentElement.parentElement
                                     const order = row.children[0].children[0]
 
-                                    if (this.value === 'asc' || this.value === 'desc') {
+                                    if (this.value === 'ASC' || this.value === 'DESC') {
+                                        if ( row.hasAttribute('data-has-sort') ) return
+
                                         row.setAttribute('data-has-sort', '')
                                         order.disabled = false
 
@@ -590,16 +617,11 @@ export default class {
                                         }
 
                                         order.value = SortsBtn.value
+                                        order.setAttribute('data-value', SortsBtn.value)
                                     }
                                     else {
-                                        row.removeAttribute('data-has-sort')
-                                        order.disabled = true
-                                        let orderValue = +order.value
-                                        order.value = null
-
-                                        for (let j = 0; j < +SortsBtn.value; j++) {
-                                            order.children[j].disabled = true
-                                        }
+                                        const orderValue = +order.value
+                                        unsort(row, order)
 
                                         SortsBtn.value = +SortsBtn.value - 1
                                         if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
@@ -608,11 +630,16 @@ export default class {
                                         const _orders = SortsPanel.querySelectorAll('[data-has-sort] [data-order]')
 
                                         for (const _order of _orders) {
-                                            if (+_order.value > orderValue) _order.value = +_order.value - 1
+                                            if (+_order.value > orderValue) {
+                                                _order.value = +_order.value - 1
+                                                _order.setAttribute('data-value', _order.value)
+                                            }
 
                                             _order.children[+SortsBtn.value].disabled = true
                                         }
                                     }
+
+                                    DataGrid.RetrieveData()
                                 }
                             },
                             options: [
@@ -621,11 +648,11 @@ export default class {
                                     textContent: 'Unsorted'
                                 },
                                 {
-                                    value: 'asc',
+                                    value: 'ASC',
                                     textContent: 'Ascending'
                                 },
                                 {
-                                    value: 'desc',
+                                    value: 'DESC',
                                     textContent: 'Descending'
                                 }
                             ]
@@ -646,7 +673,21 @@ export default class {
                     ResetBtn.className = 'panel-btn'
                     ResetBtn.textContent = 'RESET ALL'
                     ResetBtn.addEventListener('click', function() {
-                        // 
+                        const rows = SortsPanel.querySelectorAll('[data-has-sort]')
+                        if (rows.length === 0) return
+
+                        for (const row of rows) {
+                            const order = row.children[0].children[0]
+                            const direction = row.children[2].children[0]
+
+                            direction.value = 'unsorted'
+                            unsort(row, order)
+                        }
+
+                        SortsBtn.value = 0
+                        Indicator.classList.add('hide')
+
+                        DataGrid.RetrieveData()
                     })
 
                 PanelFooter.appendChild(ResetBtn)
@@ -686,14 +727,14 @@ export default class {
         this.Toolbar.appendChild(SortsPanelContainer)
     }
 
-    CreateMain = () => {
+    CreateMain() {
         this.Main = document.createElement('main-rui')
         this.CreateHeadingsContainer()
         this.CreateRowsContainer()
         this.DataGrid.appendChild(this.Main)
     }
 
-    CreateHeadingsContainer = () => {
+    CreateHeadingsContainer() {
         this.HeadingsContainer = document.createElement('headings-container-rui')
             const Headings = document.createElement('headings-rui')
 
@@ -729,7 +770,7 @@ export default class {
         this.Main.appendChild(this.HeadingsContainer)
     }
 
-    CreateRowsContainer = () => {
+    CreateRowsContainer() {
         this.RowsContainer = document.createElement('rows-container-rui')
         this.CreateRows()
         this.Main.appendChild(this.RowsContainer)
@@ -737,7 +778,7 @@ export default class {
         this.RowsContainer.addEventListener('scroll', this.ScrollHeadings)
     }
 
-    CreateRows = () => {
+    CreateRows() {
         this.RowsContainer.innerHTML = null
 
         for (let i = 0; i < this.Rows.length; i++) {
@@ -766,7 +807,7 @@ export default class {
         }
     }
 
-    CreateFooter = () => {
+    CreateFooter() {
         this.Footer = document.createElement('footer-rui')
         
             const NumSelectedRows = document.createElement('num-selected-rows-rui')
@@ -777,7 +818,7 @@ export default class {
         this.DataGrid.appendChild(this.Footer)
     }
 
-    CreatePagination = () => {
+    CreatePagination() {
         this.Pagination = document.createElement('pagination-rui')
 
             const p = document.createElement('p')
@@ -862,11 +903,11 @@ export default class {
         this.Footer.appendChild(this.Pagination)
     } // CreatePagination()
 
-    ScrollHeadings = () => {
+    ScrollHeadings() {
         this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
     }
 
-    SizeColumns = () => {
+    SizeColumns() {
         const HCols = this.HeadingsContainer.querySelectorAll('hcol-rui')
         const Rows = this.RowsContainer.querySelectorAll('row-rui')
 
@@ -878,7 +919,7 @@ export default class {
         }
     }
 
-    HideColumns = () => {
+    HideColumns() {
         const HCols = this.HeadingsContainer.querySelectorAll('hcol-rui.hide')
 
         for (const hcol of HCols) {
@@ -888,7 +929,7 @@ export default class {
         }
     }
 
-    SetupAllCheckbox = () => {
+    SetupAllCheckbox() {
         const allCheckbox = this.DataGrid.querySelector('[data-checkbox-group-all]')
         const Datagrid = this
 
@@ -908,7 +949,7 @@ export default class {
         })
     }
 
-    SetupCheckboxes = () => {
+    SetupCheckboxes() {
         const allCheckbox = this.DataGrid.querySelector('[data-checkbox-group-all]')
         const Icon = allCheckbox.nextElementSibling
         const checkboxes = this.DataGrid.querySelectorAll('[data-checkbox-group-single]')
@@ -948,7 +989,7 @@ export default class {
         }
     }
 
-    SetupResizingColumns = () => {
+    SetupResizingColumns() {
         const Headings = this.DataGrid.querySelector('headings-rui')
         const Resizables = Headings.querySelectorAll('resizable-rui')
 
@@ -1011,7 +1052,7 @@ export default class {
         }
     }
 
-    SetupNextPrevBtns = () => {
+    SetupNextPrevBtns() {
         const RowsPerPage = this.Pagination.querySelector('[data-rows-per-page-value]')
         const OffsetMin = this.Pagination.querySelector('offset-min-rui')
         const OffsetMax = this.Pagination.querySelector('offset-max-rui')
@@ -1073,7 +1114,7 @@ export default class {
         })
     } // SetupNextPrevBtns()
 
-    ResetRowsSelected = () => {
+    ResetRowsSelected() {
         const allCheckbox = this.DataGrid.querySelector('[data-checkbox-group-all]')
         if (+allCheckbox.getAttribute('data-checkbox-selected-count') > 0) allCheckbox.click()
     }
@@ -1084,7 +1125,7 @@ export default class {
      * @param {HTMLElement} parent Parent element
      * @returns {-1|0|1} -1 Means not a descendant. 0 Means the same as parent. 1 Means is a descendant
      */
-    ElemIsDescendantOf = (elem, parent) => {
+    ElemIsDescendantOf(elem, parent) {
         if (elem === parent) return 0
         for (let curElem = elem.parentElement; curElem !== null; curElem = curElem.parentElement) {
             if (curElem === parent) return 1
@@ -1092,19 +1133,19 @@ export default class {
         return -1
     }
     
-    GetFilters = () => {
-        const Rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-query]')
+    GetFilters() {
+        const rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.filters row-rui[data-has-filter]')
         const filters = []
 
-        for (let i = 0; i < Rows.length; i++) {
+        for (let i = 0; i < rows.length; i++) {
             const filter = {
                 operator: false,
-                column: Rows[i].children[2].children[0].value,
-                operation: Rows[i].children[3].children[0].value,
-                filterValue: Rows[i].children[4].children[0].value
+                column: rows[i].children[2].children[0].value,
+                operation: rows[i].children[3].children[0].value,
+                filterValue: rows[i].children[4].children[0].value
             }
 
-            if (i > 0) filter.operator = Rows[i].children[1].children[0].value
+            if (i > 0) filter.operator = rows[i].children[1].children[0].value
 
             filters.push(filter)
         }
@@ -1112,8 +1153,26 @@ export default class {
         return filters
     }
 
-    RetrieveData = () => {
+    // TODO
+    GetSorts() {
+        const rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.sorts row-rui[data-has-sort]')
+        const sorts = []
+
+        for (const row of rows) {
+            sorts.push({
+                order: row.children[0].children[0].value,
+                column: row.children[1].title,
+                direction: row.children[2].children[0].value
+            })
+        }
+        
+        sorts.sort((a, b) => +a.order - +b.order)
+        return sorts
+    }
+
+    RetrieveData() {
         const data = {
+            sorts: this.GetSorts(),
             filters: this.GetFilters(),
             limit: +this.Pagination.querySelector('[data-rows-per-page-value]').value,
             offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
@@ -1157,7 +1216,7 @@ export default class {
         .catch(e => console.error(e))
     }
 
-    FilterRetrieveData = () => {
+    FilterRetrieveData() {
         this.Pagination.querySelector('offset-min-rui').textContent = 1
         this.Pagination.querySelector('offset-max-rui').textContent = this.Pagination.querySelector('[data-rows-per-page-value]').value
         this.PrevPageBtn.disabled = true
