@@ -775,7 +775,9 @@ export default class {
         this.CreateRows()
         this.Main.appendChild(this.RowsContainer)
 
-        this.RowsContainer.addEventListener('scroll', this.ScrollHeadings)
+        this.RowsContainer.addEventListener('scroll', () => {
+            this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
+        })
     }
 
     CreateRows() {
@@ -902,10 +904,6 @@ export default class {
         this.Pagination.appendChild( PaginationActions() )
         this.Footer.appendChild(this.Pagination)
     } // CreatePagination()
-
-    ScrollHeadings() {
-        this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
-    }
 
     SizeColumns() {
         const HCols = this.HeadingsContainer.querySelectorAll('hcol-rui')

@@ -35,4 +35,20 @@ class db {
 
         return $filters;
     }
+
+    public static function sanitizeLimit($limit = 0, $default = 5) {
+        if ( is_int($limit) ) {
+            if ($limit >= $default) return $limit;
+        }
+
+        return $default;
+    }
+
+    public static function sanitizeOffset($offset = 0, $default = 0) {
+        if ( is_int($offset) ) {
+            if ($offset >= $default) return $offset;
+        }
+
+        return $default;
+    }
 } // class db
