@@ -13,45 +13,61 @@
         $limit = db::sanitizeLimit($rules->limit);
         $offset = db::sanitizeOffset($rules->offset);
 
+        $stmt = "";
+        $sql = "";
+
         if (count($rules->filters) > 0) {
             $filtersArr = db::sanitizeFilters($rules->filters);
-            $sql = "";
+            $filterSTMT = "";
 
             foreach ($filtersArr as $i => $obj) {
                 if ($obj->operator) {
-                    $sql .= $obj->operator . " ";
+                    $filterSTMT .= $obj->operator . " ";
                 }
 
-                $sql .= "(" . $obj->column . " ";
+                $filterSTMT .= "(" . $obj->column . " ";
                 
                 if ($obj->operation === "contain") {
-                    $sql .= "LIKE '%" . $obj->filterValue . "%'";
+                    $filterSTMT .= "LIKE '%" . $obj->filterValue . "%'";
                 }
                 elseif ($obj->operation === "startWith") {
-                    $sql .= "LIKE '" . $obj->filterValue . "%'";
+                    $filterSTMT .= "LIKE '" . $obj->filterValue . "%'";
                 }
                 elseif ($obj->operation === "endWith") {
-                    $sql .= "LIKE '%" . $obj->filterValue . "'";
+                    $filterSTMT .= "LIKE '%" . $obj->filterValue . "'";
                 }
                 elseif ($obj->operation === "isEmpty") {
-                    $sql .= "IS NULL OR " . $obj->column . " = ''";
+                    $filterSTMT .= "IS NULL OR " . $obj->column . " = ''";
                 }
                 elseif ($obj->operation === "isNotEmpty") {
-                    $sql .= "IS NOT NULL AND " . $obj->column . " != ''";
+                    $filterSTMT .= "IS NOT NULL AND " . $obj->column . " != ''";
                 }
                 else {
-                    $sql .= $obj->operation . " '" . $obj->filterValue . "'";
+                    $filterSTMT .= $obj->operation . " '" . $obj->filterValue . "'";
                 }
 
-                $sql .= ") ";
+                $filterSTMT .= ") ";
             }
 
-            $FinalSTMT .= " WHERE " . $sql . " LIMIT " . $offset . ", " . $limit;
-            $FinalSQL .= " WHERE " . $sql;
+            $stmt .= " WHERE " . $filterSTMT;
+            $sql .= " WHERE " . $filterSTMT;
         }
-        else {
-            $FinalSTMT .= " LIMIT " . $offset . ", " . $limit;
+
+        if (count($rules->sorts) > 0) {
+            $sortsArr = db::sanitizeSorts($rules->sorts);
+            $sortsSTMT = "";
+
+            for ($i = 0; $i < count($sortsArr); $i++) {
+                $sortsSTMT .= $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
+
+                if ($i < (count($sortsArr) - 1) ) $sortsSTMT .= ", ";
+            }
+
+            $stmt .= " ORDER BY " . $sortsSTMT;
         }
+        
+        $FinalSTMT .= $stmt . " LIMIT " . $offset . ", " . $limit;
+        $FinalSQL .= $sql;
     }
 
     $customerRows = $conn->query($FinalSTMT);

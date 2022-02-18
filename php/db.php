@@ -51,4 +51,16 @@ class db {
 
         return $default;
     }
+
+    public static function sanitizeSorts($sorts = array()) {
+        for ($i = 0; $i < count($sorts); $i++) {
+            // Column
+            $sorts[$i]->column = preg_replace('/[^A-Za-z0-9_]/', '', $sorts[$i]->column);
+
+            // Direction
+            if ($sorts[$i]->direction !== "ASC" && $sorts[$i]->direction !== "DESC") $sorts[$i]->direction = "ASC";
+        }
+
+        return $sorts;
+    }
 } // class db

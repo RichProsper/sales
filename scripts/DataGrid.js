@@ -6,7 +6,7 @@ import Select from '../vendors/rui/rui-select.min.js'
 /**
  * Grid Data
  * @typedef {Object} GridData
- * @property {String[]} columns The columns
+ * @property {Object} columns The columns
  * @property {Object[]} rows The rows
  * @property {Number} numRows The number of rows
  * @property {String} checkboxId The checkbox ID
@@ -584,7 +584,7 @@ export default class {
                         const Column =  document.createElement('span')
                         Column.textContent = Object.keys(this.Columns)[i]
                         Column.title = Object.keys(this.Columns)[i]
-                        Column.setAttribute('data-column', '')
+                        Column.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
                         Column.className = 'mr-_5'
 
                         const Direction = Select({
@@ -599,14 +599,14 @@ export default class {
                                     const order = row.children[0].children[0]
 
                                     if (this.value === 'ASC' || this.value === 'DESC') {
-                                        if ( row.hasAttribute('data-has-sort') ) return
+                                        if ( !row.hasAttribute('data-has-sort') ) {
+                                            SortsBtn.value = +SortsBtn.value + 1
+                                            if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
+                                            else Indicator.classList.add('hide')
+                                        }
 
                                         row.setAttribute('data-has-sort', '')
                                         order.disabled = false
-
-                                        SortsBtn.value = +SortsBtn.value + 1
-                                        if (+SortsBtn.value > 0) Indicator.classList.remove('hide')
-                                        else Indicator.classList.add('hide')
 
                                         const _orders = SortsPanel.querySelectorAll('[data-has-sort] [data-order]')
 
@@ -725,7 +725,7 @@ export default class {
         SortsPanelContainer.appendChild(SortsPanel)
 
         this.Toolbar.appendChild(SortsPanelContainer)
-    }
+    } // CreateSortsPanelContainer()
 
     CreateMain() {
         this.Main = document.createElement('main-rui')
@@ -1159,7 +1159,7 @@ export default class {
         for (const row of rows) {
             sorts.push({
                 order: row.children[0].children[0].value,
-                column: row.children[1].title,
+                column: row.children[1].getAttribute('data-column'),
                 direction: row.children[2].children[0].value
             })
         }
