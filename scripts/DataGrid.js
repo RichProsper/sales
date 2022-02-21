@@ -15,15 +15,16 @@ import Select from '../vendors/rui/rui-select.min.js'
 
 export default class {
     /**
-     * @param {String} gridId The Grid Id
+     * @param {String} gridId The grid ID
+     * @param {String} formModalId The form modal ID
      * @param {GridData} data The data to fill the grid
      */
-    constructor(gridId, data) {
+    constructor(gridId, formModalId, data) {
         this.DataGridContainer = document.querySelector(`[data-grid-id="${gridId}"]`)
+        this.FormModalContainer = document.querySelector(`[data-form-modal-id="${formModalId}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
-        this.CheckboxId = data.checkboxId
         this.PhpPath = data.phpPath
         this.init()
     }
@@ -347,7 +348,7 @@ export default class {
                             const colOptions = []
                             for (const col in this.Columns) {
                                 colOptions.push({
-                                    value: this.Columns[col].dbName,
+                                    value: this.Columns[col],
                                     textContent: col
                                 })
                             }
@@ -584,7 +585,7 @@ export default class {
                         const Column =  document.createElement('span')
                         Column.textContent = Object.keys(this.Columns)[i]
                         Column.title = Object.keys(this.Columns)[i]
-                        Column.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
+                        Column.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ])
                         Column.className = 'mr-_5'
 
                         const Direction = Select({
@@ -1151,7 +1152,6 @@ export default class {
         return filters
     }
 
-    // TODO
     GetSorts() {
         const rows = this.Toolbar.querySelectorAll('toolbar-panel-rui.sorts row-rui[data-has-sort]')
         const sorts = []
