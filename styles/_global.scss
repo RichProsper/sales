@@ -3,21 +3,24 @@
 :root {
     --NavHeight     : 5rem;
     // White: hsl(0, 0%, 100%)
-    --col-1st   : 0, 0%;
-    --col-1st-1 : hsl(var(--col-1st), 87%);
-    --col-1st-2 : hsl(var(--col-1st), 53%);
-    --col-1st-3 : hsl(var(--col-1st), 33%);
-    --col-1st-4 : hsl(var(--col-1st), 5%);
-    --col-1st-5 : hsl(var(--col-1st), 100%);
+    --hs-1 : 0, 0%;
+    --white-1 : hsl(var(--hs-1), 87%);
+    --white-2 : hsl(var(--hs-1), 53%);
+    --white-3 : hsl(var(--hs-1), 33%);
+    --white-4 : hsl(var(--hs-1), 5%);
+    --white-5 : hsl(var(--hs-1), 100%);
+    --white-6 : hsla(var(--hs-1), 10%, .75);
+    --white-7 : hsl(var(--hs-1), 10%);
+    --white-8 : hsla(var(--hs-1), 0%, .75);
     // Dark Blue Grey: hsl(220, 13%, 18%)
-    --col-2nd   : 220;
-    --col-2nd-1 : hsl(var(--col-2nd), 13%, 12%);
+    --hue-1      : 220;
+    --darkblue-1 : hsl(var(--hue-1), 13%, 12%);
     // Green: hsl(93, 98%, 35%)
-    --col-3rd   : 93;
-    --col-3rd-1 : hsl(var(--col-3rd), 98%, 30%);
+    --hue-2   : 93;
+    --green-1 : hsl(var(--hue-2), 98%, 30%);
 }
 html {
-    background-color: var(--col-2nd-1);
+    background-color: var(--darkblue-1);
     height: 100%;
     scroll-behavior: smooth;
     font-size: 46.875%; /* 1rem = 7.5px */
@@ -35,7 +38,7 @@ html {
 body {
     height: 100%;
     box-sizing: border-box;
-    color: var(--col-1st-1);
+    color: var(--white-1);
     font-size: 1.6rem;
     font-family: 'Poppins', sans-serif;
     letter-spacing: .1rem;
@@ -57,15 +60,15 @@ body {
     height: 15px;
 
     &-track, &-corner {
-        background: var(--col-1st-4);
+        background: var(--white-4);
     }
     &-thumb {
-        background: var(--col-1st-2);
+        background: var(--white-2);
         border-radius: 9px;
-        border: 3px solid var(--col-1st-4);
+        border: 3px solid var(--white-4);
 
         &:hover {
-            background: var(--col-1st-3); 
+            background: var(--white-3); 
         }
     }
 }

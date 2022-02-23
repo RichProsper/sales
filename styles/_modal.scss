@@ -1,0 +1,71 @@
+.modal {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--white-6);
+    padding: 10%;
+
+    &.closed {
+        display: none;
+    }
+    .content {
+        background-color: var(--white-7);
+        border-radius: 1.5rem;
+        box-shadow: 0 .2rem .8rem var(--white-8),
+                    0 -.2rem .8rem var(--white-8);
+        border: .2rem solid var(--green-1);
+
+        .header {
+            position: relative;
+            height: 4rem;
+            border-bottom: .2rem solid var(--white-3);
+
+            h3 {
+                font-size: 2rem;
+                line-height: 4rem;
+                padding: 0 1rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .close {
+                position: absolute;
+                top: -1.5rem;
+                right: -1.5rem;
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                background-color: var(--white-7);
+                border: .2rem solid;
+                border-color: var(--green-1) var(--green-1) var(--green-1) transparent;
+                transform: rotate(-45deg);
+                cursor: pointer;
+                color: inherit;
+                font-weight: 300;
+                font-size: 3rem;
+                line-height: 0;
+                transition: .2s;
+
+                & span {
+                    display: block;
+                    transform: rotate(45deg);
+                }
+                &:hover,
+                &:focus {
+                    color: var(--green-1);
+                }
+            }
+        }
+        .body {
+            padding: 1rem;
+            padding-top: 2rem;
+        }
+    }
+
+    @media only screen and (min-width: 600px) and (min-height: 600px) {
+        padding: 15% 20%;
+    }
+}

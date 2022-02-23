@@ -21,7 +21,7 @@ export default class {
      */
     constructor(gridId, formModalId, data) {
         this.DataGridContainer = document.querySelector(`[data-grid-id="${gridId}"]`)
-        this.FormModalContainer = document.querySelector(`[data-form-modal-id="${formModalId}"]`)
+        this.FormModal = document.querySelector(`[data-form-modal-id="${formModalId}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
@@ -100,6 +100,17 @@ export default class {
             NewBtn.type = 'button'
             NewBtn.className = 'toolbar-btn new'
             NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
+
+            const DataGrid = this
+            ;(() => {
+                NewBtn.addEventListener('click', () => DataGrid.FormModal.classList.remove('closed'))
+
+                DataGrid.FormModal.addEventListener('click', function(e) {
+                    if (e.target === this) this.classList.add('closed')
+                })
+        
+                DataGrid.FormModal.querySelector('button.close').addEventListener('click', () => DataGrid.FormModal.classList.add('closed'))
+            })()
 
             const DelBtn = document.createElement('button')
             DelBtn.type = 'button'
