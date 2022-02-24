@@ -66,7 +66,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 //         dbName: 'email',
 //         formElement: {
 //             name: 'input',
-//             type: 'text',
+//             type: 'email',
 //             pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
 //         }
 //     },

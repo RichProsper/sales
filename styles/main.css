@@ -243,8 +243,20 @@ header.header .links li a:hover, header.header .links li a:focus {
 }
 
 .modal .content .body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   padding: 1rem;
-  padding-top: 2rem;
+  padding-top: 0;
+}
+
+.modal .content .body div {
+  margin-top: 2.8rem;
 }
 
 @media only screen and (min-width: 600px) and (min-height: 600px) {
