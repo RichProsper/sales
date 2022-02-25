@@ -4,6 +4,7 @@
 @import url(../vendors/rui/rui-switch.min.css);
 @import url(../vendors/rui/rui-input.min.css);
 @import url(../vendors/rui/rui-select.min.css);
+@import url(../vendors/rui/rui-textarea.min.css);
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 :root {
   --NavHeight: 5rem;
@@ -243,19 +244,16 @@ header.header .links li a:hover, header.header .links li a:focus {
 }
 
 .modal .content .body {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  padding: 1rem;
+  padding: 2rem;
   padding-top: 0;
 }
 
-.modal .content .body div {
+.modal .content .body form {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal .content .body form div {
   margin-top: 2.8rem;
 }
 

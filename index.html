@@ -47,55 +47,83 @@
                 </div>
 
                 <div class="body">
-                    <!-- Title Select -->
-                    <div data-select-container>
-                        <select>
-                            <option value="Dr.">Dr.</option>
-                            <option value="Miss">Miss</option>
-                            <option value="Mr.">Mr.</option>
-                            <option value="Mrs.">Mrs.</option>
-                            <option value="Ms.">Ms.</option>
-                            <option value="Prof.">Prof.</option>
-                            <option value="Rev.">Rev.</option>
-                        </select>
-                        <span>Titles</span>
-                    </div>
+                    <form>
+                        <!-- Title Select -->
+                        <div data-select-container>
+                            <select data-focus>
+                                <option value="">Select a title...</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Mr.">Mr.</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Ms.">Ms.</option>
+                                <option value="Prof.">Prof.</option>
+                                <option value="Rev.">Rev.</option>
+                            </select>
+                            <span>Titles</span>
+                        </div>
 
-                    <!-- First Name Input -->
-                    <div data-input-container>
-                        <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="First Name">
-                        <span>First Name</span>
-                    </div>
+                        <!-- First Name Input -->
+                        <div data-input-container>
+                            <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="First Name" data-focus>
+                            <span>First Name</span>
+                        </div>
 
-                    <!-- Last Name Input -->
-                    <div data-input-container>
-                        <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="Last Name">
-                        <span>Last Name</span>
-                    </div>
+                        <!-- Last Name Input -->
+                        <div data-input-container>
+                            <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="Last Name" data-focus>
+                            <span>Last Name</span>
+                        </div>
 
-                    <!-- Email Input -->
-                    <div data-input-container>
-                        <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="Email">
-                        <span>Email</span>
-                    </div>
+                        <!-- Email Input -->
+                        <div data-input-container>
+                            <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="Email" data-focus>
+                            <span>Email</span>
+                        </div>
 
-                    <!-- Parish Select -->
-                    <div data-select-container>
-                        <select>
-                            <option value="Christ Church">Christ Church</option>
-                            <option value="St. Andrew">St. Andrew</option>
-                            <option value="St. George">St. George</option>
-                            <option value="St. James">St. James</option>
-                            <option value="St. John">St. John</option>
-                            <option value="St. Joseph">St. Joseph</option>
-                            <option value="St. Lucy">St. Lucy</option>
-                            <option value="St. Michael">St. Michael</option>
-                            <option value="St. Peter">St. Peter</option>
-                            <option value="St. Philip">St. Philip</option>
-                            <option value="St. Thomas">St. Thomas</option>
-                        </select>
-                        <span>Parishes</span>
-                    </div>
+                        <!-- Parish Select -->
+                        <div data-select-container>
+                            <select data-focus>
+                                <option value="">Select a Parish...</option>
+                                <option value="Christ Church">Christ Church</option>
+                                <option value="St. Andrew">St. Andrew</option>
+                                <option value="St. George">St. George</option>
+                                <option value="St. James">St. James</option>
+                                <option value="St. John">St. John</option>
+                                <option value="St. Joseph">St. Joseph</option>
+                                <option value="St. Lucy">St. Lucy</option>
+                                <option value="St. Michael">St. Michael</option>
+                                <option value="St. Peter">St. Peter</option>
+                                <option value="St. Philip">St. Philip</option>
+                                <option value="St. Thomas">St. Thomas</option>
+                            </select>
+                            <span>Parishes</span>
+                        </div>
+
+                        <!-- Address Textarea -->
+                        <div data-textarea-container>
+                            <textarea rows="2" cols="30" placeholder="Address..." data-focus></textarea>
+                            <span>Address...</span>
+                        </div>
+
+                        <!-- Home Number Input -->
+                        <div data-input-container>
+                            <input type="text" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" placeholder="Home Number" data-focus>
+                            <span>Home Number</span>
+                        </div>
+
+                        <!-- Cell Number Input -->
+                        <div data-input-container>
+                            <input type="text" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" placeholder="Cell Number" data-focus>
+                            <span>Cell Number</span>
+                        </div>
+
+                        <!-- Other Numbers Textarea -->
+                        <div data-textarea-container>
+                            <textarea rows="6" cols="30" placeholder="Other Numbers..." data-focus></textarea>
+                            <span>Other Numbers...</span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -110,6 +110,16 @@ export default class {
                 })
         
                 DataGrid.FormModal.querySelector('button.close').addEventListener('click', () => DataGrid.FormModal.classList.add('closed'))
+
+                const focusables = DataGrid.FormModal.querySelectorAll('[data-focus]')
+                for (const focusable of focusables) {
+                    focusable.addEventListener('focus', function() {
+                        this.parentElement.classList.add('focused')
+                    })
+                    focusable.addEventListener('blur', function() {
+                        this.parentElement.classList.remove('focused')
+                    })
+                }
             })()
 
             const DelBtn = document.createElement('button')

@@ -106,9 +106,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 //     'Other Numbers': {
 //         dbName: 'otherNos',
 //         formElement: {
-//             multiple: true,
-//             name: 'input',
-//             type: 'text',
+//             name: 'textarea',
 //             pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}'
 //         }
 //     }

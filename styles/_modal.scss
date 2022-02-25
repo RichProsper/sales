@@ -60,14 +60,16 @@
             }
         }
         .body {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            padding: 1rem;
+            padding: 2rem;
             padding-top: 0;
 
-            div {
-                margin-top: 2.8rem;
+            form {
+                max-height: 70vh;
+                overflow-y: auto;
+
+                div {
+                    margin-top: 2.8rem;
+                }
             }
         }
     }
