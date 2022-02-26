@@ -36,7 +36,7 @@
         <div data-grid-id="customers"></div>
 
         <!-- Add New Customer Modal -->
-        <div class="modal closed" data-form-modal-id="customers">
+        <div class="modal" data-form-modal-id="customers">
             <div class="content">
                 <div class="header">
                     <h3>Add New Customer</h3>
@@ -102,7 +102,7 @@
 
                         <!-- Address Textarea -->
                         <div data-textarea-container>
-                            <textarea rows="2" cols="30" placeholder="Address..." data-focus></textarea>
+                            <textarea rows="4" placeholder="Address..." data-focus></textarea>
                             <span>Address...</span>
                         </div>
 
@@ -120,8 +120,14 @@
 
                         <!-- Other Numbers Textarea -->
                         <div data-textarea-container>
-                            <textarea rows="6" cols="30" placeholder="Other Numbers..." data-focus></textarea>
+                            <textarea rows="2" placeholder="Other Numbers..." data-focus></textarea>
                             <span>Other Numbers...</span>
+                        </div>
+
+                        <!-- Reset & Submit Buttons -->
+                        <div class="reset-submit">
+                            <button type="reset">RESET</button>
+                            <button type="submit">SUBMIT</button>
                         </div>
                     </form>
                 </div>

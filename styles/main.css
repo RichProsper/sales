@@ -21,6 +21,9 @@
   --darkblue-1: hsl(var(--hue-1), 13%, 12%);
   --hue-2: 93;
   --green-1: hsl(var(--hue-2), 98%, 30%);
+  --green-2: hsl(var(--hue-2), 98%, 35%);
+  --hue-3: 349;
+  --red-1: hsl(var(--hue-3), 84%, 65%);
 }
 
 html {
@@ -175,6 +178,7 @@ header.header .links li a:hover, header.header .links li a:focus {
 }
 
 .modal {
+  display: none;
   z-index: 1;
   position: fixed;
   top: 0;
@@ -182,11 +186,13 @@ header.header .links li a:hover, header.header .links li a:focus {
   width: 100%;
   height: 100vh;
   background-color: var(--white-6);
-  padding: 10%;
+  padding-top: 10vh;
+  padding-left: 10vw;
+  padding-right: 10vw;
 }
 
-.modal.closed {
-  display: none;
+.modal.open {
+  display: block;
 }
 
 .modal .content {
@@ -257,9 +263,50 @@ header.header .links li a:hover, header.header .links li a:focus {
   margin-top: 2.8rem;
 }
 
+.modal .content .body form .reset-submit {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.modal .content .body form .reset-submit button {
+  background: none;
+  border: .1rem solid currentColor;
+  font-size: 1.8rem;
+  font-weight: 600;
+  padding: .9rem 3.6rem;
+  cursor: pointer;
+  border-radius: .4rem;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.modal .content .body form .reset-submit button[type="reset"] {
+  color: var(--red-1);
+}
+
+.modal .content .body form .reset-submit button[type="reset"]:hover, .modal .content .body form .reset-submit button[type="reset"]:focus {
+  color: initial;
+  background-color: var(--red-1);
+}
+
+.modal .content .body form .reset-submit button[type="submit"] {
+  color: var(--green-2);
+}
+
+.modal .content .body form .reset-submit button[type="submit"]:hover, .modal .content .body form .reset-submit button[type="submit"]:focus {
+  color: initial;
+  background-color: var(--green-2);
+}
+
 @media only screen and (min-width: 600px) and (min-height: 600px) {
   .modal {
-    padding: 15% 20%;
+    padding-top: 15vh;
+    padding-left: 20vw;
+    padding-right: 20vw;
   }
 }
 

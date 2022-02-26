@@ -1,4 +1,5 @@
 .modal {
+    display: none;
     z-index: 1;
     position: fixed;
     top: 0;
@@ -6,10 +7,12 @@
     width: 100%;
     height: 100vh;
     background-color: var(--white-6);
-    padding: 10%;
+    padding-top: 10vh;
+    padding-left: 10vw;
+    padding-right: 10vw;
 
-    &.closed {
-        display: none;
+    &.open {
+        display: block;
     }
     .content {
         background-color: var(--white-7);
@@ -70,11 +73,47 @@
                 div {
                     margin-top: 2.8rem;
                 }
+                .reset-submit {
+                    display: flex;
+                    justify-content: space-between;
+
+                    button {
+                        background: none;
+                        border: .1rem solid currentColor;
+                        font-size: 1.8rem;
+                        font-weight: 600;
+                        padding: .9rem 3.6rem;
+                        cursor: pointer;
+                        border-radius: .4rem;
+                        transition: .2s;
+
+                        &[type="reset"] {
+                            color: var(--red-1);
+
+                            &:hover,
+                            &:focus {
+                                color: initial;
+                                background-color: var(--red-1);
+                            }
+                        }
+                        &[type="submit"] {
+                            color: var(--green-2);
+
+                            &:hover,
+                            &:focus {
+                                color: initial;
+                                background-color: var(--green-2);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     @media only screen and (min-width: 600px) and (min-height: 600px) {
-        padding: 15% 20%;
+        padding-top: 15vh;
+        padding-left: 20vw;
+        padding-right: 20vw;
     }
 }

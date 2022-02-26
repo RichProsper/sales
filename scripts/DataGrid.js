@@ -103,13 +103,13 @@ export default class {
 
             const DataGrid = this
             ;(() => {
-                NewBtn.addEventListener('click', () => DataGrid.FormModal.classList.remove('closed'))
+                NewBtn.addEventListener('click', () => DataGrid.FormModal.classList.add('open'))
 
                 DataGrid.FormModal.addEventListener('click', function(e) {
-                    if (e.target === this) this.classList.add('closed')
+                    if (e.target === this) this.classList.remove('open')
                 })
         
-                DataGrid.FormModal.querySelector('button.close').addEventListener('click', () => DataGrid.FormModal.classList.add('closed'))
+                DataGrid.FormModal.querySelector('button.close').addEventListener('click', () => DataGrid.FormModal.classList.remove('open'))
 
                 const focusables = DataGrid.FormModal.querySelectorAll('[data-focus]')
                 for (const focusable of focusables) {
