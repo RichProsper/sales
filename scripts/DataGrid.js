@@ -81,6 +81,9 @@ export default class {
             }
         ]
         this.Timer = null
+        this.Alert = document.querySelector('[data-alert]')
+
+        this.Alert.querySelector('.close').addEventListener('click', () => this.Alert.classList.remove('open'))
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateToolbar()
@@ -764,16 +767,32 @@ export default class {
             .then(respJSON => respJSON.json())
             .then(
                 resp => {
-                    if (resp === 'New record added successfully') {
+                    if (resp === 'New record added successfully.') {
                         DataGrid.FormModal.querySelector('form').reset()
                         DataGrid.RetrieveData()
-                        console.log(resp)
+                        
+                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
+                        DataGrid.Alert.querySelector('.message').textContent = resp
+                        DataGrid.Alert.className = 'alert success open'
                     }
                     else {
                         console.error(resp)
-                        if (typeof resp === 'object') console.error('It\'s an object')
-                        else console.log('It\'s a string')
+                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
+
+                        if (typeof resp === 'object') {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
+                        }
+                        else {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
+                        }
+
+                        DataGrid.Alert.className = 'alert failure open'
                     }
+
+                    // Close alert after 7.5 seconds
+                    setTimeout(() => {
+                        DataGrid.Alert.classList.remove('open')
+                    }, 7.5 * 1000);
                 }
             )
             .catch(e => console.error(e))

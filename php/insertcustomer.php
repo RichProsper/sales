@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         try {
             $conn->exec("INSERT INTO customers VALUES (NULL, '$data->title', '$data->fname', '$data->lname', '$data->email', '$data->parish', '$address', '$data->homeNo', '$data->cellNo', '$data->otherNos', NULL, NULL)");
 
-            echo json_encode("New record added successfully");
+            echo json_encode("New record added successfully.");
         }
         catch(PDOException $e) {
             echo json_encode( $e->getMessage() );

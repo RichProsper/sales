@@ -19,9 +19,15 @@
     --hue-2   : 93;
     --green-1 : hsl(var(--hue-2), 98%, 30%);
     --green-2 : hsl(var(--hue-2), 98%, 35%);
+    --green-3 : hsl(var(--hue-2), 40%, 75%);
+    --green-4 : hsl(var(--hue-2), 60%, 20%);
+    --green-5 : hsl(var(--hue-2), 40%, 65%);
     // Light Red
     --hue-3 : 349;
     --red-1 : hsl(var(--hue-3), 84%, 65%);
+    --red-2 : hsl(var(--hue-3), 40%, 75%);
+    --red-3 : hsl(var(--hue-3), 60%, 20%);
+    --red-4 : hsl(var(--hue-3), 40%, 65%);
 }
 html {
     background-color: var(--darkblue-1);
