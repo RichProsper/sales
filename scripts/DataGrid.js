@@ -10,7 +10,8 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {Object[]} rows The rows
  * @property {Number} numRows The number of rows
  * @property {String} checkboxId The checkbox ID
- * @property {String} phpPath The path of the php script that retrieves the data
+ * @property {String} retrieveDataUrl The path of the php script that retrieves the data
+ * @property {String} insertDataUrl The path of the php script that inserts the data
  */
 
 export default class {
@@ -25,7 +26,8 @@ export default class {
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
-        this.PhpPath = data.phpPath
+        this.RetrieveDataUrl = data.retrieveDataUrl
+        this.InsertDataUrl = data.insertDataUrl
         this.init()
     }
 
@@ -96,32 +98,6 @@ export default class {
     CreateToolbar() {
         this.Toolbar = document.createElement('toolbar-rui')
 
-            const NewBtn = document.createElement('button')
-            NewBtn.type = 'button'
-            NewBtn.className = 'toolbar-btn new'
-            NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
-
-            const DataGrid = this
-            ;(() => {
-                NewBtn.addEventListener('click', () => DataGrid.FormModal.classList.add('open'))
-
-                DataGrid.FormModal.addEventListener('click', function(e) {
-                    if (e.target === this) this.classList.remove('open')
-                })
-        
-                DataGrid.FormModal.querySelector('button.close').addEventListener('click', () => DataGrid.FormModal.classList.remove('open'))
-
-                const focusables = DataGrid.FormModal.querySelectorAll('[data-focus]')
-                for (const focusable of focusables) {
-                    focusable.addEventListener('focus', function() {
-                        this.parentElement.classList.add('focused')
-                    })
-                    focusable.addEventListener('blur', function() {
-                        this.parentElement.classList.remove('focused')
-                    })
-                }
-            })()
-
             const DelBtn = document.createElement('button')
             DelBtn.type = 'button'
             DelBtn.className = 'toolbar-btn del'
@@ -130,7 +106,7 @@ export default class {
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.Toolbar.appendChild(NewBtn)
+        this.SetupNewFormModal()
         this.Toolbar.appendChild(DelBtn)
 
         this.DataGrid.appendChild(this.Toolbar)
@@ -749,6 +725,63 @@ export default class {
         this.Toolbar.appendChild(SortsPanelContainer)
     } // CreateSortsPanelContainer()
 
+    SetupNewFormModal() {
+        const NewBtn = document.createElement('button')
+        NewBtn.type = 'button'
+        NewBtn.className = 'toolbar-btn new'
+        NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
+        NewBtn.addEventListener('click', () => this.FormModal.classList.add('open'))
+
+        this.FormModal.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open')
+        })
+
+        this.FormModal.querySelector('button.close').addEventListener('click', () => this.FormModal.classList.remove('open'))
+
+        const focusables = this.FormModal.querySelectorAll('[data-focus]')
+        for (const focusable of focusables) {
+            focusable.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused')
+            })
+            focusable.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused')
+            })
+        }
+
+        const DataGrid = this
+        this.FormModal.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault()
+
+            const data = {}
+            for (const col in DataGrid.Columns) {
+                data[ DataGrid.Columns[col] ] = this.elements[ DataGrid.Columns[col] ].value
+            }
+
+            fetch(DataGrid.InsertDataUrl, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                resp => {
+                    if (resp === 'New record added successfully') {
+                        DataGrid.FormModal.querySelector('form').reset()
+                        DataGrid.RetrieveData()
+                        console.log(resp)
+                    }
+                    else {
+                        console.error(resp)
+                        if (typeof resp === 'object') console.error('It\'s an object')
+                        else console.log('It\'s a string')
+                    }
+                }
+            )
+            .catch(e => console.error(e))
+        })
+
+        this.Toolbar.appendChild(NewBtn)
+    } // SetupNewFormModal()
+
     CreateMain() {
         this.Main = document.createElement('main-rui')
         this.CreateHeadingsContainer()
@@ -1197,7 +1230,7 @@ export default class {
             offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
         }
 
-        fetch(this.PhpPath, {
+        fetch(this.RetrieveDataUrl, {
             method: 'POST',
             body: JSON.stringify(data)
         })

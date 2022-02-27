@@ -50,7 +50,7 @@
                     <form>
                         <!-- Title Select -->
                         <div data-select-container>
-                            <select data-focus>
+                            <select name="title" data-focus>
                                 <option value="">Select a title...</option>
                                 <option value="Dr.">Dr.</option>
                                 <option value="Miss">Miss</option>
@@ -65,25 +65,25 @@
 
                         <!-- First Name Input -->
                         <div data-input-container>
-                            <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="First Name" data-focus>
+                            <input type="text" name="fname" pattern="([A-Z][a-z]{1,}|[A-Z][a-z]{1,}-[A-Z][a-z]{1,})" title="Must be capitalized and contain only letters, and at most one hyphen" placeholder="First Name" required data-focus>
                             <span>First Name</span>
                         </div>
 
                         <!-- Last Name Input -->
                         <div data-input-container>
-                            <input type="text" pattern="([A-Z]{1}[a-z]{1,}|[A-Z]{1}[a-z]{1,}-[A-Z]{1}[a-z]{1,})" placeholder="Last Name" data-focus>
+                            <input type="text" name="lname" pattern="([A-Z][a-z]{1,}|[A-Z][a-z]{1,}-[A-Z][a-z]{1,})" title="Must be capitalized and contain only letters, and at most one hyphen" placeholder="Last Name" data-focus>
                             <span>Last Name</span>
                         </div>
 
                         <!-- Email Input -->
                         <div data-input-container>
-                            <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="Email" data-focus>
+                            <input type="email" name="email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" placeholder="Email" title="Must be in the form: example@example.ex" data-focus>
                             <span>Email</span>
                         </div>
 
                         <!-- Parish Select -->
                         <div data-select-container>
-                            <select data-focus>
+                            <select name="parish" data-focus>
                                 <option value="">Select a Parish...</option>
                                 <option value="Christ Church">Christ Church</option>
                                 <option value="St. Andrew">St. Andrew</option>
@@ -102,26 +102,26 @@
 
                         <!-- Address Textarea -->
                         <div data-textarea-container>
-                            <textarea rows="4" placeholder="Address..." data-focus></textarea>
+                            <textarea name="address" rows="4" placeholder="Address..." data-focus></textarea>
                             <span>Address...</span>
                         </div>
 
                         <!-- Home Number Input -->
                         <div data-input-container>
-                            <input type="text" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" placeholder="Home Number" data-focus>
+                            <input type="tel" name="homeNo" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" title="Must be 10 or more numbers/hyphens long" placeholder="Home Number" data-focus>
                             <span>Home Number</span>
                         </div>
 
                         <!-- Cell Number Input -->
                         <div data-input-container>
-                            <input type="text" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" placeholder="Cell Number" data-focus>
+                            <input type="tel" name="cellNo" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}" title="Must be 10 or more numbers/hyphens long" placeholder="Cell Number" data-focus>
                             <span>Cell Number</span>
                         </div>
 
-                        <!-- Other Numbers Textarea -->
-                        <div data-textarea-container>
-                            <textarea rows="2" placeholder="Other Numbers..." data-focus></textarea>
-                            <span>Other Numbers...</span>
+                        <!-- Other Numbers Input -->
+                        <div data-input-container>
+                            <input type="tel" name="otherNos" pattern="([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*" title="Must be 10 or more numbers/hyphens long. And each number must be separated by a comma and a space" placeholder="Other Numbers" data-focus>
+                            <span>Other Numbers</span>
                         </div>
 
                         <!-- Reset & Submit Buttons -->

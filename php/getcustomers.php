@@ -1,84 +1,85 @@
-<?php    
-    require_once 'db.php';
-    $conn = db::getDbConnection();
+<?php
 
-    $FinalSTMT = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
-    $FinalSQL = "SELECT COUNT(cId) FROM customers";
+require_once 'db.php';
+$conn = db::getDbConnection();
 
-    if ($_SERVER["REQUEST_METHOD"] === "GET") {
-        $FinalSTMT .= " LIMIT 25";
-    }
-    else if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $rules = json_decode( file_get_contents("php://input") );
-        $limit = db::sanitizeLimit($rules->limit);
-        $offset = db::sanitizeOffset($rules->offset);
+$FinalSTMT = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
+$FinalSQL = "SELECT COUNT(cId) FROM customers";
 
-        $stmt = "";
-        $sql = "";
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    $FinalSTMT .= " LIMIT 25";
+}
+else if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $rules = json_decode( file_get_contents("php://input") );
+    $limit = db::sanitizeLimit($rules->limit);
+    $offset = db::sanitizeOffset($rules->offset);
 
-        if (count($rules->filters) > 0) {
-            $filtersArr = db::sanitizeFilters($rules->filters);
-            $filterSTMT = "";
+    $stmt = "";
+    $sql = "";
 
-            foreach ($filtersArr as $i => $obj) {
-                if ($obj->operator) {
-                    $filterSTMT .= $obj->operator . " ";
-                }
+    if (count($rules->filters) > 0) {
+        $filtersArr = db::sanitizeFilters($rules->filters);
+        $filterSTMT = "";
 
-                $filterSTMT .= "(" . $obj->column . " ";
-                
-                if ($obj->operation === "contain") {
-                    $filterSTMT .= "LIKE '%" . $obj->filterValue . "%'";
-                }
-                elseif ($obj->operation === "startWith") {
-                    $filterSTMT .= "LIKE '" . $obj->filterValue . "%'";
-                }
-                elseif ($obj->operation === "endWith") {
-                    $filterSTMT .= "LIKE '%" . $obj->filterValue . "'";
-                }
-                elseif ($obj->operation === "isEmpty") {
-                    $filterSTMT .= "IS NULL OR " . $obj->column . " = ''";
-                }
-                elseif ($obj->operation === "isNotEmpty") {
-                    $filterSTMT .= "IS NOT NULL AND " . $obj->column . " != ''";
-                }
-                else {
-                    $filterSTMT .= $obj->operation . " '" . $obj->filterValue . "'";
-                }
-
-                $filterSTMT .= ") ";
+        foreach ($filtersArr as $i => $obj) {
+            if ($obj->operator) {
+                $filterSTMT .= $obj->operator . " ";
             }
 
-            $stmt .= " WHERE " . $filterSTMT;
-            $sql .= " WHERE " . $filterSTMT;
-        }
-
-        if (count($rules->sorts) > 0) {
-            $sortsArr = db::sanitizeSorts($rules->sorts);
-            $sortsSTMT = "";
-
-            for ($i = 0; $i < count($sortsArr); $i++) {
-                $sortsSTMT .= $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
-
-                if ($i < (count($sortsArr) - 1) ) $sortsSTMT .= ", ";
+            $filterSTMT .= "(" . $obj->column . " ";
+            
+            if ($obj->operation === "contain") {
+                $filterSTMT .= "LIKE '%" . $obj->filterValue . "%'";
+            }
+            elseif ($obj->operation === "startWith") {
+                $filterSTMT .= "LIKE '" . $obj->filterValue . "%'";
+            }
+            elseif ($obj->operation === "endWith") {
+                $filterSTMT .= "LIKE '%" . $obj->filterValue . "'";
+            }
+            elseif ($obj->operation === "isEmpty") {
+                $filterSTMT .= "IS NULL OR " . $obj->column . " = ''";
+            }
+            elseif ($obj->operation === "isNotEmpty") {
+                $filterSTMT .= "IS NOT NULL AND " . $obj->column . " != ''";
+            }
+            else {
+                $filterSTMT .= $obj->operation . " '" . $obj->filterValue . "'";
             }
 
-            $stmt .= " ORDER BY " . $sortsSTMT;
+            $filterSTMT .= ") ";
         }
-        
-        $FinalSTMT .= $stmt . " LIMIT " . $offset . ", " . $limit;
-        $FinalSQL .= $sql;
+
+        $stmt .= " WHERE " . $filterSTMT;
+        $sql .= " WHERE " . $filterSTMT;
     }
 
-    $customerRows = $conn->query($FinalSTMT);
-    $customerRows = $customerRows->fetchAll(PDO::FETCH_ASSOC);
+    if (count($rules->sorts) > 0) {
+        $sortsArr = db::sanitizeSorts($rules->sorts);
+        $sortsSTMT = "";
 
-    $numRows = $conn->query($FinalSQL);
-    $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+        for ($i = 0; $i < count($sortsArr); $i++) {
+            $sortsSTMT .= $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
+
+            if ($i < (count($sortsArr) - 1) ) $sortsSTMT .= ", ";
+        }
+
+        $stmt .= " ORDER BY " . $sortsSTMT;
+    }
     
-    $customer = new stdClass;
-    $customer->rows = $customerRows;
-    $customer->numRows = (int)$numRows[0]["COUNT(cId)"];
+    $FinalSTMT .= $stmt . " LIMIT " . $offset . ", " . $limit;
+    $FinalSQL .= $sql;
+}
 
-    echo json_encode($customer);
-    $conn = null;
+$customerRows = $conn->query($FinalSTMT);
+$customerRows = $customerRows->fetchAll(PDO::FETCH_ASSOC);
+
+$numRows = $conn->query($FinalSQL);
+$numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+
+$customer = new stdClass;
+$customer->rows = $customerRows;
+$customer->numRows = (int)$numRows[0]["COUNT(cId)"];
+
+echo json_encode($customer);
+$conn = null;
