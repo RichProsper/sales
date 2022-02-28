@@ -3,7 +3,7 @@
 require_once 'db.php';
 $conn = db::getDbConnection();
 
-$FinalSTMT = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
+$FinalSTMT = "SELECT cId, title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
 $FinalSQL = "SELECT COUNT(cId) FROM customers";
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {

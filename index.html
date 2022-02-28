@@ -126,8 +126,8 @@
 
                         <!-- Reset & Submit Buttons -->
                         <div class="reset-submit">
-                            <button type="reset">RESET</button>
-                            <button type="submit">SUBMIT</button>
+                            <button type="reset" class="red">RESET</button>
+                            <button type="submit" class="green">SUBMIT</button>
                         </div>
                     </form>
                 </div>
@@ -141,10 +141,27 @@
         <div data-grid-id="products"></div>
     </section>
 
-    <!-- Alert -->
-    <div class="alert" data-alert>
-        <strong class="status"></strong> <span class="message"></span>
-        <button type="button" class="close">&times;</button>
+    <!-- Delete Entity Modal -->
+    <div class="modal" data-delete-modal>
+        <div class="content">
+            <div class="header">
+                <h3 class="header-text">Add New Customer</h3>
+
+                <button type="button" class="close">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="body">
+                <form>
+                    <!-- Reset & Submit Buttons -->
+                    <div class="reset-submit">
+                        <button type="reset" class="red">RESET</button>
+                        <button type="submit" class="green">SUBMIT</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

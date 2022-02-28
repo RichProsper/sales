@@ -18,6 +18,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         customer => {
             const data = {
                 columns: {
+                    'Customer ID': 'cId',
                     Title: 'title',
                     'First Name': 'fname',
                     'Last Name': 'lname',

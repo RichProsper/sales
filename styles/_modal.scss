@@ -87,7 +87,7 @@
                         border-radius: .4rem;
                         transition: .2s;
 
-                        &[type="reset"] {
+                        &.red {
                             color: var(--red-1);
 
                             &:hover,
@@ -96,7 +96,7 @@
                                 background-color: var(--red-1);
                             }
                         }
-                        &[type="submit"] {
+                        &.green {
                             color: var(--green-2);
 
                             &:hover,
@@ -107,6 +107,18 @@
                         }
                     }
                 }
+            }
+        }
+    }
+    &[data-delete-modal] .content {
+        border-color: var(--red-1);
+
+        .header .close {
+            border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
+
+            &:hover,
+            &:focus {
+                color: var(--red-1);
             }
         }
     }

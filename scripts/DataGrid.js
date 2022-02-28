@@ -81,11 +81,9 @@ export default class {
             }
         ]
         this.Timer = null
-        this.Alert = document.querySelector('[data-alert]')
-
-        this.Alert.querySelector('.close').addEventListener('click', () => this.Alert.classList.remove('open'))
 
         this.DataGrid = document.createElement('datagrid-rui')
+        this.CreateAlert()
         this.CreateToolbar()
         this.CreateMain()
         this.CreateFooter()
@@ -98,19 +96,37 @@ export default class {
         this.SetupNextPrevBtns()
     }
 
+    CreateAlert() {
+        this.Alert = document.createElement('alert-rui')
+
+            const status = document.createElement('strong')
+            status.className = 'status'
+
+            const message = document.createElement('span')
+            message.className = 'message'
+
+            const closeBtn = document.createElement('button')
+            closeBtn.type = 'button'
+            closeBtn.className = 'close'
+            closeBtn.innerHTML = '×'
+            closeBtn.addEventListener('click', () => this.Alert.classList.remove('open'))
+
+        this.Alert.appendChild(status)
+        this.Alert.appendChild( document.createTextNode(' ') )
+        this.Alert.appendChild(message)
+        this.Alert.appendChild(closeBtn)
+
+        document.body.appendChild(this.Alert)
+    }
+
     CreateToolbar() {
         this.Toolbar = document.createElement('toolbar-rui')
-
-            const DelBtn = document.createElement('button')
-            DelBtn.type = 'button'
-            DelBtn.className = 'toolbar-btn del'
-            DelBtn.innerHTML = `<i class="far fa-trash-alt"></i> Delete`
 
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
         this.SetupNewFormModal()
-        this.Toolbar.appendChild(DelBtn)
+        this.SetupDeleteModal()
 
         this.DataGrid.appendChild(this.Toolbar)
     }
@@ -757,7 +773,9 @@ export default class {
 
             const data = {}
             for (const col in DataGrid.Columns) {
-                data[ DataGrid.Columns[col] ] = this.elements[ DataGrid.Columns[col] ].value
+                if (this.elements[ DataGrid.Columns[col] ]) {
+                    data[ DataGrid.Columns[col] ] = this.elements[ DataGrid.Columns[col] ].value
+                }
             }
 
             fetch(DataGrid.InsertDataUrl, {
@@ -773,7 +791,7 @@ export default class {
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
                         DataGrid.Alert.querySelector('.message').textContent = resp
-                        DataGrid.Alert.className = 'alert success open'
+                        DataGrid.Alert.className = 'success open'
                     }
                     else {
                         console.error(resp)
@@ -786,7 +804,7 @@ export default class {
                             DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
                         }
 
-                        DataGrid.Alert.className = 'alert failure open'
+                        DataGrid.Alert.className = 'failure open'
                     }
 
                     // Close alert after 7.5 seconds
@@ -800,6 +818,15 @@ export default class {
 
         this.Toolbar.appendChild(NewBtn)
     } // SetupNewFormModal()
+
+    SetupDeleteModal() {
+        const DelBtn = document.createElement('button')
+        DelBtn.type = 'button'
+        DelBtn.className = 'toolbar-btn del'
+        DelBtn.innerHTML = `<i class="far fa-trash-alt"></i> Delete`
+
+        this.Toolbar.appendChild(DelBtn)
+    }
 
     CreateMain() {
         this.Main = document.createElement('main-rui')

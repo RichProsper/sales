@@ -22,14 +22,8 @@
   --hue-2: 93;
   --green-1: hsl(var(--hue-2), 98%, 30%);
   --green-2: hsl(var(--hue-2), 98%, 35%);
-  --green-3: hsl(var(--hue-2), 40%, 75%);
-  --green-4: hsl(var(--hue-2), 60%, 20%);
-  --green-5: hsl(var(--hue-2), 40%, 65%);
   --hue-3: 349;
   --red-1: hsl(var(--hue-3), 84%, 65%);
-  --red-2: hsl(var(--hue-3), 40%, 75%);
-  --red-3: hsl(var(--hue-3), 60%, 20%);
-  --red-4: hsl(var(--hue-3), 40%, 65%);
 }
 
 html {
@@ -290,22 +284,34 @@ header.header .links li a:hover, header.header .links li a:focus {
   transition: .2s;
 }
 
-.modal .content .body form .reset-submit button[type="reset"] {
+.modal .content .body form .reset-submit button.red {
   color: var(--red-1);
 }
 
-.modal .content .body form .reset-submit button[type="reset"]:hover, .modal .content .body form .reset-submit button[type="reset"]:focus {
+.modal .content .body form .reset-submit button.red:hover, .modal .content .body form .reset-submit button.red:focus {
   color: initial;
   background-color: var(--red-1);
 }
 
-.modal .content .body form .reset-submit button[type="submit"] {
+.modal .content .body form .reset-submit button.green {
   color: var(--green-2);
 }
 
-.modal .content .body form .reset-submit button[type="submit"]:hover, .modal .content .body form .reset-submit button[type="submit"]:focus {
+.modal .content .body form .reset-submit button.green:hover, .modal .content .body form .reset-submit button.green:focus {
   color: initial;
   background-color: var(--green-2);
+}
+
+.modal[data-delete-modal] .content {
+  border-color: var(--red-1);
+}
+
+.modal[data-delete-modal] .content .header .close {
+  border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
+}
+
+.modal[data-delete-modal] .content .header .close:hover, .modal[data-delete-modal] .content .header .close:focus {
+  color: var(--red-1);
 }
 
 @media only screen and (min-width: 600px) and (min-height: 600px) {
@@ -314,61 +320,6 @@ header.header .links li a:hover, header.header .links li a:focus {
     padding-left: 20vw;
     padding-right: 20vw;
   }
-}
-
-.alert {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5rem;
-  -webkit-transform: translateY(-5rem);
-          transform: translateY(-5rem);
-  opacity: 0;
-  padding: 1.25rem 2.5rem;
-  -webkit-transition: .2s;
-  transition: .2s;
-}
-
-.alert.open {
-  -webkit-transform: none;
-          transform: none;
-  opacity: 1;
-}
-
-.alert .close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding-top: .2rem;
-  border: none;
-  background-color: inherit;
-  width: 5rem;
-  height: 5rem;
-  font-size: 3rem;
-  font-weight: 400;
-  cursor: pointer;
-}
-
-.alert.success {
-  background-color: var(--green-3);
-  color: var(--green-4);
-}
-
-.alert.success .close:hover,
-.alert.success .close:focus {
-  background-color: var(--green-5);
-}
-
-.alert.failure {
-  background-color: var(--red-2);
-  color: var(--red-3);
-}
-
-.alert.failure .close:hover,
-.alert.failure .close:focus {
-  background-color: var(--red-4);
 }
 
 datagrid-rui {
@@ -852,5 +803,68 @@ footer-rui pagination-actions-rui button:disabled {
   pointer-events: none;
   cursor: default;
   color: var(--grey);
+}
+
+alert-rui {
+  --hue-1: 93;
+  --green-1: hsl(var(--hue-1), 40%, 75%);
+  --green-2: hsl(var(--hue-1), 60%, 20%);
+  --green-3: hsl(var(--hue-1), 40%, 65%);
+  --hue-2: 349;
+  --red-1: hsl(var(--hue-2), 40%, 75%);
+  --red-2: hsl(var(--hue-2), 60%, 20%);
+  --red-3: hsl(var(--hue-2), 40%, 65%);
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5rem;
+  -webkit-transform: translateY(-5rem);
+          transform: translateY(-5rem);
+  opacity: 0;
+  padding: 1.25rem 2.5rem;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+alert-rui.open {
+  -webkit-transform: none;
+          transform: none;
+  opacity: 1;
+}
+
+alert-rui .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding-top: .2rem;
+  border: none;
+  background-color: inherit;
+  width: 5rem;
+  height: 5rem;
+  font-size: 3rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+alert-rui.success {
+  background-color: var(--green-1);
+  color: var(--green-2);
+}
+
+alert-rui.success .close:hover,
+alert-rui.success .close:focus {
+  background-color: var(--green-3);
+}
+
+alert-rui.failure {
+  background-color: var(--red-1);
+  color: var(--red-2);
+}
+
+alert-rui.failure .close:hover,
+alert-rui.failure .close:focus {
+  background-color: var(--red-3);
 }
 /*# sourceMappingURL=main.css.map */

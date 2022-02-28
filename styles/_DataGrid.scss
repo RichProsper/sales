@@ -429,3 +429,64 @@ footer-rui {
         }
     }
 }
+
+// *** ALERT ***
+alert-rui {
+    // Green: hsl(93, 98%, 35%)
+    --hue-1   : 93;
+    --green-1 : hsl(var(--hue-1), 40%, 75%);
+    --green-2 : hsl(var(--hue-1), 60%, 20%);
+    --green-3 : hsl(var(--hue-1), 40%, 65%);
+    // Light Red
+    --hue-2 : 349;
+    --red-1 : hsl(var(--hue-2), 40%, 75%);
+    --red-2 : hsl(var(--hue-2), 60%, 20%);
+    --red-3 : hsl(var(--hue-2), 40%, 65%);
+
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5rem;
+    transform: translateY(-5rem);
+    opacity: 0;
+    padding: 1.25rem 2.5rem;
+    transition: .2s;
+
+    &.open {
+        transform: none;
+        opacity: 1;
+    }
+    .close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding-top: .2rem;
+        border: none;
+        background-color: inherit;
+        width: 5rem;
+        height: 5rem;
+        font-size: 3rem;
+        font-weight: 400;
+        cursor: pointer;
+    }
+    &.success {
+        background-color: var(--green-1);
+        color: var(--green-2);
+
+        .close:hover,
+        .close:focus {
+            background-color: var(--green-3);
+        }
+    }
+    &.failure {
+        background-color: var(--red-1);
+        color: var(--red-2);
+
+        .close:hover,
+        .close:focus {
+            background-color: var(--red-3);
+        }
+    }
+}
