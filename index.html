@@ -133,6 +133,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Delete Customer(s) Modal -->
+        <div class="modal delete" data-delete-modal-id="customers">
+            <div class="content">
+                <div class="header">
+                    <h3 class="header-text"></h3>
+
+                    <button type="button" class="close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="body">
+                    <div class="body-text"></div>
+                    <form>
+                        <!-- Reset & Submit Buttons -->
+                        <div class="reset-submit">
+                            <button type="reset" class="green">CANCEL</button>
+                            <button type="submit" class="red">DELETE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Products -->
@@ -140,28 +164,5 @@
         <h2 class="heading">Products</h2>
         <div data-grid-id="products"></div>
     </section>
-
-    <!-- Delete Entity Modal -->
-    <div class="modal" data-delete-modal>
-        <div class="content">
-            <div class="header">
-                <h3 class="header-text">Add New Customer</h3>
-
-                <button type="button" class="close">
-                    <span>&times;</span>
-                </button>
-            </div>
-
-            <div class="body">
-                <form>
-                    <!-- Reset & Submit Buttons -->
-                    <div class="reset-submit">
-                        <button type="reset" class="red">RESET</button>
-                        <button type="submit" class="green">SUBMIT</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

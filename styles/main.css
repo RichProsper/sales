@@ -302,16 +302,26 @@ header.header .links li a:hover, header.header .links li a:focus {
   background-color: var(--green-2);
 }
 
-.modal[data-delete-modal] .content {
+.modal .content .body form .reset-submit button:disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: .5;
+}
+
+.modal.delete .content {
   border-color: var(--red-1);
 }
 
-.modal[data-delete-modal] .content .header .close {
+.modal.delete .content .header .close {
   border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
 }
 
-.modal[data-delete-modal] .content .header .close:hover, .modal[data-delete-modal] .content .header .close:focus {
+.modal.delete .content .header .close:hover, .modal.delete .content .header .close:focus {
   color: var(--red-1);
+}
+
+.modal.delete .content .body .body-text {
+  margin-top: 2rem;
 }
 
 @media only screen and (min-width: 600px) and (min-height: 600px) {

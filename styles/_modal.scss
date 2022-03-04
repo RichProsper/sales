@@ -105,12 +105,17 @@
                                 background-color: var(--green-2);
                             }
                         }
+                        &:disabled {
+                            cursor: default;
+                            pointer-events: none;
+                            opacity: .5;
+                        }
                     }
                 }
             }
         }
     }
-    &[data-delete-modal] .content {
+    &.delete .content {
         border-color: var(--red-1);
 
         .header .close {
@@ -120,6 +125,9 @@
             &:focus {
                 color: var(--red-1);
             }
+        }
+        .body .body-text {
+            margin-top: 2rem;
         }
     }
 

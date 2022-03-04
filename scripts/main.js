@@ -34,7 +34,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 retrieveDataUrl: custRetrieveDataUrl,
                 insertDataUrl: '../sales/php/insertcustomer.php'
             }
-            window.DataGrids.Customers = new DataGrid('customers', 'customers', data)
+            window.DataGrids.Customers = new DataGrid('customers', data)
         }
     )
     .catch(e => console.error(e))

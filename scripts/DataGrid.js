@@ -16,13 +16,13 @@ import Select from '../vendors/rui/rui-select.min.js'
 
 export default class {
     /**
-     * @param {String} gridId The grid ID
-     * @param {String} formModalId The form modal ID
+     * @param {String} id The ID of the grid, form modal and delete modal
      * @param {GridData} data The data to fill the grid
      */
-    constructor(gridId, formModalId, data) {
-        this.DataGridContainer = document.querySelector(`[data-grid-id="${gridId}"]`)
-        this.FormModal = document.querySelector(`[data-form-modal-id="${formModalId}"]`)
+    constructor(id, data) {
+        this.DataGridContainer = document.querySelector(`[data-grid-id="${id}"]`)
+        this.FormModal = document.querySelector(`[data-form-modal-id="${id}"]`)
+        this.DeleteModal = document.querySelector(`[data-delete-modal-id="${id}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
@@ -819,11 +819,51 @@ export default class {
         this.Toolbar.appendChild(NewBtn)
     } // SetupNewFormModal()
 
+    // TODO
     SetupDeleteModal() {
         const DelBtn = document.createElement('button')
         DelBtn.type = 'button'
         DelBtn.className = 'toolbar-btn del'
         DelBtn.innerHTML = `<i class="far fa-trash-alt"></i> Delete`
+        DelBtn.addEventListener('click', () => {
+            const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
+            const headerText = this.DeleteModal.querySelector('.header-text')
+            const bodyText = this.DeleteModal.querySelector('.body-text')
+            const delBtn = this.DeleteModal.querySelector('button[type="submit"]')
+
+            if (numSelectedRows === 0) {
+                headerText.textContent = 'No Rows Selected!'
+                bodyText.textContent = 'Please select some row(s) first then click delete.'
+                delBtn.disabled = true
+            }
+            else {
+                headerText.textContent = 'Are You Sure?'
+                bodyText.textContent = `Are you sure you want to permanently delete ${numSelectedRows === 1 ? '1 row' : numSelectedRows + ' rows'}? This action cannot be undone!`
+                delBtn.disabled = false
+            }
+
+            this.DeleteModal.classList.add('open')
+        })
+
+        this.DeleteModal.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open')
+        })
+
+        this.DeleteModal.querySelector('button.close').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
+
+        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
+
+        const DataGrid = this
+        this.DeleteModal.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault()
+
+            const ids = []
+            const idCols = DataGrid.RowsContainer.querySelectorAll('row-rui.selected col-rui[data-colindex="0"]')
+
+            for (const idCol of idCols) ids.push(+idCol.textContent)
+            
+            console.log(ids)
+        })
 
         this.Toolbar.appendChild(DelBtn)
     }
