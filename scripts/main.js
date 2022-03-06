@@ -17,6 +17,10 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
          */
         customer => {
             const data = {
+                table: {
+                    name: 'Customers',
+                    dbName: 'customers'
+                },
                 columns: {
                     'Customer ID': 'cId',
                     Title: 'title',
@@ -34,7 +38,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 retrieveDataUrl: custRetrieveDataUrl,
                 insertDataUrl: '../sales/php/customer_insert.php'
             }
-            window.DataGrids.Customers = new DataGrid('customers', data)
+            window.DataGrids.Customers = new DataGrid(data)
         }
     )
     .catch(e => console.error(e))

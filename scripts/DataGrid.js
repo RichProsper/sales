@@ -6,6 +6,9 @@ import Select from '../vendors/rui/rui-select.min.js'
 /**
  * Grid Data
  * @typedef {Object} GridData
+ * @property {Object} table The table
+ * @property {String} table.name The presentable table name
+ * @property {String} table.dbName The database table name
  * @property {Object} columns The columns
  * @property {Object[]} rows The rows
  * @property {Number} numRows The number of rows
@@ -16,13 +19,12 @@ import Select from '../vendors/rui/rui-select.min.js'
 
 export default class {
     /**
-     * @param {String} id The ID of the grid, form modal and delete modal
      * @param {GridData} data The data to fill the grid
      */
-    constructor(id, data) {
-        this.DataGridContainer = document.querySelector(`[data-grid-id="${id}"]`)
-        this.FormModal = document.querySelector(`[data-form-modal-id="${id}"]`)
-        this.DeleteModal = document.querySelector(`[data-delete-modal-id="${id}"]`)
+    constructor(data) {
+        this.DataGridContainer = document.querySelector(`[data-grid="${data.table.dbName}"]`)
+        this.FormModal = document.querySelector(`[data-form-modal="${data.table.dbName}"]`)
+        this.DeleteModal = document.querySelector(`[data-delete-modal="${data.table.dbName}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
