@@ -5,7 +5,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     window.DataGrids = {}
     // ToTop()
 
-    const custRetrieveDataUrl = '../sales/php/getcustomers.php'
+    const custRetrieveDataUrl = '../sales/php/customer_get.php'
     
     fetch(custRetrieveDataUrl)
     .then(response => response.json())
@@ -32,7 +32,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 rows: customer.rows,
                 numRows: customer.numRows,
                 retrieveDataUrl: custRetrieveDataUrl,
-                insertDataUrl: '../sales/php/insertcustomer.php'
+                insertDataUrl: '../sales/php/customer_insert.php'
             }
             window.DataGrids.Customers = new DataGrid('customers', data)
         }

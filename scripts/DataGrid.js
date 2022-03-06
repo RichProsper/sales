@@ -310,11 +310,10 @@ export default class {
                                     const numRows = +PanelContent.getAttribute('data-rows')
                                     if (numRows > 1) {
                                         e.stopPropagation()
-
                                         const row = this.parentElement.parentElement
+
                                         if ( row.hasAttribute('data-has-filter') ) {
                                             FiltersBtn.value = +FiltersBtn.value - 1
-
                                             if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
                                             else Indicator.classList.add('hide')
                                         }
@@ -322,6 +321,26 @@ export default class {
                                         row.remove()
                                         SetOperatorVisibility()
                                         PanelContent.setAttribute('data-rows', numRows - 1)
+
+                                        DataGrid.FilterRetrieveData()
+                                    }
+                                    else {
+                                        const row = this.parentElement.parentElement
+                                        if ( !row.hasAttribute('data-has-filter') ) return
+                                        
+                                        row.removeAttribute('data-has-filter')
+                                        const columns = row.children[2].children[0]
+                                        const operations = row.children[3].children[0]
+                                        const filter = row.children[4].children[0]
+
+                                        columns.value = DataGrid.Columns[ Object.keys(DataGrid.Columns)[0] ]
+                                        operations.value = DataGrid.Operations[0].value
+                                        filter.value = null
+                                        operations.dispatchEvent(new Event('change'))
+
+                                        FiltersBtn.value = +FiltersBtn.value - 1
+                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                                        else Indicator.classList.add('hide')
 
                                         DataGrid.FilterRetrieveData()
                                     }
