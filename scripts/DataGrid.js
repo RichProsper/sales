@@ -13,8 +13,9 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {Object[]} rows The rows
  * @property {Number} numRows The number of rows
  * @property {String} checkboxId The checkbox ID
- * @property {String} retrieveDataUrl The path of the php script that retrieves the data
- * @property {String} insertDataUrl The path of the php script that inserts the data
+ * @property {String} dataReadUrl The path of the php script that retrieves the data
+ * @property {String} dataCreateUrl The path of the php script that inserts the data
+ * @property {String} dataDeleteUrl The path of the php script that deletes the data
  */
 
 export default class {
@@ -28,8 +29,9 @@ export default class {
         this.Columns = data.columns
         this.Rows = data.rows
         this.NumRows = data.numRows
-        this.RetrieveDataUrl = data.retrieveDataUrl
-        this.InsertDataUrl = data.insertDataUrl
+        this.DataReadUrl = data.dataReadUrl
+        this.DataCreateUrl = data.dataCreateUrl
+        this.DataDeleteUrl = data.dataDeleteUrl
         this.init()
     }
 
@@ -799,7 +801,7 @@ export default class {
                 }
             }
 
-            fetch(DataGrid.InsertDataUrl, {
+            fetch(DataGrid.DataCreateUrl, {
                 method: 'POST',
                 body: JSON.stringify(data)
             })
@@ -883,7 +885,42 @@ export default class {
 
             for (const idCol of idCols) ids.push(+idCol.textContent)
             
-            console.log(ids)
+            fetch(DataGrid.DataDeleteUrl, {
+                method: 'POST',
+                body: JSON.stringify(ids)
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                resp => {
+                    if (resp === 'Record(s) deleted successfully.') {
+                        DataGrid.DeleteModal.classList.remove('open')
+                        DataGrid.RetrieveData()
+                        
+                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
+                        DataGrid.Alert.querySelector('.message').textContent = resp
+                        DataGrid.Alert.className = 'success open'
+                    }
+                    else {
+                        console.error(resp)
+                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
+
+                        if (resp === 'Invalid ID(s)!') {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid ID(s) detected! Please remove invalid ID(s) and try again.'
+                        }
+                        else {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
+                        }
+
+                        DataGrid.Alert.className = 'failure open'
+                    }
+
+                    // Close alert after 7.5 seconds
+                    setTimeout(() => {
+                        DataGrid.Alert.classList.remove('open')
+                    }, 7.5 * 1000);
+                }
+            )
+            .catch(e => console.error(e))
         })
 
         this.Toolbar.appendChild(DelBtn)
@@ -1337,7 +1374,7 @@ export default class {
             offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
         }
 
-        fetch(this.RetrieveDataUrl, {
+        fetch(this.DataReadUrl, {
             method: 'POST',
             body: JSON.stringify(data)
         })

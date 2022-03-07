@@ -1,6 +1,17 @@
 <?php
 
 class Validate {
+    public static function validateIDs($ids = array()) {
+        if (count($ids) === 0) return false;
+        
+        foreach($ids as $id) {
+            if ( !is_int($id) ) return false;
+            if ($id < 1) return false;
+        }
+
+        return true;
+    }
+
     public static function validateTitle($title = '') {
         $validTitles = array('Dr.', 'Miss', 'Mr.', 'Mrs.', 'Ms.', 'Prof.', 'Rev.');
 

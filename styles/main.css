@@ -167,7 +167,7 @@ header.header .links li a:hover, header.header .links li a:focus {
   padding: 1rem 0;
 }
 
-.section [data-grid-id] {
+.section [data-grid] {
   height: calc(100% - 5.5rem);
 }
 

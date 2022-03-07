@@ -5,9 +5,9 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     window.DataGrids = {}
     // ToTop()
 
-    const custRetrieveDataUrl = '../sales/php/customer_get.php'
+    const custDataReadUrl = '../sales/php/customer_read.php'
     
-    fetch(custRetrieveDataUrl)
+    fetch(custDataReadUrl)
     .then(response => response.json())
     .then(
         /**
@@ -16,7 +16,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
          * @param {Number} customer.numRows
          */
         customer => {
-            const data = {
+            window.DataGrids.Customers = new DataGrid({
                 table: {
                     name: 'Customers',
                     dbName: 'customers'
@@ -35,10 +35,10 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 },
                 rows: customer.rows,
                 numRows: customer.numRows,
-                retrieveDataUrl: custRetrieveDataUrl,
-                insertDataUrl: '../sales/php/customer_insert.php'
-            }
-            window.DataGrids.Customers = new DataGrid(data)
+                dataReadUrl: custDataReadUrl,
+                dataCreateUrl: '../sales/php/customer_create.php',
+                dataDeleteUrl: '../sales/php/customer_delete.php'
+            })
         }
     )
     .catch(e => console.error(e))
