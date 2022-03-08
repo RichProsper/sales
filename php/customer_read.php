@@ -3,11 +3,13 @@
 require_once 'db.php';
 $conn = db::getDbConnection();
 
-$FinalSTMT = "SELECT cId, title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
-$FinalSQL = "SELECT COUNT(cId) FROM customers";
+$FinalSTMT = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
+$CountSQL = "SELECT COUNT(cId) FROM customers";
+$RowIDsSQL = "SELECT cId FROM customers";
 
 if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $FinalSTMT .= " LIMIT 25";
+    $RowIDsSQL .= " LIMIT 25";
 }
 else if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $rules = json_decode( file_get_contents("php://input") );
@@ -68,17 +70,22 @@ else if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     
     $FinalSTMT .= $stmt . " LIMIT " . $offset . ", " . $limit;
-    $FinalSQL .= $sql;
+    $RowIDsSQL .= $stmt . " LIMIT " . $offset . ", " . $limit;
+    $CountSQL .= $sql;
 }
 
-$customerRows = $conn->query($FinalSTMT);
-$customerRows = $customerRows->fetchAll(PDO::FETCH_ASSOC);
+$Rows = $conn->query($FinalSTMT);
+$Rows = $Rows->fetchAll(PDO::FETCH_ASSOC);
 
-$numRows = $conn->query($FinalSQL);
+$RowIDs = $conn->query($RowIDsSQL);
+$RowIDs = $RowIDs->fetchAll(PDO::FETCH_ASSOC);
+
+$numRows = $conn->query($CountSQL);
 $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
 
 $customer = new stdClass;
-$customer->rows = $customerRows;
+$customer->rows = $Rows;
+$customer->rowIds = $RowIDs;
 $customer->numRows = (int)$numRows[0]["COUNT(cId)"];
 
 echo json_encode($customer);

@@ -13,6 +13,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         /**
          * @param {Object} customer
          * @param {Object[]} customer.rows
+         * @param {Object[]} customer.rowIds
          * @param {Number} customer.numRows
          */
         customer => {
@@ -22,7 +23,6 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     dbName: 'customers'
                 },
                 columns: {
-                    'Customer ID': 'cId',
                     Title: 'title',
                     'First Name': 'fname',
                     'Last Name': 'lname',
@@ -35,6 +35,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 },
                 rows: customer.rows,
                 numRows: customer.numRows,
+                rowIds: customer.rowIds,
                 dataReadUrl: custDataReadUrl,
                 dataCreateUrl: '../sales/php/customer_create.php',
                 dataDeleteUrl: '../sales/php/customer_delete.php'

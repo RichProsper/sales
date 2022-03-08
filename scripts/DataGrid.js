@@ -11,6 +11,7 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {String} table.dbName The database table name
  * @property {Object} columns The columns
  * @property {Object[]} rows The rows
+ * @property {Object[]} rowIds The rowIds
  * @property {Number} numRows The number of rows
  * @property {String} checkboxId The checkbox ID
  * @property {String} dataReadUrl The path of the php script that retrieves the data
@@ -28,6 +29,7 @@ export default class {
         this.DeleteModal = document.querySelector(`[data-delete-modal="${data.table.dbName}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
+        this.RowIDs = data.rowIds
         this.NumRows = data.numRows
         this.DataReadUrl = data.dataReadUrl
         this.DataCreateUrl = data.dataCreateUrl
@@ -842,7 +844,6 @@ export default class {
         this.Toolbar.appendChild(NewBtn)
     } // SetupNewFormModal()
 
-    // TODO
     SetupDeleteModal() {
         const DelBtn = document.createElement('button')
         DelBtn.type = 'button'
@@ -881,9 +882,9 @@ export default class {
             e.preventDefault()
 
             const ids = []
-            const idCols = DataGrid.RowsContainer.querySelectorAll('row-rui.selected col-rui[data-colindex="0"]')
+            const selectedRows = DataGrid.RowsContainer.querySelectorAll('row-rui.selected')
 
-            for (const idCol of idCols) ids.push(+idCol.textContent)
+            for (const selectedRow of selectedRows) ids.push( +selectedRow.getAttribute('data-entity-id') )
             
             fetch(DataGrid.DataDeleteUrl, {
                 method: 'POST',
@@ -985,14 +986,12 @@ export default class {
         for (let i = 0; i < this.Rows.length; i++) {
             const Row = document.createElement('row-rui')
             Row.setAttribute('data-rowindex', i)
+            Row.setAttribute('data-entity-id', this.RowIDs[i][ Object.keys(this.RowIDs[i])[0] ])
 
                 const Col = document.createElement('col-rui')
                 Col.className = 'select-column'
-                Col.appendChild( Checkbox({
-                    attrs: {
-                        'data-checkbox-group-single': ''
-                    }
-                }) )
+                Col.appendChild( Checkbox({ attrs: { 'data-checkbox-group-single': ''} }) )
+
             Row.appendChild(Col)
 
                 let j = 0
@@ -1383,10 +1382,12 @@ export default class {
             /**
              * @param {Object} entity
              * @param {Object[]} entity.rows
+             * @param {Object[]} entity.rowIds
              * @param {Number} entity.numRows
              */
             entity => {
                 this.Rows = entity.rows
+                this.RowIDs = entity.rowIds
 
                 if (this.NumRows !== entity.numRows) {
                     this.NumRows = entity.numRows
