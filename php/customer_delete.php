@@ -6,6 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $conn = db::getDbConnection();
     $ids = json_decode( file_get_contents("php://input") );
+    $response = new stdClass;
 
     if ( Validate::validateIDs($ids) ) {
         $sql = "DELETE FROM customers WHERE cId IN (";
@@ -17,15 +18,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         try {
             $conn->exec($sql);
-            echo json_encode("Record(s) deleted successfully.");
+            $response->success = true;
+            $response->message = "Record(s) deleted successfully.";
         }
         catch(PDOException $e) {
-            echo json_encode( $e->getMessage() );
+            $response->success = false;
+            $response->message = $e->getMessage();
         }
     }
     else {
-        echo json_encode("Invalid ID(s)!");
+        $response->success = false;
+        $response->message = "Invalid ID(s)!";
     }
-
+    
+    echo json_encode($response);
     $conn = null;
 }

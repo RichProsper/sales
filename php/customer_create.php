@@ -6,6 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $conn = db::getDbConnection();
     $data = json_decode( file_get_contents("php://input") );
+    $response = new stdClass;
 
     $valid['title'] = empty($data->title) ? true : Validate::validateTitle($data->title);
     $valid['fname'] = Validate::validateName($data->fname);
@@ -21,15 +22,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         try {
             $conn->exec("INSERT INTO customers VALUES (NULL, '$data->title', '$data->fname', '$data->lname', '$data->email', '$data->parish', '$address', '$data->homeNo', '$data->cellNo', '$data->otherNos', NULL, NULL)");
 
-            echo json_encode("New record added successfully.");
+            $response->success = true;
+            $response->message = "New record added successfully.";
         }
         catch(PDOException $e) {
-            echo json_encode( $e->getMessage() );
+            $response->success = false;
+            $response->message = $e->getMessage();
         }
     }
     else {
-        echo json_encode($valid);
+        $response->success = false;
+        $response->message = $valid;
     }
     
+    echo json_encode($response);
     $conn = null;
 }

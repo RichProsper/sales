@@ -86,7 +86,8 @@ export default class {
                 textContent: 'is not empty'
             }
         ]
-        this.Timer = null
+        this.FilterTimer = null
+        this.AlertTimer = null
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateAlert()
@@ -115,7 +116,10 @@ export default class {
             closeBtn.type = 'button'
             closeBtn.className = 'close'
             closeBtn.innerHTML = '×'
-            closeBtn.addEventListener('click', () => this.Alert.classList.remove('open'))
+            closeBtn.addEventListener('click', () => {
+                this.Alert.classList.remove('open')
+                clearTimeout(this.AlertTimer)
+            })
 
         this.Alert.appendChild(status)
         this.Alert.appendChild( document.createTextNode(' ') )
@@ -461,8 +465,8 @@ export default class {
                             },
                             evts: {
                                 input: function() {
-                                    clearTimeout(DataGrid.Timer)
-                                    DataGrid.Timer = setTimeout(() => {
+                                    clearTimeout(DataGrid.FilterTimer)
+                                    DataGrid.FilterTimer = setTimeout(() => {
                                         if (this.value) {
                                             if ( !this.parentElement.parentElement.hasAttribute('data-has-filter') ) {
                                                 this.parentElement.parentElement.setAttribute('data-has-filter', '')
@@ -809,20 +813,25 @@ export default class {
             })
             .then(respJSON => respJSON.json())
             .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String|Object} resp.message
+                 */
                 resp => {
-                    if (resp === 'New record added successfully.') {
+                    if (resp.success) {
                         DataGrid.FormModal.querySelector('form').reset()
                         DataGrid.RetrieveData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp
+                        DataGrid.Alert.querySelector('.message').textContent = resp.message
                         DataGrid.Alert.className = 'success open'
                     }
                     else {
                         console.error(resp)
                         DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
 
-                        if (typeof resp === 'object') {
+                        if (typeof resp.message === 'object') {
                             DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
                         }
                         else {
@@ -833,9 +842,9 @@ export default class {
                     }
 
                     // Close alert after 7.5 seconds
-                    setTimeout(() => {
+                    DataGrid.AlertTimer = setTimeout(() => {
                         DataGrid.Alert.classList.remove('open')
-                    }, 7.5 * 1000);
+                    }, 7.5 * 1000)
                 }
             )
             .catch(e => console.error(e))
@@ -892,20 +901,25 @@ export default class {
             })
             .then(respJSON => respJSON.json())
             .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String} resp.message
+                 */
                 resp => {
-                    if (resp === 'Record(s) deleted successfully.') {
+                    if (resp.success) {
                         DataGrid.DeleteModal.classList.remove('open')
                         DataGrid.RetrieveData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp
+                        DataGrid.Alert.querySelector('.message').textContent = resp.message
                         DataGrid.Alert.className = 'success open'
                     }
                     else {
-                        console.error(resp)
+                        console.error(resp.message)
                         DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
 
-                        if (resp === 'Invalid ID(s)!') {
+                        if (resp.message === 'Invalid ID(s)!') {
                             DataGrid.Alert.querySelector('.message').textContent = 'Invalid ID(s) detected! Please remove invalid ID(s) and try again.'
                         }
                         else {
@@ -916,16 +930,16 @@ export default class {
                     }
 
                     // Close alert after 7.5 seconds
-                    setTimeout(() => {
+                    DataGrid.AlertTimer = setTimeout(() => {
                         DataGrid.Alert.classList.remove('open')
-                    }, 7.5 * 1000);
+                    }, 7.5 * 1000)
                 }
             )
             .catch(e => console.error(e))
         })
 
         this.Toolbar.appendChild(DelBtn)
-    }
+    } // SetupDeleteModal()
 
     CreateMain() {
         this.Main = document.createElement('main-rui')
