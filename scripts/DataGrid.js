@@ -984,6 +984,7 @@ export default class {
         this.Main.appendChild(this.HeadingsContainer)
     }
 
+    // TODO column navigability
     CreateRowsContainer() {
         this.RowsContainer = document.createElement('rows-container-rui')
         this.CreateRows()
@@ -992,9 +993,38 @@ export default class {
         this.RowsContainer.addEventListener('scroll', () => {
             this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
         })
+
+        this.RowsContainer.addEventListener('keydown', (e) => {
+            e.preventDefault()
+
+            switch (e.key) {
+                case 'ArrowUp' :
+                    if (this.SelectedCol.parentElement.previousElementSibling) {
+                        this.SelectedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                    }
+                    break
+                case 'ArrowDown' :
+                    if (this.SelectedCol.parentElement.nextElementSibling) {
+                        this.SelectedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                    }
+                    break
+                case 'ArrowLeft' :
+                    if (this.SelectedCol.previousElementSibling.hasAttribute('data-colindex')) {
+                        this.SelectedCol.previousElementSibling.focus()
+                    }
+                    break
+                case 'ArrowRight' :
+                    if (this.SelectedCol.nextElementSibling) {
+                        this.SelectedCol.nextElementSibling.focus()
+                    }
+                    break
+                default :
+            }
+        })
     }
 
     CreateRows() {
+        const DataGrid = this
         this.RowsContainer.innerHTML = null
 
         for (let i = 0; i < this.Rows.length; i++) {
@@ -1011,8 +1041,21 @@ export default class {
                 let j = 0
                 for (let col in this.Rows[i]) {
                     const Col = document.createElement('col-rui')
+
                     Col.setAttribute('data-colindex', j)
+                    Col.tabIndex = -1
                     Col.textContent = this.Rows[i][col]
+
+                    Col.addEventListener('focus', function() {
+                        DataGrid.SelectedCol = this
+                    })
+                    Col.addEventListener('blur', function() {
+                        this.contentEditable = false
+                    })
+                    Col.addEventListener('dblclick', function() {
+                        this.contentEditable = true
+                    })
+
                     Row.appendChild(Col)
                     j++
                 }

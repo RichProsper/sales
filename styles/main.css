@@ -617,7 +617,7 @@ main-rui {
   font-size: 1.4rem;
 }
 
-main-rui headings-container-rui headings-rui hcol-rui heading-title-rui, main-rui rows-container-rui row-rui col-rui {
+main-rui headings-container-rui headings-rui hcol-rui heading-title-rui, main-rui rows-container-rui row-rui col-rui, main-rui rows-container-rui row-rui div {
   display: block;
   height: 100%;
   overflow: hidden;
@@ -715,12 +715,16 @@ main-rui rows-container-rui row-rui {
   transition: .1s;
 }
 
-main-rui rows-container-rui row-rui col-rui {
+main-rui rows-container-rui row-rui col-rui, main-rui rows-container-rui row-rui div {
   border-right: 0.1rem solid var(--row-hover);
   border-bottom: 0.1rem solid var(--grey);
 }
 
-main-rui rows-container-rui row-rui col-rui.hide {
+main-rui rows-container-rui row-rui col-rui:focus, main-rui rows-container-rui row-rui div:focus {
+  outline: 0.1rem solid var(--blue-1);
+}
+
+main-rui rows-container-rui row-rui col-rui.hide, main-rui rows-container-rui row-rui div.hide {
   display: none;
 }
 
