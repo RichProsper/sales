@@ -984,45 +984,120 @@ export default class {
         this.Main.appendChild(this.HeadingsContainer)
     }
 
-    // TODO column navigability
+    /**
+     * Sets the cursor postion to the given position inside an element
+     * @param {HTMLElement} elem The element with the cursor to set
+     * @param {Number} pos The position to place the cursor
+     */
+    SetCursorPosition(elem, pos) {
+        // Creates range object
+        const setpos = document.createRange();
+          
+        // Creates object for selection
+        const set = window.getSelection();
+          
+        // Set start position of range
+        setpos.setStart(elem.childNodes[0], pos);
+          
+        // Collapse range within its boundary points
+        // Returns boolean
+        setpos.collapse(true);
+          
+        // Remove all ranges set
+        set.removeAllRanges();
+          
+        // Add range with respect to range object.
+        set.addRange(setpos);
+    }
+
+    /**
+     * @param {KeyboardEvent} e The key down event
+     */
+    ColumnNavigate(e) {
+        e.preventDefault()
+
+        switch (e.key) {
+            case 'ArrowUp' :
+                if (this.SelectedCol.parentElement.previousElementSibling) {
+                    this.SelectedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                }
+                break
+            case 'ArrowDown' :
+                if (this.SelectedCol.parentElement.nextElementSibling) {
+                    this.SelectedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                }
+                break
+            case 'ArrowLeft' :
+                if (this.SelectedCol.previousElementSibling.hasAttribute('data-colindex')) {
+                    this.SelectedCol.previousElementSibling.focus()
+                }
+                break
+            case 'ArrowRight' :
+                if (this.SelectedCol.nextElementSibling) {
+                    this.SelectedCol.nextElementSibling.focus()
+                }
+                break
+            case 'Home' :
+                this.SelectedCol.parentElement.querySelector('[data-colindex="0"]').focus()
+                break
+            case 'End' :
+                this.SelectedCol.parentElement.querySelector(`[data-colindex="${this.SelectedCol.parentElement.children.length - 2}"]`).focus()
+                break
+            case 'PageUp' :
+                this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                break
+            case 'PageDown' :
+                this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                break
+            case 'Enter' :
+                this.SelectedCol.removeEventListener('keydown', this.BoundColumnNavigate)
+                this.SelectedCol.contentEditable = true
+                this.SetCursorPosition(this.SelectedCol, this.SelectedCol.textContent.length)
+                this.SelectedCol.addEventListener('keydown', this.BoundColumnEdit)
+                break
+            default :
+        }
+    }
+
+    /**
+     * @param {KeyboardEvent} e The key down event
+     */
+    ColumnEdit(e) {
+        switch (e.key) {
+            case 'Escape':
+            case 'Enter' :
+                this.SelectedCol.removeEventListener('keydown', this.BoundColumnEdit)
+
+                if (this.SelectedCol.nextElementSibling) {
+                    this.SelectedCol.nextElementSibling.focus()
+                }
+                else if (this.SelectedCol.parentElement.nextElementSibling) {
+                    this.SelectedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]').focus()
+                }
+                else {
+                    this.SelectedCol.blur()
+                    this.SelectedCol.focus()
+                }
+                break
+            default :
+        }
+    }
+
     CreateRowsContainer() {
         this.RowsContainer = document.createElement('rows-container-rui')
+        
+        this.BoundColumnNavigate = this.ColumnNavigate.bind(this)
+        this.BoundColumnEdit = this.ColumnEdit.bind(this)
         this.CreateRows()
+
         this.Main.appendChild(this.RowsContainer)
 
         this.RowsContainer.addEventListener('scroll', () => {
             this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
         })
-
-        this.RowsContainer.addEventListener('keydown', (e) => {
-            e.preventDefault()
-
-            switch (e.key) {
-                case 'ArrowUp' :
-                    if (this.SelectedCol.parentElement.previousElementSibling) {
-                        this.SelectedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
-                    }
-                    break
-                case 'ArrowDown' :
-                    if (this.SelectedCol.parentElement.nextElementSibling) {
-                        this.SelectedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
-                    }
-                    break
-                case 'ArrowLeft' :
-                    if (this.SelectedCol.previousElementSibling.hasAttribute('data-colindex')) {
-                        this.SelectedCol.previousElementSibling.focus()
-                    }
-                    break
-                case 'ArrowRight' :
-                    if (this.SelectedCol.nextElementSibling) {
-                        this.SelectedCol.nextElementSibling.focus()
-                    }
-                    break
-                default :
-            }
-        })
     }
 
+    // TODO Fix set cursor position on empty column
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
@@ -1049,11 +1124,18 @@ export default class {
                     Col.addEventListener('focus', function() {
                         DataGrid.SelectedCol = this
                     })
+
+                    Col.addEventListener('keydown', this.BoundColumnNavigate)
+
                     Col.addEventListener('blur', function() {
                         this.contentEditable = false
+                        this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
                     })
-                    Col.addEventListener('dblclick', function() {
+                    Col.addEventListener('dblclick', function(e) {
+                        this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
                         this.contentEditable = true
+                        DataGrid.SetCursorPosition(this, this.textContent.length)
+                        this.addEventListener('keydown', DataGrid.BoundColumnEdit)
                     })
 
                     Row.appendChild(Col)

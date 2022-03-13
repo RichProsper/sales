@@ -347,13 +347,17 @@ main-rui {
             height: calc(var(--Row-Height) + .1rem);
             transition: .1s;
 
-            col-rui, div {
+            col-rui {
                 @extend %cell;
                 border-right: .1rem solid var(--row-hover);
                 border-bottom: .1rem solid var(--grey);
 
                 &:focus {
                     outline: .1rem solid var(--blue-1);
+
+                    &::selection {
+                        background-color: transparent;
+                    }
                 }
                 &.hide {
                     display: none;
