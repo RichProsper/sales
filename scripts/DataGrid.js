@@ -88,6 +88,7 @@ export default class {
         ]
         this.FilterTimer = null
         this.AlertTimer = null
+        this.Canvas = document.createElement('canvas')
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateAlert()
@@ -995,6 +996,9 @@ export default class {
           
         // Creates object for selection
         const set = window.getSelection();
+
+        // If there are no nodes, create one
+        if (elem.childNodes.length === 0) elem.appendChild( document.createTextNode('') )
           
         // Set start position of range
         setpos.setStart(elem.childNodes[0], pos);
@@ -1050,10 +1054,7 @@ export default class {
                 this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
                 break
             case 'Enter' :
-                this.SelectedCol.removeEventListener('keydown', this.BoundColumnNavigate)
-                this.SelectedCol.contentEditable = true
-                this.SetCursorPosition(this.SelectedCol, this.SelectedCol.textContent.length)
-                this.SelectedCol.addEventListener('keydown', this.BoundColumnEdit)
+                this.SelectedCol.dispatchEvent( new MouseEvent('dblclick') )
                 break
             default :
         }
@@ -1097,7 +1098,44 @@ export default class {
         })
     }
 
-    // TODO Fix set cursor position on empty column
+    /**
+     * Calculates the width in px of a given text
+     * @param {String} text the text
+     * @param {HTMLElement} elem the element to derive the css font descriptor (weight, size, family) of the text from
+     * @returns {Number} the width of the text in px
+     */
+    // TODO GetTextPxWidth By temp span
+    GetTextPxWidth(text, elem) {
+        const fontWeight = window.getComputedStyle(elem, null).getPropertyValue('font-weight')
+        const fontSize = window.getComputedStyle(elem, null).getPropertyValue('font-size')
+        const fontFamily = window.getComputedStyle(elem, null).getPropertyValue('font-family')
+
+        const context = this.Canvas.getContext('2d')
+        context.font = `${fontWeight} ${fontSize} ${fontFamily}`
+        console.log(context.font)
+
+        return Math.ceil(context.measureText(text).width * 1.25)
+    }
+
+    /**
+     * Resize a given column to the given width
+     * @param {HTMLElement} col The column to resize
+     * @param {Number} newPxWidth The width in px to resize to
+     */
+    ResizeColumn(col, newPxWidth) {
+        const newRemWidth = this.PxToRem(newPxWidth)
+        const HCol = this.HeadingsContainer.children[0].children[+col.getAttribute('data-colindex') + 1]
+        const Cols = this.RowsContainer.querySelectorAll(`[data-colindex="${col.getAttribute('data-colindex')}"]`)
+
+        HCol.style.minWidth = `${newRemWidth}rem`
+        HCol.style.maxWidth = `${newRemWidth}rem`
+
+        for (const Col of Cols) {
+            Col.style.minWidth = `${newRemWidth}rem`
+            Col.style.maxWidth = `${newRemWidth}rem`
+        }
+    }
+
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
@@ -1131,9 +1169,13 @@ export default class {
                         this.contentEditable = false
                         this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
                     })
-                    Col.addEventListener('dblclick', function(e) {
+                    Col.addEventListener('dblclick', function() {
+                        const textWidth = DataGrid.GetTextPxWidth(this.textContent, this)
+                        if (textWidth > this.offsetWidth) DataGrid.ResizeColumn(this, textWidth)
+
                         this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
                         this.contentEditable = true
+
                         DataGrid.SetCursorPosition(this, this.textContent.length)
                         this.addEventListener('keydown', DataGrid.BoundColumnEdit)
                     })
@@ -1269,7 +1311,7 @@ export default class {
         const Datagrid = this
 
         allCheckbox.addEventListener('change', function() {
-            const checkboxes = Datagrid.DataGrid.querySelectorAll('[data-checkbox-group-single]')
+            const checkboxes = Datagrid.RowsContainer.querySelectorAll('[data-checkbox-group-single]')
 
             if (this.checked) {
                 for (const checkbox of checkboxes) {
@@ -1324,6 +1366,18 @@ export default class {
         }
     }
 
+    /**
+     * Convert px to rem units
+     * @param {Number} px the length in px
+     * @returns {Number} the length in rem
+     */
+    PxToRem(px) {
+        if (window.innerWidth >= 2700) return (+px / 15)
+        if (window.innerWidth >= 1800) return (+px / 12.5)
+        if (window.innerWidth >= 900 ) return (+px / 10)
+        return (+px / 7.5)
+    }
+
     SetupResizingColumns() {
         const Headings = this.DataGrid.querySelector('headings-rui')
         const Resizables = Headings.querySelectorAll('resizable-rui')
@@ -1335,12 +1389,6 @@ export default class {
             minWidth: 5, //5rem
             minLeft: 0
         }
-        const getDenom = () => {
-            if (window.innerWidth >= 2700) return 15
-            if (window.innerWidth >= 1800) return 12.5
-            if (window.innerWidth >= 900 ) return 10
-            return 7.5
-        }
         /**
          * @param {MouseEvent} e 
          */
@@ -1349,14 +1397,14 @@ export default class {
             const HColWidth = HCol.getBoundingClientRect().width
 
             // Stops resizing when cursors moves to the left of the resizable icon
-            if (( HColWidth / getDenom() ) === curPos.minWidth) {
+            if (( this.PxToRem(HColWidth) ) === curPos.minWidth) {
                 curPos.minLeft = curPos.minLeft < 0 ? e.clientX : curPos.minLeft
             }
             if (e.clientX < curPos.minLeft) return
 
             const diff = e.clientX - curPos.x
             curPos.x = e.clientX
-            const newWidth = (HColWidth + diff) / getDenom()
+            const newWidth = this.PxToRem(HColWidth + diff)
             
             if (newWidth < curPos.minWidth) return
 

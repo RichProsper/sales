@@ -724,14 +724,6 @@ main-rui rows-container-rui row-rui col-rui:focus {
   outline: 0.1rem solid var(--blue-1);
 }
 
-main-rui rows-container-rui row-rui col-rui:focus::-moz-selection {
-  background-color: transparent;
-}
-
-main-rui rows-container-rui row-rui col-rui:focus::selection {
-  background-color: transparent;
-}
-
 main-rui rows-container-rui row-rui col-rui.hide {
   display: none;
 }
