@@ -40,6 +40,7 @@ export default class {
     init() {
         this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
         this.RPPDV = 25 //RowsPerPageDefaultValue
+        this.ScrollbarWidth = 15
         this.Operations = [
             {
                 value: '=',
@@ -1015,6 +1016,23 @@ export default class {
     }
 
     /**
+     * Scroll parent element if element is partially
+     * or fully offscreen to the left or right
+     * @param {HTMLElement} el The element to keep in view
+     * @param {HTMLElement} containerEl The parent element to scroll if need be
+     */
+    KeepElementInView(el, containerEl) {
+        // If this element is offscreen to the right
+        if ( (el.offsetLeft + el.offsetWidth - containerEl.offsetLeft) > (containerEl.offsetWidth - this.ScrollbarWidth + containerEl.scrollLeft) ) {
+            containerEl.scrollLeft = el.offsetLeft + el.offsetWidth - containerEl.offsetLeft - containerEl.offsetWidth + this.ScrollbarWidth + 1
+        }
+        // If this element is offscreen to the left
+        else if ( (el.offsetLeft - containerEl.offsetLeft) < containerEl.scrollLeft ) {
+            containerEl.scrollLeft = el.offsetLeft - containerEl.offsetLeft - 1
+        }
+    }
+
+    /**
      * @param {KeyboardEvent} e The key down event
      */
     ColumnNavigate(e) {
@@ -1034,18 +1052,22 @@ export default class {
             case 'ArrowLeft' :
                 if (this.SelectedCol.previousElementSibling.hasAttribute('data-colindex')) {
                     this.SelectedCol.previousElementSibling.focus()
+                    this.KeepElementInView(this.SelectedCol, this.RowsContainer)
                 }
                 break
             case 'ArrowRight' :
                 if (this.SelectedCol.nextElementSibling) {
                     this.SelectedCol.nextElementSibling.focus()
+                    this.KeepElementInView(this.SelectedCol, this.RowsContainer)
                 }
                 break
             case 'Home' :
                 this.SelectedCol.parentElement.querySelector('[data-colindex="0"]').focus()
+                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
                 break
             case 'End' :
                 this.SelectedCol.parentElement.querySelector(`[data-colindex="${this.SelectedCol.parentElement.children.length - 2}"]`).focus()
+                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
                 break
             case 'PageUp' :
                 this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
@@ -1063,6 +1085,7 @@ export default class {
     /**
      * @param {KeyboardEvent} e The key down event
      */
+    // TODO handle update to database. Add data-column & data-value to columns
     ColumnEdit(e) {
         switch (e.key) {
             case 'Escape':
@@ -1079,6 +1102,8 @@ export default class {
                     this.SelectedCol.blur()
                     this.SelectedCol.focus()
                 }
+
+                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
                 break
             default :
         }
@@ -1086,35 +1111,14 @@ export default class {
 
     CreateRowsContainer() {
         this.RowsContainer = document.createElement('rows-container-rui')
-        
         this.BoundColumnNavigate = this.ColumnNavigate.bind(this)
         this.BoundColumnEdit = this.ColumnEdit.bind(this)
         this.CreateRows()
-
         this.Main.appendChild(this.RowsContainer)
 
         this.RowsContainer.addEventListener('scroll', () => {
             this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
         })
-    }
-
-    /**
-     * Calculates the width in px of a given text
-     * @param {String} text the text
-     * @param {HTMLElement} elem the element to derive the css font descriptor (weight, size, family) of the text from
-     * @returns {Number} the width of the text in px
-     */
-    // TODO GetTextPxWidth By temp span
-    GetTextPxWidth(text, elem) {
-        const fontWeight = window.getComputedStyle(elem, null).getPropertyValue('font-weight')
-        const fontSize = window.getComputedStyle(elem, null).getPropertyValue('font-size')
-        const fontFamily = window.getComputedStyle(elem, null).getPropertyValue('font-family')
-
-        const context = this.Canvas.getContext('2d')
-        context.font = `${fontWeight} ${fontSize} ${fontFamily}`
-        console.log(context.font)
-
-        return Math.ceil(context.measureText(text).width * 1.25)
     }
 
     /**
@@ -1166,27 +1170,33 @@ export default class {
                     Col.addEventListener('keydown', this.BoundColumnNavigate)
 
                     Col.addEventListener('blur', function() {
+                        if (!this.hasAttribute('contenteditable')) return
+                        if (this.contentEditable === 'false') return
+
                         this.contentEditable = false
                         this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
                     })
                     Col.addEventListener('dblclick', function() {
-                        const textWidth = DataGrid.GetTextPxWidth(this.textContent, this)
-                        if (textWidth > this.offsetWidth) DataGrid.ResizeColumn(this, textWidth)
+                        if (this.contentEditable === 'true') return
+
+                        if (this.scrollWidth > this.offsetWidth) DataGrid.ResizeColumn(this, this.scrollWidth + 10)
 
                         this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
                         this.contentEditable = true
 
                         DataGrid.SetCursorPosition(this, this.textContent.length)
+                        DataGrid.KeepElementInView(this, DataGrid.RowsContainer)
+
                         this.addEventListener('keydown', DataGrid.BoundColumnEdit)
                     })
 
                     Row.appendChild(Col)
                     j++
-                }
+                } // End for
 
             this.RowsContainer.appendChild(Row)
-        }
-    }
+        } // End for
+    } // CreateRows()
 
     CreateFooter() {
         this.Footer = document.createElement('footer-rui')
@@ -1503,10 +1513,12 @@ export default class {
     }
 
     /**
-     * Determines if the element 'elem' is a descendant of the element 'parent'
+     * Determines if the element 'elem' is a descendant
+     * of the element 'parent'
      * @param {HTMLElement} elem Descendant element
      * @param {HTMLElement} parent Parent element
-     * @returns {-1|0|1} -1 Means not a descendant. 0 Means the same as parent. 1 Means is a descendant
+     * @returns {-1|0|1} -1 Means not a descendant.
+     * 0 Means the same as parent. 1 Means is a descendant
      */
     ElemIsDescendantOf(elem, parent) {
         if (elem === parent) return 0
