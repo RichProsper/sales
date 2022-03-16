@@ -1,12 +1,18 @@
 <?php
 
 class Validate {
+    public static function validateID($id = 1) {
+        if ( !is_int($id) ) return false;
+        if ($id < 1) return false;
+        
+        return true;
+    }
+
     public static function validateIDs($ids = array()) {
         if (count($ids) === 0) return false;
         
         foreach($ids as $id) {
-            if ( !is_int($id) ) return false;
-            if ($id < 1) return false;
+            if ( !self::validateID($id) ) return false;
         }
 
         return true;

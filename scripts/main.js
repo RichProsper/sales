@@ -38,7 +38,8 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 rowIds: customer.rowIds,
                 dataReadUrl: custDataReadUrl,
                 dataCreateUrl: '../sales/php/customer_create.php',
-                dataDeleteUrl: '../sales/php/customer_delete.php'
+                dataDeleteUrl: '../sales/php/customer_delete.php',
+                dataUpdateUrl: '../sales/php/customer_update.php'
             })
         }
     )

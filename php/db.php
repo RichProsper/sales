@@ -63,4 +63,8 @@ class db {
 
         return $sorts;
     }
+
+    public static function escapeString($str) {
+        // TODO escape the following characters: \x00, \n, \r, \, ', " and \x1a
+    }
 } // class db

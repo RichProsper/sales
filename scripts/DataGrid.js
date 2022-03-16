@@ -17,6 +17,7 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {String} dataReadUrl The path of the php script that retrieves the data
  * @property {String} dataCreateUrl The path of the php script that inserts the data
  * @property {String} dataDeleteUrl The path of the php script that deletes the data
+ * @property {String} dataUpdateUrl The path of the php script that updates the data
  */
 
 export default class {
@@ -34,6 +35,7 @@ export default class {
         this.DataReadUrl = data.dataReadUrl
         this.DataCreateUrl = data.dataCreateUrl
         this.DataDeleteUrl = data.dataDeleteUrl
+        this.DataUpdateUrl = data.dataUpdateUrl
         this.init()
     }
 
@@ -89,6 +91,7 @@ export default class {
         ]
         this.FilterTimer = null
         this.AlertTimer = null
+        this.AlertDuration = 5 * 1000
         this.Canvas = document.createElement('canvas')
 
         this.DataGrid = document.createElement('datagrid-rui')
@@ -802,6 +805,9 @@ export default class {
         this.FormModal.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault()
 
+            DataGrid.Alert.classList.remove('open')
+            clearTimeout(DataGrid.AlertTimer)
+
             const data = {}
             for (const col in DataGrid.Columns) {
                 if (this.elements[ DataGrid.Columns[col] ]) {
@@ -843,10 +849,10 @@ export default class {
                         DataGrid.Alert.className = 'failure open'
                     }
 
-                    // Close alert after 7.5 seconds
+                    // Close alert after some seconds
                     DataGrid.AlertTimer = setTimeout(() => {
                         DataGrid.Alert.classList.remove('open')
-                    }, 7.5 * 1000)
+                    }, DataGrid.AlertDuration)
                 }
             )
             .catch(e => console.error(e))
@@ -892,6 +898,9 @@ export default class {
         this.DeleteModal.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault()
 
+            DataGrid.Alert.classList.remove('open')
+            clearTimeout(DataGrid.AlertTimer)
+
             const ids = []
             const selectedRows = DataGrid.RowsContainer.querySelectorAll('row-rui.selected')
 
@@ -931,10 +940,10 @@ export default class {
                         DataGrid.Alert.className = 'failure open'
                     }
 
-                    // Close alert after 7.5 seconds
+                    // Close alert after some seconds
                     DataGrid.AlertTimer = setTimeout(() => {
                         DataGrid.Alert.classList.remove('open')
-                    }, 7.5 * 1000)
+                    }, DataGrid.AlertDuration)
                 }
             )
             .catch(e => console.error(e))
@@ -966,6 +975,7 @@ export default class {
 
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const HCol = document.createElement('hcol-rui')
+                    HCol.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ])
                     HCol.style.minWidth = '12rem'
                     HCol.style.maxWidth = '12rem'
 
@@ -1085,7 +1095,6 @@ export default class {
     /**
      * @param {KeyboardEvent} e The key down event
      */
-    // TODO handle update to database. Add data-column & data-value to columns
     ColumnEdit(e) {
         switch (e.key) {
             case 'Escape':
@@ -1162,6 +1171,7 @@ export default class {
                     Col.setAttribute('data-colindex', j)
                     Col.tabIndex = -1
                     Col.textContent = this.Rows[i][col]
+                    Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
 
                     Col.addEventListener('focus', function() {
                         DataGrid.SelectedCol = this
@@ -1175,7 +1185,60 @@ export default class {
 
                         this.contentEditable = false
                         this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
+
+                        if (this.textContent === this.getAttribute('data-value')) return
+
+                        DataGrid.Alert.classList.remove('open')
+                        clearTimeout(DataGrid.AlertTimer)
+
+                        const data = {
+                            id: +this.parentElement.getAttribute('data-entity-id'),
+                            column: DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'),
+                            value: this.textContent
+                        }
+
+                        fetch(DataGrid.DataUpdateUrl, {
+                            method: 'POST',
+                            body: JSON.stringify(data)
+                        })
+                        .then(respJSON => respJSON.json())
+                        .then(
+                            /**
+                             * @param {Object} resp
+                             * @param {Boolean} resp.success
+                             * @param {String} resp.message
+                             */
+                            resp => {
+                                if (resp.success) {     
+                                    this.setAttribute('data-value', this.textContent)
+
+                                    DataGrid.Alert.querySelector('.status').textContent = 'Success!'
+                                    DataGrid.Alert.querySelector('.message').textContent = resp.message
+                                    DataGrid.Alert.className = 'success open'
+                                }
+                                else {
+                                    console.error(resp.message)
+                                    DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
+            
+                                    if (resp.message === 'Invalid column data') {
+                                        DataGrid.Alert.querySelector('.message').textContent = 'Invalid column data detected! Please remove invalid data and submit again.'
+                                    }
+                                    else {
+                                        DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
+                                    }
+            
+                                    DataGrid.Alert.className = 'failure open'
+                                }
+            
+                                // Close alert after some seconds
+                                DataGrid.AlertTimer = setTimeout(() => {
+                                    DataGrid.Alert.classList.remove('open')
+                                }, DataGrid.AlertDuration)
+                            }
+                        )
+                        .catch(e => console.error(e))
                     })
+
                     Col.addEventListener('dblclick', function() {
                         if (this.contentEditable === 'true') return
 
