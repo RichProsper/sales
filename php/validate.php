@@ -19,8 +19,8 @@ class Validate {
     }
 
     public static function validateName($name = '') {
-        // Minimums: 'Ti' or 'Ja-Ze'
-        $regex = '/^([A-Z][a-z]{1,}|[A-Z][a-z]{1,}-[A-Z][a-z]{1,})$/';
+        // Only letters, hyphens and spaces allowed
+        $regex = '/^[A-Za-z\-\s]{1,}$/';
         
         return (preg_match($regex, $name) !== 0);
     }

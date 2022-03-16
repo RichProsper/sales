@@ -65,13 +65,13 @@
 
                         <!-- First Name Input -->
                         <div data-input-container>
-                            <input type="text" name="fname" pattern="([A-Z][a-z]{1,}|[A-Z][a-z]{1,}-[A-Z][a-z]{1,})" title="Must be capitalized and contain only letters, and at most one hyphen" placeholder="First Name" required data-focus>
+                            <input type="text" name="fname" pattern="[A-Za-z\-\s]{1,}" title="Only letters, hyphens and spaces allowed" placeholder="First Name" required data-focus>
                             <span>First Name</span>
                         </div>
 
                         <!-- Last Name Input -->
                         <div data-input-container>
-                            <input type="text" name="lname" pattern="([A-Z][a-z]{1,}|[A-Z][a-z]{1,}-[A-Z][a-z]{1,})" title="Must be capitalized and contain only letters, and at most one hyphen" placeholder="Last Name" data-focus>
+                            <input type="text" name="lname" pattern="[A-Za-z\-\s]{1,}" title="Only letters, hyphens and spaces allowed" placeholder="Last Name" data-focus>
                             <span>Last Name</span>
                         </div>
 

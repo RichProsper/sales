@@ -8,6 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $data = json_decode( file_get_contents("php://input") );
     $response = new stdClass;
 
+    $data->fname = ucwords($data->fname);
+    $data->lname = ucwords($data->lname);
+
     $valid['title'] = empty($data->title) ? true : Validate::validateTitle($data->title);
     $valid['fname'] = Validate::validateName($data->fname);
     $valid['lname'] = empty($data->lname) ? true : Validate::validateName($data->lname);
