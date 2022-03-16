@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $valid['lname'] = empty($data->lname) ? true : Validate::validateName($data->lname);
     $valid['email'] = empty($data->email) ? true : Validate::validateEmail($data->email);
     $valid['parish'] = empty($data->parish) ? true : Validate::validateParish($data->parish);
-    $address = htmlspecialchars( stripslashes( trim($data->address) ) );
+    $address = db::escapeString($data->address);
     $valid['homeNo'] = empty($data->homeNo) ? true : Validate::validateTel($data->homeNo);
     $valid['cellNo'] = empty($data->cellNo) ? true : Validate::validateTel($data->cellNo);
     $valid['otherNos'] = empty($data->otherNos) ? true : Validate::validateMultTel($data->otherNos);

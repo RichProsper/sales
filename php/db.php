@@ -30,7 +30,7 @@ class db {
             if ( !array_search($filters[$i]->operation, $validOperations, true) ) $filters[$i]->operation = '=';
 
             // Filter Value
-            $filters[$i]->filterValue = filter_var($filters[$i]->filterValue, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_HIGH);
+            $filters[$i]->filterValue = self::escapeString($filters[$i]->filterValue);
         }
 
         return $filters;
@@ -65,6 +65,6 @@ class db {
     }
 
     public static function escapeString($str) {
-        // TODO escape the following characters: \x00, \n, \r, \, ', " and \x1a
+        return htmlspecialchars( addslashes( str_replace( "\\", "", trim($str) ) ) );
     }
 } // class db

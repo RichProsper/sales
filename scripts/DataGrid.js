@@ -1654,15 +1654,14 @@ export default class {
                 if (this.NumRows !== entity.numRows) {
                     this.NumRows = entity.numRows
                     this.Pagination.querySelector('num-rows-rui').textContent = this.NumRows
-
-                    if (entity.numRows === 0) {
-                        this.Pagination.querySelector('offset-min-rui').textContent = 0
-                        this.Pagination.querySelector('offset-max-rui').textContent = 0
-                    }
-                    if (entity.numRows <= +this.Pagination.querySelector('[data-rows-per-page-value]').value) {
-                        this.NextPageBtn.disabled = true
-                        this.Pagination.querySelector('offset-max-rui').textContent = entity.numRows
-                    }
+                }
+                if (entity.numRows === 0) {
+                    this.Pagination.querySelector('offset-min-rui').textContent = 0
+                    this.Pagination.querySelector('offset-max-rui').textContent = 0
+                }
+                if (entity.numRows <= +this.Pagination.querySelector('[data-rows-per-page-value]').value) {
+                    this.NextPageBtn.disabled = true
+                    this.Pagination.querySelector('offset-max-rui').textContent = entity.numRows
                 }
                 
                 this.ResetRowsSelected()

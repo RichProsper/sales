@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $validValue = empty($data->value) ? true : Validate::validateParish($data->value);
             break;
         case "address" :
-            $data->value = htmlspecialchars( stripslashes( trim($data->value) ) );
+            $data->value = db::escapeString($data->value);
             break;
         case "homeNo" :
         case "cellNo" :
