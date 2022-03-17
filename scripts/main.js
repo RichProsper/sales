@@ -5,9 +5,12 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     window.DataGrids = {}
     // ToTop()
 
-    const custDataReadUrl = '../sales/php/customer_read.php'
+    const crudCustomerUrl = '../sales/php/crud_customer.php'
     
-    fetch(custDataReadUrl)
+    fetch(crudCustomerUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'READ_ALL' })
+    })
     .then(response => response.json())
     .then(
         /**
@@ -36,10 +39,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 rows: customer.rows,
                 numRows: customer.numRows,
                 rowIds: customer.rowIds,
-                dataReadUrl: custDataReadUrl,
-                dataCreateUrl: '../sales/php/customer_create.php',
-                dataDeleteUrl: '../sales/php/customer_delete.php',
-                dataUpdateUrl: '../sales/php/customer_update.php'
+                crudUrl: crudCustomerUrl
             })
         }
     )

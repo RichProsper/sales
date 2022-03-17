@@ -14,10 +14,8 @@ import Select from '../vendors/rui/rui-select.min.js'
  * @property {Object[]} rowIds The rowIds
  * @property {Number} numRows The number of rows
  * @property {String} checkboxId The checkbox ID
- * @property {String} dataReadUrl The path of the php script that retrieves the data
- * @property {String} dataCreateUrl The path of the php script that inserts the data
- * @property {String} dataDeleteUrl The path of the php script that deletes the data
- * @property {String} dataUpdateUrl The path of the php script that updates the data
+ * @property {String} crudUrl The path of the php script that
+ * handles CRUD operations
  */
 
 export default class {
@@ -32,10 +30,7 @@ export default class {
         this.Rows = data.rows
         this.RowIDs = data.rowIds
         this.NumRows = data.numRows
-        this.DataReadUrl = data.dataReadUrl
-        this.DataCreateUrl = data.dataCreateUrl
-        this.DataDeleteUrl = data.dataDeleteUrl
-        this.DataUpdateUrl = data.dataUpdateUrl
+        this.CrudUrl = data.crudUrl
         this.init()
     }
 
@@ -337,7 +332,7 @@ export default class {
                                         SetOperatorVisibility()
                                         PanelContent.setAttribute('data-rows', numRows - 1)
 
-                                        DataGrid.FilterRetrieveData()
+                                        DataGrid.FilterReadData()
                                     }
                                     else {
                                         const row = this.parentElement.parentElement
@@ -357,7 +352,7 @@ export default class {
                                         if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
                                         else Indicator.classList.add('hide')
 
-                                        DataGrid.FilterRetrieveData()
+                                        DataGrid.FilterReadData()
                                     }
                                 })
 
@@ -371,9 +366,9 @@ export default class {
                                         const Ops = PanelContent.querySelectorAll('[data-operators]')
                                         for (const Op of Ops) Op.children[0].value = this.value
 
-                                        // When to call FilterRetrieveData
+                                        // When to call FilterReadData
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterRetrieveData()
+                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
                                     }
                                 },
                                 options: [
@@ -408,7 +403,7 @@ export default class {
                                 evts: {
                                     change: function() {
                                         const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterRetrieveData()
+                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
                                     }
                                 },
                                 options: colOptions
@@ -435,7 +430,7 @@ export default class {
                                                 FiltersBtn.value = +FiltersBtn.value + 1
                                             }
                                             
-                                            DataGrid.FilterRetrieveData()
+                                            DataGrid.FilterReadData()
                                         }
                                         else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
                                         {
@@ -443,10 +438,10 @@ export default class {
                                             row.removeAttribute('data-has-filter')
 
                                             FiltersBtn.value = +FiltersBtn.value - 1
-                                            DataGrid.FilterRetrieveData()
+                                            DataGrid.FilterReadData()
                                         }
                                         else if (filterValue.value) {
-                                            DataGrid.FilterRetrieveData()
+                                            DataGrid.FilterReadData()
                                         }
 
                                         this.setAttribute('data-value', this.value)
@@ -486,7 +481,7 @@ export default class {
                                         if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
                                         else Indicator.classList.add('hide')
 
-                                        DataGrid.FilterRetrieveData()
+                                        DataGrid.FilterReadData()
                                     }, 1000)
                                 }
                             }
@@ -625,7 +620,7 @@ export default class {
                                     order.setAttribute('data-value', this.getAttribute('data-value'))
 
                                     this.setAttribute('data-value', this.value)
-                                    DataGrid.RetrieveData()
+                                    DataGrid.ReadData()
                                 }
                             },
                             options: orderOptions
@@ -690,7 +685,7 @@ export default class {
                                         }
                                     }
 
-                                    DataGrid.RetrieveData()
+                                    DataGrid.ReadData()
                                 }
                             },
                             options: [
@@ -738,7 +733,7 @@ export default class {
                         SortsBtn.value = 0
                         Indicator.classList.add('hide')
 
-                        DataGrid.RetrieveData()
+                        DataGrid.ReadData()
                     })
 
                 PanelFooter.appendChild(ResetBtn)
@@ -815,9 +810,9 @@ export default class {
                 }
             }
 
-            fetch(DataGrid.DataCreateUrl, {
+            fetch(DataGrid.CrudUrl, {
                 method: 'POST',
-                body: JSON.stringify(data)
+                body: JSON.stringify({ action: 'CREATE', payload: data })
             })
             .then(respJSON => respJSON.json())
             .then(
@@ -829,7 +824,7 @@ export default class {
                 resp => {
                     if (resp.success) {
                         DataGrid.FormModal.querySelector('form').reset()
-                        DataGrid.RetrieveData()
+                        DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
                         DataGrid.Alert.querySelector('.message').textContent = resp.message
@@ -906,9 +901,9 @@ export default class {
 
             for (const selectedRow of selectedRows) ids.push( +selectedRow.getAttribute('data-entity-id') )
             
-            fetch(DataGrid.DataDeleteUrl, {
+            fetch(DataGrid.CrudUrl, {
                 method: 'POST',
-                body: JSON.stringify(ids)
+                body: JSON.stringify({ action: 'DELETE', payload: ids })
             })
             .then(respJSON => respJSON.json())
             .then(
@@ -920,7 +915,7 @@ export default class {
                 resp => {
                     if (resp.success) {
                         DataGrid.DeleteModal.classList.remove('open')
-                        DataGrid.RetrieveData()
+                        DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
                         DataGrid.Alert.querySelector('.message').textContent = resp.message
@@ -1197,9 +1192,9 @@ export default class {
                             value: this.textContent
                         }
 
-                        fetch(DataGrid.DataUpdateUrl, {
+                        fetch(DataGrid.CrudUrl, {
                             method: 'POST',
-                            body: JSON.stringify(data)
+                            body: JSON.stringify({ action: 'UPDATE', payload: data })
                         })
                         .then(respJSON => respJSON.json())
                         .then(
@@ -1319,7 +1314,7 @@ export default class {
                             }
                             else NextPageBtn.disabled = false
 
-                            DataGrid.RetrieveData()
+                            DataGrid.ReadData()
                         }
                     },
                     options
@@ -1532,7 +1527,7 @@ export default class {
             else OffsetMax.textContent = newOffsetMaxVal
 
             DataGrid.PrevPageBtn.disabled = false
-            DataGrid.RetrieveData()
+            DataGrid.ReadData()
         })
 
         this.PrevPageBtn.addEventListener('click', function() {
@@ -1566,7 +1561,7 @@ export default class {
             }
 
             DataGrid.NextPageBtn.disabled = disabled
-            DataGrid.RetrieveData()
+            DataGrid.ReadData()
         })
     } // SetupNextPrevBtns()
 
@@ -1627,7 +1622,7 @@ export default class {
         return sorts
     }
 
-    RetrieveData() {
+    ReadData() {
         const data = {
             sorts: this.GetSorts(),
             filters: this.GetFilters(),
@@ -1635,9 +1630,9 @@ export default class {
             offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
         }
 
-        fetch(this.DataReadUrl, {
+        fetch(this.CrudUrl, {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify({ action: 'READ', payload: data })
         })
         .then(resp => resp.json())
         .then(
@@ -1674,11 +1669,11 @@ export default class {
         .catch(e => console.error(e))
     }
 
-    FilterRetrieveData() {
+    FilterReadData() {
         this.Pagination.querySelector('offset-min-rui').textContent = 1
         this.Pagination.querySelector('offset-max-rui').textContent = this.Pagination.querySelector('[data-rows-per-page-value]').value
         this.PrevPageBtn.disabled = true
         this.NextPageBtn.disabled = false
-        this.RetrieveData()
+        this.ReadData()
     }
 } // class{}

@@ -1,6 +1,6 @@
 <?php
 
-class db {
+class DB {
     public static function getDbConnection() {
         try {
             $connString = "mysql:host=localhost;dbname=sales_db";
@@ -67,4 +67,58 @@ class db {
     public static function escapeString($str) {
         return htmlspecialchars( addslashes( str_replace( "\\", "", trim($str) ) ) );
     }
-} // class db
+} // class DB
+
+class Validate {
+    public static function ID($id = 1) {
+        if ( !is_int($id) ) return false;
+        if ($id < 1) return false;
+        
+        return true;
+    }
+
+    public static function IDs($ids = array()) {
+        if (count($ids) === 0) return false;
+        
+        foreach($ids as $id) {
+            if ( !self::ID($id) ) return false;
+        }
+
+        return true;
+    }
+
+    public static function Title($title = '') {
+        $validTitles = array('Dr.', 'Miss', 'Mr.', 'Mrs.', 'Ms.', 'Prof.', 'Rev.');
+
+        return (array_search($title, $validTitles, true) !== false);
+    }
+
+    public static function Name($name = '') {
+        // Only letters, hyphens and spaces allowed
+        $regex = '/^[A-Za-z\-\s]{1,}$/';
+        
+        return (preg_match($regex, $name) !== 0);
+    }
+
+    public static function Email($email = '') {
+        return (filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
+    }
+
+    public static function Parish($parish = '') {
+        $validParishes = array('Christ Church', 'St. Andrew', 'St. George', 'St. James', 'St. John', 'St. Joseph', 'St. Lucy', 'St. Michael', 'St. Peter', 'St. Philip', 'St. Thomas');
+
+        return (array_search($parish, $validParishes, true) !== false);
+    }
+
+    public static function TelNo($tel = '') {
+        $regex = '/^([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}$/';
+
+        return (preg_match($regex, $tel) !== 0);
+    }
+
+    public static function MultTelNos($multTel = '') {
+        $regex = '/^([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*$/';
+
+        return (preg_match($regex, $multTel) !== 0);
+    }
+} // class Validate
