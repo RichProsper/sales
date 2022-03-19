@@ -12,7 +12,10 @@ $response = new stdClass;
 
 switch ($req->action) {
     case "READ_ALL" :
-        $rows = $conn->query("SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers LIMIT 25");
+        // Almost equivalent to PHP's htmlspecialchars_decode()
+        $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
+        
+        $rows = $conn->query("SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers LIMIT 25");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
 
         $rowIds = $conn->query("SELECT cId FROM customers LIMIT 25");
@@ -28,7 +31,9 @@ switch ($req->action) {
         echo json_encode($customer);
         break;
     case "READ" :
-        $rowsSQL = "SELECT title, fname, lname, email, parish, address, homeNo, cellNo, otherNos FROM customers";
+        $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
+
+        $rowsSQL = "SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers";
         $rowIdsSQL = "SELECT cId FROM customers";
         $numRowsSQL = "SELECT COUNT(cId) FROM customers";
 

@@ -1065,8 +1065,6 @@ export default class {
         switch (e.key) {
             case 'Escape':
             case 'Enter' :
-                this.SelectedCol.removeEventListener('keydown', this.BoundColumnEdit)
-
                 if (this.SelectedCol.nextElementSibling) {
                     this.SelectedCol.nextElementSibling.focus()
                 }
@@ -1149,6 +1147,7 @@ export default class {
                         if (this.readOnly) return
 
                         this.readOnly = true
+                        this.removeEventListener('keydown', DataGrid.BoundColumnEdit)
                         this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
 
                         if (this.value === this.getAttribute('data-value')) return
