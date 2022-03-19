@@ -185,8 +185,8 @@ export default class {
                         attrs: { checked: '' },
                         evts: {
                             change: function() {
-                                const HCol = Datagrid.DataGrid.querySelectorAll('hcol-rui')[i + 1]
-                                const Cols = Datagrid.DataGrid.querySelectorAll(`col-rui[data-colindex="${i}"]`)
+                                const HCol = Datagrid.HeadingsContainer.querySelectorAll('hcol-rui')[i + 1]
+                                const Cols = Datagrid.RowsContainer.querySelectorAll(`[data-colindex="${i}"]`)
                                 
                                 if (this.checked) {
                                     HCol.classList.remove('hide')
@@ -992,38 +992,9 @@ export default class {
     }
 
     /**
-     * Sets the cursor postion to the given position inside an element
-     * @param {HTMLElement} elem The element with the cursor to set
-     * @param {Number} pos The position to place the cursor
-     */
-    SetCursorPosition(elem, pos) {
-        // Creates range object
-        const setpos = document.createRange();
-          
-        // Creates object for selection
-        const set = window.getSelection();
-
-        // If there are no nodes, create one
-        if (elem.childNodes.length === 0) elem.appendChild( document.createTextNode('') )
-          
-        // Set start position of range
-        setpos.setStart(elem.childNodes[0], pos);
-          
-        // Collapse range within its boundary points
-        // Returns boolean
-        setpos.collapse(true);
-          
-        // Remove all ranges set
-        set.removeAllRanges();
-          
-        // Add range with respect to range object.
-        set.addRange(setpos);
-    }
-
-    /**
      * Scroll parent element if element is partially
      * or fully offscreen to the left or right
-     * @param {HTMLElement} el The element to keep in view
+     * @param {HTMLInputElement} el The element to keep in view
      * @param {HTMLElement} containerEl The parent element to scroll if need be
      */
     KeepElementInView(el, containerEl) {
@@ -1161,12 +1132,12 @@ export default class {
 
                 let j = 0
                 for (let col in this.Rows[i]) {
-                    const Col = document.createElement('col-rui')
+                    const Col = document.createElement('input')
 
                     Col.setAttribute('data-colindex', j)
-                    Col.tabIndex = -1
-                    Col.textContent = this.Rows[i][col]
+                    Col.value = this.Rows[i][col] ? this.Rows[i][col] : ''
                     Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
+                    Col.readOnly = true
 
                     Col.addEventListener('focus', function() {
                         DataGrid.SelectedCol = this
@@ -1175,13 +1146,12 @@ export default class {
                     Col.addEventListener('keydown', this.BoundColumnNavigate)
 
                     Col.addEventListener('blur', function() {
-                        if (!this.hasAttribute('contenteditable')) return
-                        if (this.contentEditable === 'false') return
+                        if (this.readOnly) return
 
-                        this.contentEditable = false
+                        this.readOnly = true
                         this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
 
-                        if (this.textContent === this.getAttribute('data-value')) return
+                        if (this.value === this.getAttribute('data-value')) return
 
                         DataGrid.Alert.classList.remove('open')
                         clearTimeout(DataGrid.AlertTimer)
@@ -1189,7 +1159,7 @@ export default class {
                         const data = {
                             id: +this.parentElement.getAttribute('data-entity-id'),
                             column: DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'),
-                            value: this.textContent
+                            value: this.value
                         }
 
                         fetch(DataGrid.CrudUrl, {
@@ -1205,7 +1175,7 @@ export default class {
                              */
                             resp => {
                                 if (resp.success) {     
-                                    this.setAttribute('data-value', this.textContent)
+                                    this.setAttribute('data-value', this.value)
 
                                     DataGrid.Alert.querySelector('.status').textContent = 'Success!'
                                     DataGrid.Alert.querySelector('.message').textContent = resp.message
@@ -1235,14 +1205,14 @@ export default class {
                     })
 
                     Col.addEventListener('dblclick', function() {
-                        if (this.contentEditable === 'true') return
+                        if (!this.readOnly) return
 
                         if (this.scrollWidth > this.offsetWidth) DataGrid.ResizeColumn(this, this.scrollWidth + 10)
 
                         this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
-                        this.contentEditable = true
+                        this.readOnly = false
 
-                        DataGrid.SetCursorPosition(this, this.textContent.length)
+                        this.setSelectionRange(this.value.length, this.value.length)
                         DataGrid.KeepElementInView(this, DataGrid.RowsContainer)
 
                         this.addEventListener('keydown', DataGrid.BoundColumnEdit)
@@ -1369,7 +1339,7 @@ export default class {
 
         for (const hcol of HCols) {
             const i = +hcol.children[1].getAttribute('data-colindex')
-            const Cols = this.RowsContainer.querySelectorAll(`col-rui[data-colindex="${i}"]`)
+            const Cols = this.RowsContainer.querySelectorAll(`[data-colindex="${i}"]`)
             for (const col of Cols) col.classList.add('hide')
         }
     }
@@ -1479,7 +1449,7 @@ export default class {
             HCol.style.minWidth = `${newWidth}rem`
             HCol.style.maxWidth = `${newWidth}rem`
 
-            const Cols = this.RowsContainer.querySelectorAll(`col-rui[data-colindex="${curPos.colIndex}"]`)
+            const Cols = this.RowsContainer.querySelectorAll(`[data-colindex="${curPos.colIndex}"]`)
             for (let col of Cols) {
                 col.style.minWidth = `${newWidth}rem`
                 col.style.maxWidth = `${newWidth}rem`

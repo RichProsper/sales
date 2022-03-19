@@ -617,16 +617,6 @@ main-rui {
   font-size: 1.4rem;
 }
 
-main-rui headings-container-rui headings-rui hcol-rui heading-title-rui, main-rui rows-container-rui row-rui col-rui {
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: var(--Row-Height);
-  padding: 0 1rem;
-}
-
 main-rui headings-container-rui {
   display: block;
   height: calc(var(--Row-Height) + .1rem);
@@ -657,6 +647,13 @@ main-rui headings-container-rui headings-rui hcol-rui:first-child {
 }
 
 main-rui headings-container-rui headings-rui hcol-rui heading-title-rui {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: var(--Row-Height);
+  padding: 0 1rem;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
@@ -715,28 +712,54 @@ main-rui rows-container-rui row-rui {
   transition: .1s;
 }
 
-main-rui rows-container-rui row-rui col-rui {
+main-rui rows-container-rui row-rui col-rui,
+main-rui rows-container-rui row-rui input {
+  display: block;
+  height: 100%;
+  line-height: var(--Row-Height);
+  padding: 0 1rem;
+  border: unset;
+  background-color: unset;
+  color: inherit;
+  font-size: inherit;
   border-right: 0.1rem solid var(--row-hover);
   border-bottom: 0.1rem solid var(--grey);
 }
 
-main-rui rows-container-rui row-rui col-rui:focus {
+main-rui rows-container-rui row-rui col-rui:focus,
+main-rui rows-container-rui row-rui input:focus {
   outline: 0.1rem solid var(--blue-1);
 }
 
-main-rui rows-container-rui row-rui col-rui.hide {
+main-rui rows-container-rui row-rui col-rui.hide,
+main-rui rows-container-rui row-rui input.hide {
   display: none;
 }
 
-main-rui rows-container-rui row-rui:hover col-rui {
+main-rui rows-container-rui row-rui input:-moz-read-only {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main-rui rows-container-rui row-rui input:read-only {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main-rui rows-container-rui row-rui:hover col-rui,
+main-rui rows-container-rui row-rui:hover input {
   background-color: var(--row-hover);
 }
 
-main-rui rows-container-rui row-rui.selected col-rui {
+main-rui rows-container-rui row-rui.selected col-rui,
+main-rui rows-container-rui row-rui.selected input {
   background-color: var(--row-select);
 }
 
-main-rui rows-container-rui row-rui.selected:hover col-rui {
+main-rui rows-container-rui row-rui.selected:hover col-rui,
+main-rui rows-container-rui row-rui.selected:hover input {
   background-color: var(--row-select-hover);
 }
 
