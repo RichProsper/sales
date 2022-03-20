@@ -24,8 +24,7 @@ export default class {
      */
     constructor(data) {
         this.DataGridContainer = document.querySelector(`[data-grid="${data.table.dbName}"]`)
-        this.FormModal = document.querySelector(`[data-form-modal="${data.table.dbName}"]`)
-        this.DeleteModal = document.querySelector(`[data-delete-modal="${data.table.dbName}"]`)
+        this.NewModal = document.querySelector(`[data-form-modal="${data.table.dbName}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.RowIDs = data.rowIds
@@ -90,6 +89,7 @@ export default class {
         this.Canvas = document.createElement('canvas')
 
         this.DataGrid = document.createElement('datagrid-rui')
+        this.CreateDeleteModal()
         this.CreateAlert()
         this.CreateToolbar()
         this.CreateMain()
@@ -129,13 +129,72 @@ export default class {
         document.body.appendChild(this.Alert)
     }
 
+    CreateDeleteModal() {
+        this.DeleteModal = document.createElement('div')
+        this.DeleteModal.className = 'modal delete'
+
+            const content = document.createElement('div')
+            content.className = 'content'
+
+                const header = document.createElement('div')
+                header.className = 'header'
+
+                    const headerText = document.createElement('h3')
+                    headerText.className = 'header-text'
+
+                    const closeBtn = document.createElement('button')
+                    closeBtn.type = 'button'
+                    closeBtn.className = 'close'
+                    closeBtn.innerHTML = `<span>&times;</span>`
+
+                header.appendChild(headerText)
+                header.appendChild(closeBtn)
+
+                const body = document.createElement('div')
+                body.className = 'body'
+
+                    const bodyText = document.createElement('div')
+                    bodyText.className = 'body-text'
+
+                    const form = document.createElement('form')
+
+                        const resetSubmit = document.createElement('div')
+                        resetSubmit.className = 'reset-submit'
+
+                            const resetBtn = document.createElement('button')
+                            resetBtn.type = 'reset'
+                            resetBtn.className = 'green'
+                            resetBtn.textContent = 'CANCEL'
+
+                            const submitBtn = document.createElement('button')
+                            submitBtn.type = 'submit'
+                            submitBtn.className = 'red'
+                            submitBtn.textContent = 'DELETE'
+
+                        resetSubmit.appendChild(resetBtn)
+                        resetSubmit.appendChild(submitBtn)
+
+                    form.appendChild(resetSubmit)
+
+
+                body.appendChild(bodyText)
+                body.appendChild(form)
+
+            content.appendChild(header)
+            content.appendChild(body)
+
+        this.DeleteModal.appendChild(content)
+
+        document.body.appendChild(this.DeleteModal)
+    }
+
     CreateToolbar() {
         this.Toolbar = document.createElement('toolbar-rui')
 
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.SetupNewFormModal()
+        this.SetupNewModal()
         this.SetupDeleteModal()
 
         this.DataGrid.appendChild(this.Toolbar)
@@ -773,20 +832,20 @@ export default class {
         this.Toolbar.appendChild(SortsPanelContainer)
     } // CreateSortsPanelContainer()
 
-    SetupNewFormModal() {
+    SetupNewModal() {
         const NewBtn = document.createElement('button')
         NewBtn.type = 'button'
         NewBtn.className = 'toolbar-btn new'
         NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
-        NewBtn.addEventListener('click', () => this.FormModal.classList.add('open'))
+        NewBtn.addEventListener('click', () => this.NewModal.classList.add('open'))
 
-        this.FormModal.addEventListener('click', function(e) {
+        this.NewModal.addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('open')
         })
 
-        this.FormModal.querySelector('button.close').addEventListener('click', () => this.FormModal.classList.remove('open'))
+        this.NewModal.querySelector('button.close').addEventListener('click', () => this.NewModal.classList.remove('open'))
 
-        const focusables = this.FormModal.querySelectorAll('[data-focus]')
+        const focusables = this.NewModal.querySelectorAll('[data-focus]')
         for (const focusable of focusables) {
             focusable.addEventListener('focus', function() {
                 this.parentElement.classList.add('focused')
@@ -797,7 +856,7 @@ export default class {
         }
 
         const DataGrid = this
-        this.FormModal.querySelector('form').addEventListener('submit', function(e) {
+        this.NewModal.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault()
 
             DataGrid.Alert.classList.remove('open')
@@ -823,7 +882,7 @@ export default class {
                  */
                 resp => {
                     if (resp.success) {
-                        DataGrid.FormModal.querySelector('form').reset()
+                        DataGrid.NewModal.querySelector('form').reset()
                         DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
@@ -854,7 +913,7 @@ export default class {
         })
 
         this.Toolbar.appendChild(NewBtn)
-    } // SetupNewFormModal()
+    } // SetupNewModal()
 
     SetupDeleteModal() {
         const DelBtn = document.createElement('button')
