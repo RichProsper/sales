@@ -124,9 +124,9 @@ switch ($req->action) {
         $valid['lname'] = empty($lname) ? true : Validate::Name($lname);
         $valid['email'] = empty($email) ? true : Validate::Email($email);
         $valid['parish'] = empty($parish) ? true : Validate::Parish($parish);
-        $valid['homeNo'] = empty($homeNo) ? true : Validate::Tel($homeNo);
-        $valid['cellNo'] = empty($cellNo) ? true : Validate::Tel($cellNo);
-        $valid['otherNos'] = empty($otherNos) ? true : Validate::MultTel($otherNos);
+        $valid['homeNo'] = empty($homeNo) ? true : Validate::TelNo($homeNo);
+        $valid['cellNo'] = empty($cellNo) ? true : Validate::TelNo($cellNo);
+        $valid['otherNos'] = empty($otherNos) ? true : Validate::MultTelNos($otherNos);
 
         if ( !array_search(false, $valid, true) ) {
             try {
@@ -204,10 +204,10 @@ switch ($req->action) {
                 break;
             case "homeNo" :
             case "cellNo" :
-                $validValue = empty($value) ? true : Validate::Tel($value);
+                $validValue = empty($value) ? true : Validate::TelNo($value);
                 break;
             case "otherNos" :
-                $validValue = empty($value) ? true : Validate::MultTel($value);
+                $validValue = empty($value) ? true : Validate::MultTelNos($value);
                 break;
             default :
                 $validValue = false;
