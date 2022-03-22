@@ -70,14 +70,15 @@ class DB {
 } // class DB
 
 class Validate {
-    public static function ID($id = 1) {
+    public static function ID($id) {
         if ( !is_int($id) ) return false;
         if ($id < 1) return false;
         
         return true;
     }
 
-    public static function IDs($ids = array()) {
+    public static function IDs($ids) {
+        if ( !is_array($ids) ) return false;
         if (count($ids) === 0) return false;
         
         foreach($ids as $id) {
@@ -87,38 +88,70 @@ class Validate {
         return true;
     }
 
-    public static function Title($title = '') {
+    public static function Title($title) {
         $validTitles = array('Dr.', 'Miss', 'Mr.', 'Mrs.', 'Ms.', 'Prof.', 'Rev.');
 
         return (array_search($title, $validTitles, true) !== false);
     }
 
-    public static function Name($name = '') {
+    public static function Name($name) {
         // Only letters, hyphens and spaces allowed
         $regex = '/^[A-Za-z\-\s]{1,}$/';
         
         return (preg_match($regex, $name) !== 0);
     }
 
-    public static function Email($email = '') {
+    public static function Email($email) {
         return (filter_var($email, FILTER_VALIDATE_EMAIL) !== false);
     }
 
-    public static function Parish($parish = '') {
+    public static function Parish($parish) {
         $validParishes = array('Christ Church', 'St. Andrew', 'St. George', 'St. James', 'St. John', 'St. Joseph', 'St. Lucy', 'St. Michael', 'St. Peter', 'St. Philip', 'St. Thomas');
 
         return (array_search($parish, $validParishes, true) !== false);
     }
 
-    public static function TelNo($tel = '') {
+    public static function TelNo($tel) {
         $regex = '/^([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}$/';
 
         return (preg_match($regex, $tel) !== 0);
     }
 
-    public static function MultTelNos($multTel = '') {
+    public static function MultTelNos($multTel) {
         $regex = '/^([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*$/';
 
         return (preg_match($regex, $multTel) !== 0);
     }
+
+    // TODO
+    public static function Image($image) {
+        return true;
+    }
+
+    public static function Unit($unit) {
+        $validUnits = array('Kilograms (kg)', 'Grams (g)', 'Pounds (lbs)', 'Ounces (oz)');
+
+        return (array_search($unit, $validUnits, true) !== false);
+    }
+
+    public static function UnitPrice($unitPrice) {
+        if ( !is_numeric($unitPrice) ) return false;
+        if ($unitPrice < 0.01) return false;
+        
+        return true;
+    }
 } // class Validate
+
+class Format {
+    public static function UnitPrice($unitPrice = "0.01") {
+        $unitPrice = round($unitPrice, 2);
+        $hasDecimal = strpos($unitPrice, '.');
+
+        if (!$hasDecimal) return $unitPrice . ".00";
+        else {
+            if ( $hasDecimal === (strlen($unitPrice) - 2) ) return $unitPrice . "0";
+        }
+
+        return $unitPrice;
+    }
+} // class Format

@@ -3,10 +3,12 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 
 (() => {
     window.DataGrids = {}
-    // ToTop()
+    ToTop()
 
     const crudCustomerUrl = '../sales/php/crud_customer.php'
+    const crudProductUrl = '../sales/php/crud_product.php'
     
+    // Customers
     fetch(crudCustomerUrl, {
         method: 'POST',
         body: JSON.stringify({ action: 'READ_ALL' })
@@ -40,6 +42,41 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                 numRows: customer.numRows,
                 rowIds: customer.rowIds,
                 crudUrl: crudCustomerUrl
+            })
+        }
+    )
+    .catch(e => console.error(e))
+
+    // Products
+    fetch(crudProductUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'READ_ALL' })
+    })
+    .then(response => response.json())
+    .then(
+        /**
+         * @param {Object} product
+         * @param {Object[]} product.rows
+         * @param {Object[]} product.rowIds
+         * @param {Number} product.numRows
+         */
+        product => {
+            window.DataGrids.Products = new DataGrid({
+                table: {
+                    name: 'Products',
+                    dbName: 'products'
+                },
+                columns: {
+                    Name: 'name',
+                    Description: 'desc',
+                    Image: 'image',
+                    Unit: 'unit',
+                    'Unit Price ($)': 'unitPrice'
+                },
+                rows: product.rows,
+                numRows: product.numRows,
+                rowIds: product.rowIds,
+                crudUrl: crudProductUrl
             })
         }
     )

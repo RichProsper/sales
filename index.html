@@ -36,7 +36,7 @@
         <div data-grid="customers"></div>
 
         <!-- Add New Customer Modal -->
-        <div class="modal" data-form-modal="customers">
+        <div class="modal" data-new-modal="customers">
             <div class="content">
                 <div class="header">
                     <h3>Add New Customer</h3>
@@ -139,6 +139,64 @@
     <section id="products" class="section">
         <h2 class="heading">Products</h2>
         <div data-grid="products"></div>
+
+        <!-- Add New Product Modal -->
+        <div class="modal" data-new-modal="products">
+            <div class="content">
+                <div class="header">
+                    <h3>Add New Product</h3>
+
+                    <button type="button" class="close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="body">
+                    <form>
+                        <!-- Name Input -->
+                        <div data-input-container>
+                            <input type="text" name="name" pattern="[A-Za-z\-\s]{1,}" title="Only letters, hyphens and spaces allowed" placeholder="Name" required data-focus>
+                            <span>Name</span>
+                        </div>
+
+                        <!-- Description Textarea -->
+                        <div data-textarea-container>
+                            <textarea name="desc" rows="4" placeholder="Description..." data-focus></textarea>
+                            <span>Description...</span>
+                        </div>
+
+                        <!-- Image Input -->
+                        <div data-input-container>
+                            <input type="file" name="image" title="Only '.jfif', '.jpg', '.jpeg', '.webp' and '.png' image file extensions allowed" data-focus>
+                        </div>
+
+                        <!-- Unit Select -->
+                        <div data-select-container>
+                            <select name="unit" required data-focus>
+                                <option value="">Select a Unit...</option>
+                                <option value="Kilograms (kg)">Kilograms (kg)</option>
+                                <option value="Grams (g)">Grams (g)</option>
+                                <option value="Pounds (lbs)">Pounds (lbs)</option>
+                                <option value="Ounces (oz)">Ounces (oz)</option>
+                            </select>
+                            <span>Units</span>
+                        </div>
+
+                        <!-- Unit Price Input -->
+                        <div data-input-container>
+                            <input type="number" name="unitPrice" min="0.01" step="0.01" placeholder="Unit Price" required data-focus>
+                            <span>Unit Price</span>
+                        </div>
+
+                        <!-- Reset & Submit Buttons -->
+                        <div class="reset-submit">
+                            <button type="reset" class="red">RESET</button>
+                            <button type="submit" class="green">SUBMIT</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 </body>
 </html>

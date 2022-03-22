@@ -24,7 +24,7 @@ export default class {
      */
     constructor(data) {
         this.DataGridContainer = document.querySelector(`[data-grid="${data.table.dbName}"]`)
-        this.NewModal = document.querySelector(`[data-form-modal="${data.table.dbName}"]`)
+        this.NewModal = document.querySelector(`[data-new-modal="${data.table.dbName}"]`)
         this.Columns = data.columns
         this.Rows = data.rows
         this.RowIDs = data.rowIds
