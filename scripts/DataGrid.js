@@ -1475,6 +1475,7 @@ export default class {
     }
 
     SetupResizingColumns() {
+        const DataGrid = this
         const Headings = this.DataGrid.querySelector('headings-rui')
         const Resizables = Headings.querySelectorAll('resizable-rui')
 
@@ -1527,6 +1528,21 @@ export default class {
                 this.classList.add('active')
                 window.addEventListener('mousemove', resizeCols)
                 window.addEventListener('mouseup', cleanup)
+            })
+
+            Resizables[i].addEventListener('dblclick', function(e) {
+                let maxScrollWidth = this.previousElementSibling.scrollWidth
+                const cols = DataGrid.RowsContainer.querySelectorAll(`[data-colindex="${this.getAttribute('data-colindex')}"]`)
+
+                for (const col of cols) {
+                    if ( (col.scrollWidth + 1) > maxScrollWidth ) {
+                        maxScrollWidth = col.scrollWidth + 1
+                    }
+                }
+
+                if (maxScrollWidth > this.previousElementSibling.offsetWidth) {
+                    DataGrid.ResizeColumn(cols[0], maxScrollWidth + 10)
+                }
             })
         }
     }
