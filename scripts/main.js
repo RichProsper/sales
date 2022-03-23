@@ -3,7 +3,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 
 (() => {
     window.DataGrids = {}
-    ToTop()
+    // ToTop()
 
     const crudCustomerUrl = '../sales/php/crud_customer.php'
     const crudProductUrl = '../sales/php/crud_product.php'

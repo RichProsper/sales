@@ -181,7 +181,7 @@ switch ($req->action) {
                 $validValue = Validate::Name($value);
                 break;
             case "desc" :
-                $validValue = DB::escapeString($value);
+                $value = DB::escapeString($value);
                 break;
             case "image" :
                 $validValue = empty($value) ? true : Validate::Image($value);
