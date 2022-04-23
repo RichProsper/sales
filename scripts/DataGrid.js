@@ -24,7 +24,7 @@ export default class {
      */
     constructor(data) {
         this.DataGridContainer = document.querySelector(`[data-grid="${data.table.dbName}"]`)
-        this.NewModal = document.querySelector(`[data-new-modal="${data.table.dbName}"]`)
+        this.TableName = data.table.name
         this.Columns = data.columns
         this.Rows = data.rows
         this.RowIDs = data.rowIds
@@ -89,6 +89,7 @@ export default class {
         this.Canvas = document.createElement('canvas')
 
         this.DataGrid = document.createElement('datagrid-rui')
+        this.CreateNewModal()
         this.CreateDeleteModal()
         this.CreateAlert()
         this.CreateToolbar()
@@ -127,6 +128,65 @@ export default class {
         this.Alert.appendChild(closeBtn)
 
         document.body.appendChild(this.Alert)
+    }
+
+    CreateNewModal() {
+        this.NewModal = document.createElement('div')
+        this.NewModal.className = 'modal'
+
+            const content = document.createElement('div')
+            content.className = 'content'
+
+                const header = document.createElement('div')
+                header.className = 'header'
+
+                    const headerText = document.createElement('h3')
+                    headerText.className = 'header-text'
+                    headerText.textContent = `Add New ${this.TableName}`
+
+                    const closeBtn = document.createElement('button')
+                    closeBtn.type = 'button'
+                    closeBtn.className = 'close'
+                    closeBtn.innerHTML = `<span>&times;</span>`
+
+                header.appendChild(headerText)
+                header.appendChild(closeBtn)
+
+                const body = document.createElement('div')
+                body.className = 'body'
+
+                    const bodyText = document.createElement('div')
+                    bodyText.className = 'body-text'
+
+                    const form = document.createElement('form')
+
+                        const resetSubmit = document.createElement('div')
+                        resetSubmit.className = 'reset-submit'
+
+                            const resetBtn = document.createElement('button')
+                            resetBtn.type = 'reset'
+                            resetBtn.className = 'green'
+                            resetBtn.textContent = 'CANCEL'
+
+                            const submitBtn = document.createElement('button')
+                            submitBtn.type = 'submit'
+                            submitBtn.className = 'red'
+                            submitBtn.textContent = 'DELETE'
+
+                        resetSubmit.appendChild(resetBtn)
+                        resetSubmit.appendChild(submitBtn)
+
+                    form.appendChild(resetSubmit)
+
+
+                body.appendChild(bodyText)
+                body.appendChild(form)
+
+            content.appendChild(header)
+            content.appendChild(body)
+
+        this.NewModal.appendChild(content)
+        document.body.appendChild(this.NewModal)
     }
 
     CreateDeleteModal() {
@@ -184,7 +244,6 @@ export default class {
             content.appendChild(body)
 
         this.DeleteModal.appendChild(content)
-
         document.body.appendChild(this.DeleteModal)
     }
 
@@ -845,15 +904,7 @@ export default class {
 
         this.NewModal.querySelector('button.close').addEventListener('click', () => this.NewModal.classList.remove('open'))
 
-        const focusables = this.NewModal.querySelectorAll('[data-focus]')
-        for (const focusable of focusables) {
-            focusable.addEventListener('focus', function() {
-                this.parentElement.classList.add('focused')
-            })
-            focusable.addEventListener('blur', function() {
-                this.parentElement.classList.remove('focused')
-            })
-        }
+        this.NewModal.querySelector('button[type="reset"]').addEventListener('click', () => this.NewModal.classList.remove('open'))
 
         const DataGrid = this
         this.NewModal.querySelector('form').addEventListener('submit', function(e) {

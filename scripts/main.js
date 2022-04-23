@@ -24,7 +24,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         customer => {
             window.DataGrids.Customers = new DataGrid({
                 table: {
-                    name: 'Customers',
+                    name: 'Customer',
                     dbName: 'customers'
                 },
                 columns: {
@@ -38,6 +38,9 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     'Cell Number': 'cellNo',
                     'Other Numbers': 'otherNos'
                 },
+                // columns: {
+
+                // },
                 rows: customer.rows,
                 numRows: customer.numRows,
                 rowIds: customer.rowIds,
@@ -63,7 +66,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         product => {
             window.DataGrids.Products = new DataGrid({
                 table: {
-                    name: 'Products',
+                    name: 'Product',
                     dbName: 'products'
                 },
                 columns: {
