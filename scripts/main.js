@@ -42,7 +42,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                                 { value: 'Mrs.', textContent: 'Mrs.' },
                                 { value: 'Ms.', textContent: 'Ms.' },
                                 { value: 'Prof.', textContent: 'Prof.' },
-                                { value: 'Rev.', textContent: 'Rev.' },
+                                { value: 'Rev.', textContent: 'Rev.' }
                             ]
                         }
                     },
@@ -98,7 +98,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                                 { value: 'St. Michael', textContent: 'St. Michael' },
                                 { value: 'St. Peter', textContent: 'St. Peter' },
                                 { value: 'St. Philip', textContent: 'St. Philip' },
-                                { value: 'St. Thomas', textContent: 'St. Thomas' },
+                                { value: 'St. Thomas', textContent: 'St. Thomas' }
                             ]
                         }
                     },
@@ -156,37 +156,87 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     .catch(e => console.error(e))
 
     // Products
-    // fetch(crudProductUrl, {
-    //     method: 'POST',
-    //     body: JSON.stringify({ action: 'READ_ALL' })
-    // })
-    // .then(response => response.json())
-    // .then(
-    //     /**
-    //      * @param {Object} product
-    //      * @param {Object[]} product.rows
-    //      * @param {Object[]} product.rowIds
-    //      * @param {Number} product.numRows
-    //      */
-    //     product => {
-    //         window.DataGrids.Products = new DataGrid({
-    //             table: {
-    //                 name: 'Product',
-    //                 dbName: 'products'
-    //             },
-    //             columns: {
-    //                 Name: 'name',
-    //                 Description: 'desc',
-    //                 Image: 'image',
-    //                 Unit: 'unit',
-    //                 'Unit Price ($)': 'unitPrice'
-    //             },
-    //             rows: product.rows,
-    //             numRows: product.numRows,
-    //             rowIds: product.rowIds,
-    //             crudUrl: crudProductUrl
-    //         })
-    //     }
-    // )
-    // .catch(e => console.error(e))
+    fetch(crudProductUrl, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'READ_ALL' })
+    })
+    .then(response => response.json())
+    .then(
+        /**
+         * @param {Object} product
+         * @param {Object[]} product.rows
+         * @param {Object[]} product.rowIds
+         * @param {Number} product.numRows
+         */
+        product => {
+            window.DataGrids.Products = new DataGrid({
+                table: {
+                    name: 'Product',
+                    dbName: 'products'
+                },
+                columns: {
+                    'Name': {
+                        dbName: 'name',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'text', name: 'name', pattern: '[A-Za-z\-\s]{1,}',
+                                title: 'Only letters, hyphens and spaces allowed',
+                                placeholder: 'Name', required: ''
+                            }
+                        }
+                    },
+                    Description: {
+                        dbName: 'desc',
+                        tagName: 'textarea',
+                        tag: {
+                            attrs: {
+                                name: 'desc', rows: '4', placeholder: 'Description...'
+                            }
+                        }
+                    },
+                    'Image': {
+                        dbName: 'image',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'file', name: 'image',
+                                title: 'Only ".jfif", ".jpg", ".jpeg", ".webp" and ".png" image file extensions allowed'
+                            }
+                        }
+                    },
+                    Unit: {
+                        dbName: 'unit',
+                        tagName: 'select',
+                        tag: {
+                            labelText: 'Units',
+                            attrs: { name: 'unit', required: '' },
+                            options: [
+                                { value: '', textContent: 'Select a unit...' },
+                                { value: 'Kilograms (kg)', textContent: 'Kilograms (kg)' },
+                                { value: 'Grams (g)', textContent: 'Grams (g)' },
+                                { value: 'Pounds (lbs)', textContent: 'Pounds (lbs)' },
+                                { value: 'Ounces (oz)', textContent: 'Ounces (oz)' }
+                            ]
+                        }
+                    },
+                    'Unit Price ($)': {
+                        dbName: 'unitPrice',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'number', name: 'unitPrice', min: '0.01', step: '0.01',
+                                placeholder: 'Unit Price ($)', required: ''
+                            }
+                        }
+                    }
+                },
+                rows: product.rows,
+                numRows: product.numRows,
+                rowIds: product.rowIds,
+                crudUrl: crudProductUrl
+            })
+        }
+    )
+    .catch(e => console.error(e))
 })()
