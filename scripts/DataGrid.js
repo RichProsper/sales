@@ -2,6 +2,7 @@ import Checkbox from '../vendors/rui/rui-checkbox.min.js'
 import Switch from '../vendors/rui/rui-switch.min.js'
 import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
+import Textarea from '../vendors/rui/rui-textarea.min.js'
 
 /**
  * Grid Data
@@ -160,18 +161,36 @@ export default class {
 
                     const form = document.createElement('form')
 
+                        for (const col in this.Columns) {
+                            switch (this.Columns[col].tagName) {
+                                case 'input': {
+                                    form.appendChild( Input(this.Columns[col].tag) )
+                                    break
+                                }
+                                case 'textarea': {
+                                    form.appendChild( Textarea(this.Columns[col].tag) )
+                                    break
+                                }
+                                case 'select': {
+                                    form.appendChild( Select(this.Columns[col].tag) )
+                                    break
+                                }
+                                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
+                            }
+                        }
+
                         const resetSubmit = document.createElement('div')
                         resetSubmit.className = 'reset-submit'
 
                             const resetBtn = document.createElement('button')
                             resetBtn.type = 'reset'
-                            resetBtn.className = 'green'
-                            resetBtn.textContent = 'CANCEL'
+                            resetBtn.className = 'red'
+                            resetBtn.textContent = 'RESET'
 
                             const submitBtn = document.createElement('button')
                             submitBtn.type = 'submit'
-                            submitBtn.className = 'red'
-                            submitBtn.textContent = 'DELETE'
+                            submitBtn.className = 'green'
+                            submitBtn.textContent = 'SUBMIT'
 
                         resetSubmit.appendChild(resetBtn)
                         resetSubmit.appendChild(submitBtn)
@@ -461,7 +480,7 @@ export default class {
                                         const operations = row.children[3].children[0]
                                         const filter = row.children[4].children[0]
 
-                                        columns.value = DataGrid.Columns[ Object.keys(DataGrid.Columns)[0] ]
+                                        columns.value = DataGrid.Columns[ Object.keys(DataGrid.Columns)[0] ].dbName
                                         operations.value = DataGrid.Operations[0].value
                                         filter.value = null
                                         operations.dispatchEvent(new Event('change'))
@@ -511,7 +530,7 @@ export default class {
                             const colOptions = []
                             for (const col in this.Columns) {
                                 colOptions.push({
-                                    value: this.Columns[col],
+                                    value: this.Columns[col].dbName,
                                     textContent: col
                                 })
                             }
@@ -748,7 +767,7 @@ export default class {
                         const Column =  document.createElement('span')
                         Column.textContent = Object.keys(this.Columns)[i]
                         Column.title = Object.keys(this.Columns)[i]
-                        Column.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ])
+                        Column.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
                         Column.className = 'mr-_5'
 
                         const Direction = Select({
@@ -904,8 +923,6 @@ export default class {
 
         this.NewModal.querySelector('button.close').addEventListener('click', () => this.NewModal.classList.remove('open'))
 
-        this.NewModal.querySelector('button[type="reset"]').addEventListener('click', () => this.NewModal.classList.remove('open'))
-
         const DataGrid = this
         this.NewModal.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault()
@@ -915,8 +932,8 @@ export default class {
 
             const data = {}
             for (const col in DataGrid.Columns) {
-                if (this.elements[ DataGrid.Columns[col] ]) {
-                    data[ DataGrid.Columns[col] ] = this.elements[ DataGrid.Columns[col] ].value
+                if (this.elements[ DataGrid.Columns[col].dbName ]) {
+                    data[ DataGrid.Columns[col].dbName ] = this.elements[ DataGrid.Columns[col].dbName ].value
                 }
             }
 
@@ -1080,7 +1097,7 @@ export default class {
 
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const HCol = document.createElement('hcol-rui')
-                    HCol.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ])
+                    HCol.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
                     HCol.style.minWidth = '12rem'
                     HCol.style.maxWidth = '12rem'
 

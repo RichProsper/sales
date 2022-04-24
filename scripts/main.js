@@ -28,19 +28,124 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                     dbName: 'customers'
                 },
                 columns: {
-                    Title: 'title',
-                    'First Name': 'fname',
-                    'Last Name': 'lname',
-                    Email: 'email',
-                    Parish: 'parish',
-                    Address: 'address',
-                    'Home Number': 'homeNo',
-                    'Cell Number': 'cellNo',
-                    'Other Numbers': 'otherNos'
+                    Title: {
+                        dbName: 'title',
+                        tagName: 'select',
+                        tag: {
+                            labelText: 'Titles',
+                            attrs: { name: 'title' },
+                            options: [
+                                { value: '', textContent: 'Select a title...' },
+                                { value: 'Dr.', textContent: 'Dr.' },
+                                { value: 'Miss', textContent: 'Miss' },
+                                { value: 'Mr.', textContent: 'Mr.' },
+                                { value: 'Mrs.', textContent: 'Mrs.' },
+                                { value: 'Ms.', textContent: 'Ms.' },
+                                { value: 'Prof.', textContent: 'Prof.' },
+                                { value: 'Rev.', textContent: 'Rev.' },
+                            ]
+                        }
+                    },
+                    'First Name': {
+                        dbName: 'fname',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'text', name: 'fname', pattern: '[A-Za-z\-\s]{1,}',
+                                title: 'Only letters, hyphens and spaces allowed',
+                                placeholder: 'First Name', required: ''
+                            }
+                        }
+                    },
+                    'Last Name': {
+                        dbName: 'lname',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'text', name: 'lname', pattern: '[A-Za-z\-\s]{1,}',
+                                title: 'Only letters, hyphens and spaces allowed',
+                                placeholder: 'Last Name'
+                            }
+                        }
+                    },
+                    Email: {
+                        dbName: 'email',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'email', name: 'email',
+                                pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                                title: 'Must be in the form: example@example.ex',
+                                placeholder: 'Email'
+                            }
+                        }
+                    },
+                    Parish: {
+                        dbName: 'parish',
+                        tagName: 'select',
+                        tag: {
+                            labelText: 'Parishes',
+                            attrs: { name: 'parish' },
+                            options: [
+                                { value: '', textContent: 'Select a parish...' },
+                                { value: 'Christ Church', textContent: 'Christ Church' },
+                                { value: 'St. Andrew', textContent: 'St. Andrew' },
+                                { value: 'St. George', textContent: 'St. George' },
+                                { value: 'St. James', textContent: 'St. James' },
+                                { value: 'St. John', textContent: 'St. John' },
+                                { value: 'St. Joseph', textContent: 'St. Joseph' },
+                                { value: 'St. Lucy', textContent: 'St. Lucy' },
+                                { value: 'St. Michael', textContent: 'St. Michael' },
+                                { value: 'St. Peter', textContent: 'St. Peter' },
+                                { value: 'St. Philip', textContent: 'St. Philip' },
+                                { value: 'St. Thomas', textContent: 'St. Thomas' },
+                            ]
+                        }
+                    },
+                    Address: {
+                        dbName: 'address',
+                        tagName: 'textarea',
+                        tag: {
+                            attrs: {
+                                name: 'address', rows: '4', placeholder: 'Address...'
+                            }
+                        }
+                    },
+                    'Home Number': {
+                        dbName: 'homeNo',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'tel', name: 'homeNo', pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}',
+                                title: 'Must be 10 or more numbers/hyphens long',
+                                placeholder: 'Home Number'
+                            }
+                        }
+                    },
+                    'Cell Number': {
+                        dbName: 'cellNo',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'tel', name: 'cellNo', pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}',
+                                title: 'Must be 10 or more numbers/hyphens long',
+                                placeholder: 'Cell Number'
+                            }
+                        }
+                    },
+                    'Other Numbers': {
+                        dbName: 'otherNos',
+                        tagName: 'input',
+                        tag: {
+                            attrs: {
+                                type: 'tel', name: 'otherNos',
+                                pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*',
+                                title: 'Must be 10 or more numbers/hyphens long. And each number must be separated by a comma and a space',
+                                placeholder: 'Other Numbers'
+                            }
+                        }
+                    }
                 },
-                // columns: {
-
-                // },
                 rows: customer.rows,
                 numRows: customer.numRows,
                 rowIds: customer.rowIds,
@@ -51,37 +156,37 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     .catch(e => console.error(e))
 
     // Products
-    fetch(crudProductUrl, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'READ_ALL' })
-    })
-    .then(response => response.json())
-    .then(
-        /**
-         * @param {Object} product
-         * @param {Object[]} product.rows
-         * @param {Object[]} product.rowIds
-         * @param {Number} product.numRows
-         */
-        product => {
-            window.DataGrids.Products = new DataGrid({
-                table: {
-                    name: 'Product',
-                    dbName: 'products'
-                },
-                columns: {
-                    Name: 'name',
-                    Description: 'desc',
-                    Image: 'image',
-                    Unit: 'unit',
-                    'Unit Price ($)': 'unitPrice'
-                },
-                rows: product.rows,
-                numRows: product.numRows,
-                rowIds: product.rowIds,
-                crudUrl: crudProductUrl
-            })
-        }
-    )
-    .catch(e => console.error(e))
+    // fetch(crudProductUrl, {
+    //     method: 'POST',
+    //     body: JSON.stringify({ action: 'READ_ALL' })
+    // })
+    // .then(response => response.json())
+    // .then(
+    //     /**
+    //      * @param {Object} product
+    //      * @param {Object[]} product.rows
+    //      * @param {Object[]} product.rowIds
+    //      * @param {Number} product.numRows
+    //      */
+    //     product => {
+    //         window.DataGrids.Products = new DataGrid({
+    //             table: {
+    //                 name: 'Product',
+    //                 dbName: 'products'
+    //             },
+    //             columns: {
+    //                 Name: 'name',
+    //                 Description: 'desc',
+    //                 Image: 'image',
+    //                 Unit: 'unit',
+    //                 'Unit Price ($)': 'unitPrice'
+    //             },
+    //             rows: product.rows,
+    //             numRows: product.numRows,
+    //             rowIds: product.rowIds,
+    //             crudUrl: crudProductUrl
+    //         })
+    //     }
+    // )
+    // .catch(e => console.error(e))
 })()
