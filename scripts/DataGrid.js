@@ -930,16 +930,12 @@ export default class {
             DataGrid.Alert.classList.remove('open')
             clearTimeout(DataGrid.AlertTimer)
 
-            const data = {}
-            for (const col in DataGrid.Columns) {
-                if (this.elements[ DataGrid.Columns[col].dbName ]) {
-                    data[ DataGrid.Columns[col].dbName ] = this.elements[ DataGrid.Columns[col].dbName ].value
-                }
-            }
+            const data = new FormData(this)
+            data.append('REQUEST_ACTION', 'DELETE')
 
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'CREATE', payload: data })
+                body: data
             })
             .then(respJSON => respJSON.json())
             .then(
@@ -1027,10 +1023,14 @@ export default class {
             const selectedRows = DataGrid.RowsContainer.querySelectorAll('row-rui.selected')
 
             for (const selectedRow of selectedRows) ids.push( +selectedRow.getAttribute('data-entity-id') )
+
+            const data = new FormData()
+            data.append('REQUEST_ACTION', 'DELETE')
+            data.append('ids', JSON.stringify(ids))
             
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'DELETE', payload: ids })
+                body: data
             })
             .then(respJSON => respJSON.json())
             .then(
@@ -1282,15 +1282,15 @@ export default class {
                         DataGrid.Alert.classList.remove('open')
                         clearTimeout(DataGrid.AlertTimer)
 
-                        const data = {
-                            id: +this.parentElement.getAttribute('data-entity-id'),
-                            column: DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'),
-                            value: this.value
-                        }
+                        const data = new FormData()
+                        data.append('REQUEST_ACTION', 'UPDATE')
+                        data.append('id', this.parentElement.getAttribute('data-entity-id'))
+                        data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
+                        data.append('value', this.value)
 
                         fetch(DataGrid.CrudUrl, {
                             method: 'POST',
-                            body: JSON.stringify({ action: 'UPDATE', payload: data })
+                            body: data
                         })
                         .then(respJSON => respJSON.json())
                         .then(
@@ -1715,7 +1715,7 @@ export default class {
             filters.push(filter)
         }
 
-        return filters
+        return JSON.stringify(filters)
     }
 
     GetSorts() {
@@ -1731,20 +1731,20 @@ export default class {
         }
         
         sorts.sort((a, b) => +a.order - +b.order)
-        return sorts
+        return JSON.stringify(sorts)
     }
 
     ReadData() {
-        const data = {
-            sorts: this.GetSorts(),
-            filters: this.GetFilters(),
-            limit: +this.Pagination.querySelector('[data-rows-per-page-value]').value,
-            offset: +this.Pagination.querySelector('offset-min-rui').textContent - 1
-        }
+        const data = new FormData()
+        data.append('REQUEST_ACTION', 'READ')
+        data.append('sorts', this.GetSorts())
+        data.append('filters', this.GetFilters())
+        data.append('limit', this.Pagination.querySelector('[data-rows-per-page-value]').value)
+        data.append('offset', this.Pagination.querySelector('offset-min-rui').textContent - 1)
 
         fetch(this.CrudUrl, {
             method: 'POST',
-            body: JSON.stringify({ action: 'READ', payload: data })
+            body: data
         })
         .then(resp => resp.json())
         .then(

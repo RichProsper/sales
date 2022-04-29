@@ -5,12 +5,11 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") die("No direct script access allowed!
 require_once 'database.php';
 
 $conn = DB::getDbConnection();
-$req = json_decode( file_get_contents("php://input") );
 
 $product = new stdClass;
 $response = new stdClass;
 
-switch ($req->action) {
+switch ($_POST["REQUEST_ACTION"]) {
     case "READ_ALL" :
         // Almost equivalent to PHP's htmlspecialchars_decode()
         $desc = "REPLACE( REPLACE( REPLACE( REPLACE(`desc`, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
@@ -31,20 +30,23 @@ switch ($req->action) {
         echo json_encode($product);
         break;
     case "READ" :
+        $filters = json_decode($_POST["filters"]);
+        $sorts = json_decode($_POST["sorts"]);
+
         $desc = "REPLACE( REPLACE( REPLACE( REPLACE(`desc`, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
 
         $rowsSQL = "SELECT name, $desc, image, unit, unitPrice FROM products";
         $rowIdsSQL = "SELECT pId FROM products";
         $numRowsSQL = "SELECT COUNT(pId) FROM products";
 
-        $limit = DB::sanitizeLimit($req->payload->limit);
-        $offset = DB::sanitizeOffset($req->payload->offset);
+        $limit = DB::sanitizeLimit( intval($_POST["limit"]) );
+        $offset = DB::sanitizeOffset( intval($_POST["offset"]) );
 
         $r_ri = ""; // for rows & row Ids
         $nr = ""; // For num rows
 
-        if (count($req->payload->filters) > 0) {
-            $filtersArr = DB::sanitizeFilters($req->payload->filters);
+        if (count($filters) > 0) {
+            $filtersArr = DB::sanitizeFilters($filters);
             $filtersSQL = "";
 
             foreach ($filtersArr as $i => $obj) {
@@ -52,7 +54,7 @@ switch ($req->action) {
                     $filtersSQL .= $obj->operator . " ";
                 }
 
-                $filtersSQL .= "(" . $obj->column . " ";
+                $filtersSQL .= "(`" . $obj->column . "` ";
                 
                 if ($obj->operation === "contain") {
                     $filtersSQL .= "LIKE '%" . $obj->filterValue . "%'";
@@ -64,10 +66,10 @@ switch ($req->action) {
                     $filtersSQL .= "LIKE '%" . $obj->filterValue . "'";
                 }
                 elseif ($obj->operation === "isEmpty") {
-                    $filtersSQL .= "IS NULL OR " . $obj->column . " = ''";
+                    $filtersSQL .= "IS NULL OR `" . $obj->column . "` = ''";
                 }
                 elseif ($obj->operation === "isNotEmpty") {
-                    $filtersSQL .= "IS NOT NULL AND " . $obj->column . " != ''";
+                    $filtersSQL .= "IS NOT NULL AND `" . $obj->column . "` != ''";
                 }
                 else {
                     $filtersSQL .= $obj->operation . " '" . $obj->filterValue . "'";
@@ -80,12 +82,12 @@ switch ($req->action) {
             $nr .= " WHERE " . $filtersSQL;
         }
 
-        if (count($req->payload->sorts) > 0) {
-            $sortsArr = DB::sanitizeSorts($req->payload->sorts);
+        if (count($sorts) > 0) {
+            $sortsArr = DB::sanitizeSorts($sorts);
             $sortsSQL = "";
 
             for ($i = 0; $i < count($sortsArr); $i++) {
-                $sortsSQL .= $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
+                $sortsSQL .= "`" . $sortsArr[$i]->column . "` " . $sortsArr[$i]->direction;
 
                 if ($i < (count($sortsArr) - 1) ) $sortsSQL .= ", ";
             }
@@ -109,16 +111,16 @@ switch ($req->action) {
         echo json_encode($product);
         break;
     case "CREATE" :
-        $name = ucwords($req->payload->name);
-        $desc = DB::escapeString($req->payload->desc);
-        $image = $req->payload->image;
-        $unit = $req->payload->unit;
-        $unitPrice = $req->payload->unitPrice;
+        $name = ucwords($_POST["name"]);
+        $desc = DB::escapeString($_POST["desc"]);
+        $image = ""; // TODO
+        $unit = $_POST["unit"];
+        $unitPrice = $_POST["unitPrice"];
 
-        $valid['name'] = Validate::Name($name);
-        $valid['image'] = empty($image) ? true : Validate::Image($image);
-        $valid['unit'] = Validate::Unit($unit);
-        $valid['unitPrice'] = Validate::UnitPrice($unitPrice);
+        $valid["name"] = Validate::Name($name);
+        $valid["image"] = empty($image) ? true : Validate::Image($image);
+        $valid["unit"] = Validate::Unit($unit);
+        $valid["unitPrice"] = Validate::UnitPrice($unitPrice);
         $unitPrice = Format::UnitPrice($unitPrice);
 
         if ( !array_search(false, $valid, true) ) {
@@ -141,7 +143,7 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     case "DELETE" :
-        $ids = $req->payload;
+        $ids = json_decode($_POST["ids"]);
 
         if ( Validate::IDs($ids) ) {
             $sql = "DELETE FROM products WHERE pId IN (";
@@ -169,9 +171,9 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     case "UPDATE" :
-        $id = $req->payload->id;
-        $column = $req->payload->column;
-        $value = $req->payload->value;
+        $id = intval($_POST["id"]);
+        $column = $_POST["column"];
+        $value = $_POST["value"];
 
         $validID = Validate::ID($id);
         $validValue = true;
@@ -217,7 +219,8 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     default :
-        echo json_encode("Action '$req->action' not recognized");
+    $req_action = $_POST["REQUEST_ACTION"];
+    echo json_encode("Action '$req_action' not recognized");
 }
 
 $conn = null;

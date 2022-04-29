@@ -5,12 +5,11 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") die("No direct script access allowed!
 require_once 'database.php';
 
 $conn = DB::getDbConnection();
-$req = json_decode( file_get_contents("php://input") );
 
 $customer = new stdClass;
 $response = new stdClass;
 
-switch ($req->action) {
+switch ($_POST["REQUEST_ACTION"]) {
     case "READ_ALL" :
         // Almost equivalent to PHP's htmlspecialchars_decode()
         $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
@@ -31,20 +30,23 @@ switch ($req->action) {
         echo json_encode($customer);
         break;
     case "READ" :
+        $filters = json_decode($_POST["filters"]);
+        $sorts = json_decode($_POST["sorts"]);
+
         $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
 
         $rowsSQL = "SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers";
         $rowIdsSQL = "SELECT cId FROM customers";
         $numRowsSQL = "SELECT COUNT(cId) FROM customers";
 
-        $limit = DB::sanitizeLimit($req->payload->limit);
-        $offset = DB::sanitizeOffset($req->payload->offset);
+        $limit = DB::sanitizeLimit( intval($_POST["limit"]) );
+        $offset = DB::sanitizeOffset( intval($_POST["offset"]) );
 
         $r_ri = ""; // for rows & row Ids
         $nr = ""; // For num rows
 
-        if (count($req->payload->filters) > 0) {
-            $filtersArr = DB::sanitizeFilters($req->payload->filters);
+        if (count($filters) > 0) {
+            $filtersArr = DB::sanitizeFilters($filters);
             $filtersSQL = "";
 
             foreach ($filtersArr as $i => $obj) {
@@ -52,7 +54,7 @@ switch ($req->action) {
                     $filtersSQL .= $obj->operator . " ";
                 }
 
-                $filtersSQL .= "(" . $obj->column . " ";
+                $filtersSQL .= "(`" . $obj->column . "` ";
                 
                 if ($obj->operation === "contain") {
                     $filtersSQL .= "LIKE '%" . $obj->filterValue . "%'";
@@ -64,10 +66,10 @@ switch ($req->action) {
                     $filtersSQL .= "LIKE '%" . $obj->filterValue . "'";
                 }
                 elseif ($obj->operation === "isEmpty") {
-                    $filtersSQL .= "IS NULL OR " . $obj->column . " = ''";
+                    $filtersSQL .= "IS NULL OR `" . $obj->column . "` = ''";
                 }
                 elseif ($obj->operation === "isNotEmpty") {
-                    $filtersSQL .= "IS NOT NULL AND " . $obj->column . " != ''";
+                    $filtersSQL .= "IS NOT NULL AND `" . $obj->column . "` != ''";
                 }
                 else {
                     $filtersSQL .= $obj->operation . " '" . $obj->filterValue . "'";
@@ -80,12 +82,12 @@ switch ($req->action) {
             $nr .= " WHERE " . $filtersSQL;
         }
 
-        if (count($req->payload->sorts) > 0) {
-            $sortsArr = DB::sanitizeSorts($req->payload->sorts);
+        if (count($sorts) > 0) {
+            $sortsArr = DB::sanitizeSorts($sorts);
             $sortsSQL = "";
 
             for ($i = 0; $i < count($sortsArr); $i++) {
-                $sortsSQL .= $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
+                $sortsSQL .= "`" . $sortsArr[$i]->column . "` " . $sortsArr[$i]->direction;
 
                 if ($i < (count($sortsArr) - 1) ) $sortsSQL .= ", ";
             }
@@ -109,24 +111,24 @@ switch ($req->action) {
         echo json_encode($customer);
         break;
     case "CREATE" :
-        $title = $req->payload->title;
-        $fname = ucwords($req->payload->fname);
-        $lname = ucwords($req->payload->lname);
-        $email = $req->payload->email;
-        $parish = $req->payload->parish;
-        $address = DB::escapeString($req->payload->address);
-        $homeNo = $req->payload->homeNo;
-        $cellNo = $req->payload->cellNo;
-        $otherNos = $req->payload->otherNos;
+        $title = $_POST["title"];
+        $fname = ucwords($_POST["fname"]);
+        $lname = ucwords($_POST["lname"]);
+        $email = $_POST["email"];
+        $parish = $_POST["parish"];
+        $address = DB::escapeString($_POST["address"]);
+        $homeNo = $_POST["homeNo"];
+        $cellNo = $_POST["cellNo"];
+        $otherNos = $_POST["otherNos"];
 
-        $valid['title'] = empty($title) ? true : Validate::Title($title);
-        $valid['fname'] = Validate::Name($fname);
-        $valid['lname'] = empty($lname) ? true : Validate::Name($lname);
-        $valid['email'] = empty($email) ? true : Validate::Email($email);
-        $valid['parish'] = empty($parish) ? true : Validate::Parish($parish);
-        $valid['homeNo'] = empty($homeNo) ? true : Validate::TelNo($homeNo);
-        $valid['cellNo'] = empty($cellNo) ? true : Validate::TelNo($cellNo);
-        $valid['otherNos'] = empty($otherNos) ? true : Validate::MultTelNos($otherNos);
+        $valid["title"] = empty($title) ? true : Validate::Title($title);
+        $valid["fname"] = Validate::Name($fname);
+        $valid["lname"] = empty($lname) ? true : Validate::Name($lname);
+        $valid["email"] = empty($email) ? true : Validate::Email($email);
+        $valid["parish"] = empty($parish) ? true : Validate::Parish($parish);
+        $valid["homeNo"] = empty($homeNo) ? true : Validate::TelNo($homeNo);
+        $valid["cellNo"] = empty($cellNo) ? true : Validate::TelNo($cellNo);
+        $valid["otherNos"] = empty($otherNos) ? true : Validate::MultTelNos($otherNos);
 
         if ( !array_search(false, $valid, true) ) {
             try {
@@ -148,7 +150,7 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     case "DELETE" :
-        $ids = $req->payload;
+        $ids = json_decode($_POST["ids"]);
 
         if ( Validate::IDs($ids) ) {
             $sql = "DELETE FROM customers WHERE cId IN (";
@@ -176,9 +178,9 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     case "UPDATE" :
-        $id = $req->payload->id;
-        $column = $req->payload->column;
-        $value = $req->payload->value;
+        $id = intval($_POST["id"]);
+        $column = $_POST["column"];
+        $value = $_POST["value"];
 
         $validID = Validate::ID($id);
         $validValue = true;
@@ -233,7 +235,8 @@ switch ($req->action) {
         echo json_encode($response);
         break;
     default :
-        echo json_encode("Action '$req->action' not recognized");
+        $req_action = $_POST["REQUEST_ACTION"];
+        echo json_encode("Action '$req_action' not recognized");
 }
 
 $conn = null;

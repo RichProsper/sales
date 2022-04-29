@@ -2,16 +2,19 @@ import DataGrid from './DataGrid.js'
 import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 
 (() => {
-    window.DataGrids = {}
     // ToTop()
+    window.DataGrids = {} 
 
     const crudCustomerUrl = '../sales/php/crud_customer.php'
     const crudProductUrl = '../sales/php/crud_product.php'
+
+    const REQUEST_ACTION = new FormData()
+    REQUEST_ACTION.append('REQUEST_ACTION', 'READ_ALL')
     
     // Customers
     fetch(crudCustomerUrl, {
         method: 'POST',
-        body: JSON.stringify({ action: 'READ_ALL' })
+        body: REQUEST_ACTION
     })
     .then(response => response.json())
     .then(
@@ -51,7 +54,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tagName: 'input',
                         tag: {
                             attrs: {
-                                type: 'text', name: 'fname', pattern: '[A-Za-z\-\s]{1,}',
+                                type: 'text', name: 'fname', pattern: '[A-Za-z\\-\\s]{1,}',
                                 title: 'Only letters, hyphens and spaces allowed',
                                 placeholder: 'First Name', required: ''
                             }
@@ -62,7 +65,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tagName: 'input',
                         tag: {
                             attrs: {
-                                type: 'text', name: 'lname', pattern: '[A-Za-z\-\s]{1,}',
+                                type: 'text', name: 'lname', pattern: '[A-Za-z\\-\\s]{1,}',
                                 title: 'Only letters, hyphens and spaces allowed',
                                 placeholder: 'Last Name'
                             }
@@ -74,7 +77,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tag: {
                             attrs: {
                                 type: 'email', name: 'email',
-                                pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                                pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
                                 title: 'Must be in the form: example@example.ex',
                                 placeholder: 'Email'
                             }
@@ -139,7 +142,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tag: {
                             attrs: {
                                 type: 'tel', name: 'otherNos',
-                                pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*',
+                                pattern: '([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4}(,\\s([0-9]{1,3}|1-[0-9]{3})-[0-9]{3,4}-[0-9]{4})*',
                                 title: 'Must be 10 or more numbers/hyphens long. And each number must be separated by a comma and a space',
                                 placeholder: 'Other Numbers'
                             }
@@ -158,7 +161,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     // Products
     fetch(crudProductUrl, {
         method: 'POST',
-        body: JSON.stringify({ action: 'READ_ALL' })
+        body: REQUEST_ACTION
     })
     .then(response => response.json())
     .then(
@@ -180,7 +183,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tagName: 'input',
                         tag: {
                             attrs: {
-                                type: 'text', name: 'name', pattern: '[A-Za-z\-\s]{1,}',
+                                type: 'text', name: 'name', pattern: '[A-Za-z\\-\\s]{1,}',
                                 title: 'Only letters, hyphens and spaces allowed',
                                 placeholder: 'Name', required: ''
                             }
