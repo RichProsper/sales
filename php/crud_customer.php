@@ -217,7 +217,7 @@ switch ($_POST["REQUEST_ACTION"]) {
     
         if ($validID && $validValue) {
             try {
-                $conn->exec("UPDATE customers SET $column = '$value' WHERE cId = $id");
+                $conn->exec("UPDATE customers SET `$column` = '$value' WHERE cId = $id");
     
                 $response->success = true;
                 $response->message = "Column updated successfully.";

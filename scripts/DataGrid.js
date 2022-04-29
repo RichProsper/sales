@@ -931,7 +931,7 @@ export default class {
             clearTimeout(DataGrid.AlertTimer)
 
             const data = new FormData(this)
-            data.append('REQUEST_ACTION', 'DELETE')
+            data.append('REQUEST_ACTION', 'CREATE')
 
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',

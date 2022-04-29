@@ -113,17 +113,27 @@ switch ($_POST["REQUEST_ACTION"]) {
     case "CREATE" :
         $name = ucwords($_POST["name"]);
         $desc = DB::escapeString($_POST["desc"]);
-        $image = ""; // TODO
+        $image = "";
         $unit = $_POST["unit"];
         $unitPrice = $_POST["unitPrice"];
 
         $valid["name"] = Validate::Name($name);
-        $valid["image"] = empty($image) ? true : Validate::Image($image);
+        $valid["image"] = Validate::Image($_FILES["image"]);
         $valid["unit"] = Validate::Unit($unit);
         $valid["unitPrice"] = Validate::UnitPrice($unitPrice);
         $unitPrice = Format::UnitPrice($unitPrice);
 
         if ( !array_search(false, $valid, true) ) {
+            if ( !empty($_FILES["image"]["tmp_name"]) ) {
+                $image = "uploads/" . basename($_FILES["image"]["name"]);
+
+                if ( !move_uploaded_file($_FILES["image"]["tmp_name"], $image) ) {
+                    $response->success = false;
+                    $response->message = "Error uploading file";
+                    break;
+                }
+            }
+
             try {
                 $conn->exec("INSERT INTO products VALUES (NULL, '$name', '$desc', '$image', '$unit', '$unitPrice', NULL, NULL)");
 

@@ -204,7 +204,7 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
                         tag: {
                             attrs: {
                                 type: 'file', name: 'image',
-                                title: 'Only ".jfif", ".jpg", ".jpeg", ".webp" and ".png" image file extensions allowed'
+                                title: 'Only ".jfif", ".jpg", ".jpeg", ".webp", ".gif" and ".png" image file types allowed'
                             }
                         }
                     },
@@ -242,4 +242,8 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
         }
     )
     .catch(e => console.error(e))
+
+    // TODO Update Product Image
+    // TODO Reset File Input on form reset
+    // TODO Add image viewer to File Input
 })()
