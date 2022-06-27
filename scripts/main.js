@@ -1,8 +1,6 @@
 import DataGrid from './DataGrid.js'
-import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
 
 (() => {
-    // ToTop()
     window.DataGrids = {} 
 
     const crudCustomerUrl = '../sales/php/crud_customer.php'
@@ -243,7 +241,6 @@ import ToTop from '../vendors/rui/rui-to-top-btn.min.js'
     )
     .catch(e => console.error(e))
 
+    // TODO Integrate RWC Modal & Input Media File
     // TODO Update Product Image
-    // TODO Reset File Input on form reset
-    // TODO Add image viewer to File Input
 })()

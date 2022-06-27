@@ -8,7 +8,7 @@ import Textarea from '../vendors/rui/rui-textarea.min.js'
  * Grid Data
  * @typedef {Object} GridData
  * @property {Object} table The table
- * @property {String} table.name The presentable table name
+ * @property {String} table.name The human readable table name
  * @property {String} table.dbName The database table name
  * @property {Object} columns The columns
  * @property {Object[]} rows The rows
