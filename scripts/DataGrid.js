@@ -88,10 +88,8 @@ export default class {
         this.AlertDuration = 5 * 1000
 
         this.DataGrid = document.createElement('datagrid-rui')
-        this.CreateDeleteModal()
         this.CreateAlert()
         this.CreateToolbar()
-        this.CreateNewModal()
         this.CreateMain()
         this.CreateFooter()
         this.DataGridContainer.appendChild(this.DataGrid)
@@ -101,7 +99,7 @@ export default class {
         this.SetupCheckboxes()
         this.SetupResizingColumns()
         this.SetupNextPrevBtns()
-    }
+    } // init()
 
     CreateAlert() { // 10 lines
         this.Alert = document.createElement('alert-rui')
@@ -119,167 +117,14 @@ export default class {
         document.body.appendChild(this.Alert)
     }
 
-    CreateNewModal() {
-        this.NewModal = document.createElement('rwc-modal')
-        this.NewModal.innerHTML = `
-            <span slot="heading">Add New ${this.TableName}</span>
-            <div slot="body-content"><form></form></div>
-        `
-        const form = this.NewModal.querySelector('form')
-
-        for (const col in this.Columns) {
-            switch (this.Columns[col].tagName) {
-                case 'input': {
-                    form.appendChild( Input(this.Columns[col].tag) )
-                    break
-                }
-                case 'textarea': {
-                    form.appendChild( Textarea(this.Columns[col].tag) )
-                    break
-                }
-                case 'select': {
-                    form.appendChild( Select(this.Columns[col].tag) )
-                    break
-                }
-                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
-            }
-        }
-        
-        form.innerHTML += `
-            <div class="reset-submit">
-                <button type="reset" class="red">RESET</button>
-                <button type="submit" class="green">SUBMIT</button>
-            </div>
-        `
-        const DataGrid = this
-        form.addEventListener('submit', function(e) {
-            e.preventDefault()
-
-            DataGrid.Alert.classList.remove('open')
-            clearTimeout(DataGrid.AlertTimer)
-
-            const data = new FormData(this)
-            data.append('REQUEST_ACTION', 'CREATE')
-
-            fetch(DataGrid.CrudUrl, {
-                method: 'POST',
-                body: data
-            })
-            .then(respJSON => respJSON.json())
-            .then(
-                /**
-                 * @param {Object} resp
-                 * @param {Boolean} resp.success
-                 * @param {String|Object} resp.message
-                 */
-                resp => {
-                    if (resp.success) {
-                        DataGrid.NewModal.querySelector('form').reset()
-                        DataGrid.ReadData()
-                        
-                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp.message
-                        DataGrid.Alert.className = 'success open'
-                    }
-                    else {
-                        console.error(resp)
-                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
-
-                        if (typeof resp.message === 'object') {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
-                        }
-                        else {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
-                        }
-
-                        DataGrid.Alert.className = 'failure open'
-                    }
-
-                    // Close alert after some seconds
-                    DataGrid.AlertTimer = setTimeout(() => {
-                        DataGrid.Alert.classList.remove('open')
-                    }, DataGrid.AlertDuration)
-                }
-            )
-            .catch(e => console.error(e))
-        })
-
-        document.body.appendChild(this.NewModal)
-
-        // New Button
-        this.Toolbar.innerHTML += `
-            <button type="button" class="toolbar-btn new">
-                <i class="fas fa-plus"></i> New
-            </button>
-        `
-        this.Toolbar.querySelector('.toolbar-btn.new').addEventListener('click', () => this.NewModal.openModal())
-    }
-
-    CreateDeleteModal() {
-        this.DeleteModal = document.createElement('div')
-        this.DeleteModal.className = 'modal delete'
-
-            const content = document.createElement('div')
-            content.className = 'content'
-
-                const header = document.createElement('div')
-                header.className = 'header'
-
-                    const headerText = document.createElement('h3')
-                    headerText.className = 'header-text'
-
-                    const closeBtn = document.createElement('button')
-                    closeBtn.type = 'button'
-                    closeBtn.className = 'close'
-                    closeBtn.innerHTML = `<span>&times;</span>`
-
-                header.appendChild(headerText)
-                header.appendChild(closeBtn)
-
-                const body = document.createElement('div')
-                body.className = 'body'
-
-                    const bodyText = document.createElement('div')
-                    bodyText.className = 'body-text'
-
-                    const form = document.createElement('form')
-
-                        const resetSubmit = document.createElement('div')
-                        resetSubmit.className = 'reset-submit'
-
-                            const resetBtn = document.createElement('button')
-                            resetBtn.type = 'reset'
-                            resetBtn.className = 'green'
-                            resetBtn.textContent = 'CANCEL'
-
-                            const submitBtn = document.createElement('button')
-                            submitBtn.type = 'submit'
-                            submitBtn.className = 'red'
-                            submitBtn.textContent = 'DELETE'
-
-                        resetSubmit.appendChild(resetBtn)
-                        resetSubmit.appendChild(submitBtn)
-
-                    form.appendChild(resetSubmit)
-
-
-                body.appendChild(bodyText)
-                body.appendChild(form)
-
-            content.appendChild(header)
-            content.appendChild(body)
-
-        this.DeleteModal.appendChild(content)
-        document.body.appendChild(this.DeleteModal)
-    }
-
     CreateToolbar() {
         this.Toolbar = document.createElement('toolbar-rui')
 
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.SetupDeleteModal()
+        this.CreateNewModal()
+        this.CreateDeleteModal()
 
         this.DataGrid.appendChild(this.Toolbar)
     }
@@ -916,41 +761,136 @@ export default class {
         this.Toolbar.appendChild(SortsPanelContainer)
     } // CreateSortsPanelContainer()
 
-    SetupDeleteModal() {
-        const DelBtn = document.createElement('button')
-        DelBtn.type = 'button'
-        DelBtn.className = 'toolbar-btn del'
-        DelBtn.innerHTML = `<i class="far fa-trash-alt"></i> Delete`
-        DelBtn.addEventListener('click', () => {
-            const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
-            const headerText = this.DeleteModal.querySelector('.header-text')
-            const bodyText = this.DeleteModal.querySelector('.body-text')
-            const delBtn = this.DeleteModal.querySelector('button[type="submit"]')
+    /**
+     * Converts an HTML string to actual DOM node(s)
+     * @param {String} htmlString The HTML string
+     * @returns {HTMLCollection}
+     */
+    HTMLStringToNode(htmlString) {
+        const div = document.createElement('div')
+        div.innerHTML = htmlString
+        return div.children
+    }
 
-            if (numSelectedRows === 0) {
-                headerText.textContent = 'No Rows Selected!'
-                bodyText.textContent = 'Please select some row(s) first then click delete.'
-                delBtn.disabled = true
-            }
-            else {
-                headerText.textContent = 'Are You Sure?'
-                bodyText.textContent = `Are you sure you want to permanently delete ${numSelectedRows === 1 ? '1 row' : numSelectedRows + ' rows'}? This action cannot be undone!`
-                delBtn.disabled = false
-            }
+    CreateNewModal() {
+        this.NewModal = document.createElement('rwc-modal')
+        this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
+        this.NewModal.innerHTML = `
+            <span slot="heading">Add New ${this.TableName}</span>
+            <div slot="body-content"><form></form></div>
+        `
+        const form = this.NewModal.querySelector('form')
 
-            this.DeleteModal.classList.add('open')
+        for (const col in this.Columns) {
+            switch (this.Columns[col].tagName) {
+                case 'input': {
+                    form.appendChild( Input(this.Columns[col].tag) )
+                    break
+                }
+                case 'textarea': {
+                    form.appendChild( Textarea(this.Columns[col].tag) )
+                    break
+                }
+                case 'select': {
+                    form.appendChild( Select(this.Columns[col].tag) )
+                    break
+                }
+                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
+            }
+        }
+        
+        form.innerHTML += `
+            <div class="reset-submit">
+                <button type="reset" class="red">RESET</button>
+                <button type="submit" class="green">SUBMIT</button>
+            </div>
+        `
+        const DataGrid = this
+        form.addEventListener('submit', function(e) {
+            e.preventDefault()
+
+            DataGrid.Alert.classList.remove('open')
+            clearTimeout(DataGrid.AlertTimer)
+
+            const data = new FormData(this)
+            data.append('REQUEST_ACTION', 'CREATE')
+
+            fetch(DataGrid.CrudUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String|Object} resp.message
+                 */
+                resp => {
+                    if (resp.success) {
+                        DataGrid.NewModal.querySelector('form').reset()
+                        DataGrid.ReadData()
+                        
+                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
+                        DataGrid.Alert.querySelector('.message').textContent = resp.message
+                        DataGrid.Alert.className = 'success open'
+                    }
+                    else {
+                        console.error(resp)
+                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
+
+                        if (typeof resp.message === 'object') {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
+                        }
+                        else {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
+                        }
+
+                        DataGrid.Alert.className = 'failure open'
+                    }
+
+                    // Close alert after some seconds
+                    DataGrid.AlertTimer = setTimeout(() => {
+                        DataGrid.Alert.classList.remove('open')
+                    }, DataGrid.AlertDuration)
+                }
+            )
+            .catch(e => console.error(e))
         })
 
-        this.DeleteModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open')
-        })
+        document.body.appendChild(this.NewModal)
 
-        this.DeleteModal.querySelector('button.close').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
+        // New Button
+        this.Toolbar.append(...this.HTMLStringToNode(`
+            <button type="button" class="toolbar-btn new">
+                <i class="fas fa-plus"></i> New
+            </button>
+        `))
+        this.Toolbar.querySelector('.toolbar-btn.new').addEventListener('click', () => this.NewModal.openModal())
+    } // CreateNewModal()
 
-        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
+    CreateDeleteModal() {
+        this.DeleteModal = document.createElement('rwc-modal')
+        this.DeleteModal.modalOutlineColor = 'hsl(349, 84%, 65%)'
+        this.DeleteModal.innerHTML = `
+            <span slot="heading"></span>
+            <div slot="body-content">
+                <div class="body-text"></div>
+                <form>
+                    <div class="reset-submit">
+                        <button type="reset" class="green">CANCEL</button>
+                        <button type="submit" class="red">DELETE</button>
+                    </div>
+                </form>
+            </div>
+        `
+        document.body.appendChild(this.DeleteModal)
+
+        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.Modal.classList.remove('open'))
 
         const DataGrid = this
-        this.DeleteModal.querySelector('form').addEventListener('submit', function(e) {
+        const form = this.DeleteModal.querySelector('form')
+        form.addEventListener('submit', function(e) {
             e.preventDefault()
 
             DataGrid.Alert.classList.remove('open')
@@ -978,7 +918,7 @@ export default class {
                  */
                 resp => {
                     if (resp.success) {
-                        DataGrid.DeleteModal.classList.remove('open')
+                        DataGrid.DeleteModal.Modal.classList.remove('open')
                         DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
@@ -1008,8 +948,32 @@ export default class {
             .catch(e => console.error(e))
         })
 
-        this.Toolbar.appendChild(DelBtn)
-    } // SetupDeleteModal()
+        // Delete Button
+        this.Toolbar.append(...this.HTMLStringToNode(`
+            <button type="button" class="toolbar-btn del">
+                <i class="far fa-trash-alt"></i> Delete
+            </button>
+        `))
+        this.Toolbar.querySelector('.toolbar-btn.del').addEventListener('click', () => {
+            const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
+            const headerText = this.DeleteModal.querySelector('[slot="heading"]')
+            const bodyText = this.DeleteModal.querySelector('.body-text')
+            const delBtn = this.DeleteModal.querySelector('button[type="submit"]')
+
+            if (numSelectedRows === 0) {
+                headerText.textContent = 'No Rows Selected!'
+                bodyText.textContent = 'Please select some row(s) first then click delete.'
+                delBtn.disabled = true
+            }
+            else {
+                headerText.textContent = 'Are You Sure?'
+                bodyText.textContent = `Are you sure you want to permanently delete ${numSelectedRows === 1 ? '1 row' : numSelectedRows + ' rows'}? This action cannot be undone!`
+                delBtn.disabled = false
+            }
+
+            this.DeleteModal.openModal()
+        })
+    } // CreateDeleteModal()
 
     CreateMain() {
         this.Main = document.createElement('main-rui')

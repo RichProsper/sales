@@ -1,117 +1,50 @@
-.modal {
-    display: none;
-    z-index: 1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background-color: var(--white-6);
-    padding-top: 10vh;
-    padding-left: 10vw;
-    padding-right: 10vw;
+rwc-modal form {
+    max-height: 70vh;
+    overflow-y: auto;
 
-    &.open {
-        display: block;
+    div {
+        margin-top: 2.8rem;
+
+        &:first-child {
+            margin-top: 1.6rem;
+        }
     }
-    .content {
-        background-color: var(--white-7);
-        border-radius: 1.5rem;
-        box-shadow: 0 .2rem .8rem var(--white-8),
-                    0 -.2rem .8rem var(--white-8);
-        border: .2rem solid var(--green-1);
+    .reset-submit {
+        display: flex;
+        justify-content: space-between;
 
-        .header {
-            position: relative;
-            height: 4rem;
-            border-bottom: .2rem solid var(--white-3);
+        button {
+            background: none;
+            border: .1rem solid currentColor;
+            font-size: 1.8rem;
+            font-weight: 600;
+            padding: .9rem 3.6rem;
+            cursor: pointer;
+            border-radius: .4rem;
+            transition: .2s;
 
-            h3 {
-                font-size: 2rem;
-                line-height: 4rem;
-                padding: 0 1rem;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .close {
-                position: absolute;
-                top: -1.5rem;
-                right: -1.5rem;
-                width: 3rem;
-                height: 3rem;
-                border-radius: 50%;
-                background-color: var(--white-7);
-                border: .2rem solid;
-                border-color: var(--green-1) var(--green-1) var(--green-1) transparent;
-                transform: rotate(-45deg);
-                cursor: pointer;
-                color: inherit;
-                font-weight: 300;
-                font-size: 3rem;
-                line-height: 0;
-                transition: .2s;
+            &.red {
+                color: var(--red-1);
 
-                & span {
-                    display: block;
-                    transform: rotate(45deg);
-                }
                 &:hover,
                 &:focus {
-                    color: var(--green-1);
+                    color: initial;
+                    background-color: var(--red-1);
                 }
             }
-        }
-        .body {
-            padding: 2rem;
-            padding-top: 0;
+            &.green {
+                color: var(--green-2);
 
-            form {
-                max-height: 70vh;
-                overflow-y: auto;
-
-                div {
-                    margin-top: 2.8rem;
+                &:hover,
+                &:focus {
+                    color: initial;
+                    background-color: var(--green-2);
                 }
-                .reset-submit {
-                    display: flex;
-                    justify-content: space-between;
-
-                    button {
-                        background: none;
-                        border: .1rem solid currentColor;
-                        font-size: 1.8rem;
-                        font-weight: 600;
-                        padding: .9rem 3.6rem;
-                        cursor: pointer;
-                        border-radius: .4rem;
-                        transition: .2s;
-
-                        &.red {
-                            color: var(--red-1);
-
-                            &:hover,
-                            &:focus {
-                                color: initial;
-                                background-color: var(--red-1);
-                            }
-                        }
-                        &.green {
-                            color: var(--green-2);
-
-                            &:hover,
-                            &:focus {
-                                color: initial;
-                                background-color: var(--green-2);
-                            }
-                        }
-                        &:disabled {
-                            cursor: default;
-                            pointer-events: none;
-                            opacity: .5;
-                        }
-                    }
-                }
+            }
+            &:disabled {
+                cursor: default;
+                pointer-events: none;
+                opacity: .5;
             }
         }
     }
@@ -129,11 +62,5 @@
         .body .body-text {
             margin-top: 2rem;
         }
-    }
-
-    @media only screen and (min-width: 600px) and (min-height: 600px) {
-        padding-top: 15vh;
-        padding-left: 20vw;
-        padding-right: 20vw;
     }
 }

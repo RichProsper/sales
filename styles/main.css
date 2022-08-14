@@ -176,93 +176,20 @@ header.header .links li a:hover, header.header .links li a:focus {
   }
 }
 
-.modal {
-  display: none;
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: var(--white-6);
-  padding-top: 10vh;
-  padding-left: 10vw;
-  padding-right: 10vw;
-}
-
-.modal.open {
-  display: block;
-}
-
-.modal .content {
-  background-color: var(--white-7);
-  border-radius: 1.5rem;
-  -webkit-box-shadow: 0 0.2rem 0.8rem var(--white-8), 0 -0.2rem 0.8rem var(--white-8);
-          box-shadow: 0 0.2rem 0.8rem var(--white-8), 0 -0.2rem 0.8rem var(--white-8);
-  border: 0.2rem solid var(--green-1);
-}
-
-.modal .content .header {
-  position: relative;
-  height: 4rem;
-  border-bottom: 0.2rem solid var(--white-3);
-}
-
-.modal .content .header h3 {
-  font-size: 2rem;
-  line-height: 4rem;
-  padding: 0 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.modal .content .header .close {
-  position: absolute;
-  top: -1.5rem;
-  right: -1.5rem;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  background-color: var(--white-7);
-  border: .2rem solid;
-  border-color: var(--green-1) var(--green-1) var(--green-1) transparent;
-  -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
-  cursor: pointer;
-  color: inherit;
-  font-weight: 300;
-  font-size: 3rem;
-  line-height: 0;
-  -webkit-transition: .2s;
-  transition: .2s;
-}
-
-.modal .content .header .close span {
-  display: block;
-  -webkit-transform: rotate(45deg);
-          transform: rotate(45deg);
-}
-
-.modal .content .header .close:hover, .modal .content .header .close:focus {
-  color: var(--green-1);
-}
-
-.modal .content .body {
-  padding: 2rem;
-  padding-top: 0;
-}
-
-.modal .content .body form {
+rwc-modal form {
   max-height: 70vh;
   overflow-y: auto;
 }
 
-.modal .content .body form div {
+rwc-modal form div {
   margin-top: 2.8rem;
 }
 
-.modal .content .body form .reset-submit {
+rwc-modal form div:first-child {
+  margin-top: 1.6rem;
+}
+
+rwc-modal form .reset-submit {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -271,7 +198,7 @@ header.header .links li a:hover, header.header .links li a:focus {
           justify-content: space-between;
 }
 
-.modal .content .body form .reset-submit button {
+rwc-modal form .reset-submit button {
   background: none;
   border: .1rem solid currentColor;
   font-size: 1.8rem;
@@ -283,52 +210,44 @@ header.header .links li a:hover, header.header .links li a:focus {
   transition: .2s;
 }
 
-.modal .content .body form .reset-submit button.red {
+rwc-modal form .reset-submit button.red {
   color: var(--red-1);
 }
 
-.modal .content .body form .reset-submit button.red:hover, .modal .content .body form .reset-submit button.red:focus {
+rwc-modal form .reset-submit button.red:hover, rwc-modal form .reset-submit button.red:focus {
   color: initial;
   background-color: var(--red-1);
 }
 
-.modal .content .body form .reset-submit button.green {
+rwc-modal form .reset-submit button.green {
   color: var(--green-2);
 }
 
-.modal .content .body form .reset-submit button.green:hover, .modal .content .body form .reset-submit button.green:focus {
+rwc-modal form .reset-submit button.green:hover, rwc-modal form .reset-submit button.green:focus {
   color: initial;
   background-color: var(--green-2);
 }
 
-.modal .content .body form .reset-submit button:disabled {
+rwc-modal form .reset-submit button:disabled {
   cursor: default;
   pointer-events: none;
   opacity: .5;
 }
 
-.modal.delete .content {
+rwc-modal form.delete .content {
   border-color: var(--red-1);
 }
 
-.modal.delete .content .header .close {
+rwc-modal form.delete .content .header .close {
   border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
 }
 
-.modal.delete .content .header .close:hover, .modal.delete .content .header .close:focus {
+rwc-modal form.delete .content .header .close:hover, rwc-modal form.delete .content .header .close:focus {
   color: var(--red-1);
 }
 
-.modal.delete .content .body .body-text {
+rwc-modal form.delete .content .body .body-text {
   margin-top: 2rem;
-}
-
-@media only screen and (min-width: 600px) and (min-height: 600px) {
-  .modal {
-    padding-top: 15vh;
-    padding-left: 20vw;
-    padding-right: 20vw;
-  }
 }
 
 datagrid-rui {

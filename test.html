@@ -14,27 +14,22 @@
 <body>
     
     <script>
-        (() => {
-            const template = document.createElement('template')
-            template.innerHTML = `
-                <section class="section">
-                    <div class="div">
-                        <span class="a">A</span>
-                        <span class="b">B</span>
-                        <span class="c">C</span>
-                    </div>
-                </section>
-            `
+        function HTMLStringToNode(htmlString) {
+            const div = document.createElement('div')
+            div.innerHTML = htmlString
+            return div.children
+        }
 
-            const main = document.createElement('main')
-            main.appendChild(template.content.cloneNode(true))
-
-            main.querySelector('div').addEventListener('mouseenter', function() {
-                this.style.fontSize = `${Math.random() * (30 - 15) + 15}px`
-            })
-
-            document.body.prepend(main)
-        })()
+        document.body.append(...HTMLStringToNode(`
+            <section>
+                <div class="div">
+                    <span class="a">A</span>
+                    <span class="b">B</span>
+                    <span class="c">C</span>
+                </div>
+            </section>
+            <section>New Section!</section>
+        `))
     </script>
 </body>
 </html>
