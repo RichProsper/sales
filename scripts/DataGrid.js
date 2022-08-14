@@ -88,10 +88,10 @@ export default class {
         this.AlertDuration = 5 * 1000
 
         this.DataGrid = document.createElement('datagrid-rui')
-        this.CreateNewModal()
         this.CreateDeleteModal()
         this.CreateAlert()
         this.CreateToolbar()
+        this.CreateNewModal()
         this.CreateMain()
         this.CreateFooter()
         this.DataGridContainer.appendChild(this.DataGrid)
@@ -103,107 +103,116 @@ export default class {
         this.SetupNextPrevBtns()
     }
 
-    CreateAlert() {
+    CreateAlert() { // 10 lines
         this.Alert = document.createElement('alert-rui')
+        this.Alert.innerHTML = `
+            <strong class="status"></strong>
+            <span class="message"></span>
+            <button type="button" class="close">×</button>
+        `
 
-            const status = document.createElement('strong')
-            status.className = 'status'
-
-            const message = document.createElement('span')
-            message.className = 'message'
-
-            const closeBtn = document.createElement('button')
-            closeBtn.type = 'button'
-            closeBtn.className = 'close'
-            closeBtn.innerHTML = '×'
-            closeBtn.addEventListener('click', () => {
-                this.Alert.classList.remove('open')
-                clearTimeout(this.AlertTimer)
-            })
-
-        this.Alert.appendChild(status)
-        this.Alert.appendChild( document.createTextNode(' ') )
-        this.Alert.appendChild(message)
-        this.Alert.appendChild(closeBtn)
+        this.Alert.querySelector('button').addEventListener('click', () => {
+            this.Alert.classList.remove('open')
+            clearTimeout(this.AlertTimer)
+        })
 
         document.body.appendChild(this.Alert)
     }
 
     CreateNewModal() {
-        this.NewModal = document.createElement('div')
-        this.NewModal.className = 'modal'
+        this.NewModal = document.createElement('rwc-modal')
+        this.NewModal.innerHTML = `
+            <span slot="heading">Add New ${this.TableName}</span>
+            <div slot="body-content"><form></form></div>
+        `
+        const form = this.NewModal.querySelector('form')
 
-            const content = document.createElement('div')
-            content.className = 'content'
+        for (const col in this.Columns) {
+            switch (this.Columns[col].tagName) {
+                case 'input': {
+                    form.appendChild( Input(this.Columns[col].tag) )
+                    break
+                }
+                case 'textarea': {
+                    form.appendChild( Textarea(this.Columns[col].tag) )
+                    break
+                }
+                case 'select': {
+                    form.appendChild( Select(this.Columns[col].tag) )
+                    break
+                }
+                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
+            }
+        }
+        
+        form.innerHTML += `
+            <div class="reset-submit">
+                <button type="reset" class="red">RESET</button>
+                <button type="submit" class="green">SUBMIT</button>
+            </div>
+        `
+        const DataGrid = this
+        form.addEventListener('submit', function(e) {
+            e.preventDefault()
 
-                const header = document.createElement('div')
-                header.className = 'header'
+            DataGrid.Alert.classList.remove('open')
+            clearTimeout(DataGrid.AlertTimer)
 
-                    const headerText = document.createElement('h3')
-                    headerText.className = 'header-text'
-                    headerText.textContent = `Add New ${this.TableName}`
+            const data = new FormData(this)
+            data.append('REQUEST_ACTION', 'CREATE')
 
-                    const closeBtn = document.createElement('button')
-                    closeBtn.type = 'button'
-                    closeBtn.className = 'close'
-                    closeBtn.innerHTML = `<span>&times;</span>`
+            fetch(DataGrid.CrudUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String|Object} resp.message
+                 */
+                resp => {
+                    if (resp.success) {
+                        DataGrid.NewModal.querySelector('form').reset()
+                        DataGrid.ReadData()
+                        
+                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
+                        DataGrid.Alert.querySelector('.message').textContent = resp.message
+                        DataGrid.Alert.className = 'success open'
+                    }
+                    else {
+                        console.error(resp)
+                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
 
-                header.appendChild(headerText)
-                header.appendChild(closeBtn)
-
-                const body = document.createElement('div')
-                body.className = 'body'
-
-                    const bodyText = document.createElement('div')
-                    bodyText.className = 'body-text'
-
-                    const form = document.createElement('form')
-
-                        for (const col in this.Columns) {
-                            switch (this.Columns[col].tagName) {
-                                case 'input': {
-                                    form.appendChild( Input(this.Columns[col].tag) )
-                                    break
-                                }
-                                case 'textarea': {
-                                    form.appendChild( Textarea(this.Columns[col].tag) )
-                                    break
-                                }
-                                case 'select': {
-                                    form.appendChild( Select(this.Columns[col].tag) )
-                                    break
-                                }
-                                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
-                            }
+                        if (typeof resp.message === 'object') {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
+                        }
+                        else {
+                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
                         }
 
-                        const resetSubmit = document.createElement('div')
-                        resetSubmit.className = 'reset-submit'
+                        DataGrid.Alert.className = 'failure open'
+                    }
 
-                            const resetBtn = document.createElement('button')
-                            resetBtn.type = 'reset'
-                            resetBtn.className = 'red'
-                            resetBtn.textContent = 'RESET'
+                    // Close alert after some seconds
+                    DataGrid.AlertTimer = setTimeout(() => {
+                        DataGrid.Alert.classList.remove('open')
+                    }, DataGrid.AlertDuration)
+                }
+            )
+            .catch(e => console.error(e))
+        })
 
-                            const submitBtn = document.createElement('button')
-                            submitBtn.type = 'submit'
-                            submitBtn.className = 'green'
-                            submitBtn.textContent = 'SUBMIT'
-
-                        resetSubmit.appendChild(resetBtn)
-                        resetSubmit.appendChild(submitBtn)
-
-                    form.appendChild(resetSubmit)
-
-
-                body.appendChild(bodyText)
-                body.appendChild(form)
-
-            content.appendChild(header)
-            content.appendChild(body)
-
-        this.NewModal.appendChild(content)
         document.body.appendChild(this.NewModal)
+
+        // New Button
+        this.Toolbar.innerHTML += `
+            <button type="button" class="toolbar-btn new">
+                <i class="fas fa-plus"></i> New
+            </button>
+        `
+        this.Toolbar.querySelector('.toolbar-btn.new').addEventListener('click', () => this.NewModal.openModal())
     }
 
     CreateDeleteModal() {
@@ -270,7 +279,6 @@ export default class {
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.SetupNewModal()
         this.SetupDeleteModal()
 
         this.DataGrid.appendChild(this.Toolbar)
@@ -907,75 +915,6 @@ export default class {
 
         this.Toolbar.appendChild(SortsPanelContainer)
     } // CreateSortsPanelContainer()
-
-    SetupNewModal() {
-        const NewBtn = document.createElement('button')
-        NewBtn.type = 'button'
-        NewBtn.className = 'toolbar-btn new'
-        NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
-        NewBtn.addEventListener('click', () => this.NewModal.classList.add('open'))
-
-        this.NewModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open')
-        })
-
-        this.NewModal.querySelector('button.close').addEventListener('click', () => this.NewModal.classList.remove('open'))
-
-        const DataGrid = this
-        this.NewModal.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault()
-
-            DataGrid.Alert.classList.remove('open')
-            clearTimeout(DataGrid.AlertTimer)
-
-            const data = new FormData(this)
-            data.append('REQUEST_ACTION', 'CREATE')
-
-            fetch(DataGrid.CrudUrl, {
-                method: 'POST',
-                body: data
-            })
-            .then(respJSON => respJSON.json())
-            .then(
-                /**
-                 * @param {Object} resp
-                 * @param {Boolean} resp.success
-                 * @param {String|Object} resp.message
-                 */
-                resp => {
-                    if (resp.success) {
-                        DataGrid.NewModal.querySelector('form').reset()
-                        DataGrid.ReadData()
-                        
-                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp.message
-                        DataGrid.Alert.className = 'success open'
-                    }
-                    else {
-                        console.error(resp)
-                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
-
-                        if (typeof resp.message === 'object') {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
-                        }
-                        else {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
-                        }
-
-                        DataGrid.Alert.className = 'failure open'
-                    }
-
-                    // Close alert after some seconds
-                    DataGrid.AlertTimer = setTimeout(() => {
-                        DataGrid.Alert.classList.remove('open')
-                    }, DataGrid.AlertDuration)
-                }
-            )
-            .catch(e => console.error(e))
-        })
-
-        this.Toolbar.appendChild(NewBtn)
-    } // SetupNewModal()
 
     SetupDeleteModal() {
         const DelBtn = document.createElement('button')
