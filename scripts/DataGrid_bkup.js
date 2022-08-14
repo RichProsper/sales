@@ -103,7 +103,7 @@ export default class {
         this.SetupNextPrevBtns()
     }
 
-    CreateAlert() {
+    CreateAlert() { // 25 lines
         this.Alert = document.createElement('alert-rui')
 
             const status = document.createElement('strong')
@@ -129,7 +129,7 @@ export default class {
         document.body.appendChild(this.Alert)
     }
 
-    CreateNewModal() {
+    CreateNewModal() { // 72 lines
         this.NewModal = document.createElement('div')
         this.NewModal.className = 'modal'
 
@@ -153,9 +153,6 @@ export default class {
 
                 const body = document.createElement('div')
                 body.className = 'body'
-
-                    const bodyText = document.createElement('div')
-                    bodyText.className = 'body-text'
 
                     const form = document.createElement('form')
 
@@ -196,7 +193,6 @@ export default class {
                     form.appendChild(resetSubmit)
 
 
-                body.appendChild(bodyText)
                 body.appendChild(form)
 
             content.appendChild(header)
