@@ -86,7 +86,6 @@ export default class {
         this.FilterTimer = null
         this.AlertTimer = null
         this.AlertDuration = 5 * 1000
-        this.Canvas = document.createElement('canvas')
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateNewModal()
