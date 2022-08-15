@@ -103,7 +103,7 @@ export default class {
         this.SetupNextPrevBtns()
     }
 
-    CreateAlert() { // 25 lines
+    CreateAlert() {
         this.Alert = document.createElement('alert-rui')
 
             const status = document.createElement('strong')
@@ -129,7 +129,7 @@ export default class {
         document.body.appendChild(this.Alert)
     }
 
-    CreateNewModal() { // 72 lines
+    CreateNewModal() {
         this.NewModal = document.createElement('div')
         this.NewModal.className = 'modal'
 

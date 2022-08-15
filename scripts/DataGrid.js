@@ -772,6 +772,7 @@ export default class {
         return div.children
     }
 
+    // TODO
     CreateNewModal() {
         this.NewModal = document.createElement('rwc-modal')
         this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
@@ -861,12 +862,13 @@ export default class {
         document.body.appendChild(this.NewModal)
 
         // New Button
-        this.Toolbar.append(...this.HTMLStringToNode(`
+        const newBtn = this.HTMLStringToNode(`
             <button type="button" class="toolbar-btn new">
                 <i class="fas fa-plus"></i> New
             </button>
-        `))
-        this.Toolbar.querySelector('.toolbar-btn.new').addEventListener('click', () => this.NewModal.openModal())
+        `)[0]
+        newBtn.addEventListener('click', () => this.NewModal.openModal())
+        this.Toolbar.appendChild(newBtn)
     } // CreateNewModal()
 
     CreateDeleteModal() {
@@ -918,7 +920,7 @@ export default class {
                  */
                 resp => {
                     if (resp.success) {
-                        DataGrid.DeleteModal.Modal.classList.remove('open')
+                        DataGrid.DeleteModal.closeModal()
                         DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
@@ -949,12 +951,12 @@ export default class {
         })
 
         // Delete Button
-        this.Toolbar.append(...this.HTMLStringToNode(`
+        const deleteBtn = this.HTMLStringToNode(`
             <button type="button" class="toolbar-btn del">
                 <i class="far fa-trash-alt"></i> Delete
             </button>
-        `))
-        this.Toolbar.querySelector('.toolbar-btn.del').addEventListener('click', () => {
+        `)[0]
+        deleteBtn.addEventListener('click', () => {
             const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
             const headerText = this.DeleteModal.querySelector('[slot="heading"]')
             const bodyText = this.DeleteModal.querySelector('.body-text')
@@ -973,6 +975,7 @@ export default class {
 
             this.DeleteModal.openModal()
         })
+        this.Toolbar.appendChild(deleteBtn)
     } // CreateDeleteModal()
 
     CreateMain() {
