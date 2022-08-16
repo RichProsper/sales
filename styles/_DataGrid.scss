@@ -359,6 +359,7 @@ main-rui {
 
                 &:focus {
                     outline: .1rem solid var(--blue-1);
+                    outline-offset: -.1rem;
                 }
                 &.hide {
                     display: none;
