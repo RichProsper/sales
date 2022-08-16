@@ -88,8 +88,6 @@ export default class {
         this.AlertDuration = 5 * 1000
 
         this.DataGrid = document.createElement('datagrid-rui')
-        this.CreateNewModal()
-        this.CreateDeleteModal()
         this.CreateAlert()
         this.CreateToolbar()
         this.CreateMain()
@@ -101,163 +99,22 @@ export default class {
         this.SetupCheckboxes()
         this.SetupResizingColumns()
         this.SetupNextPrevBtns()
-    }
+    } // init()
 
-    CreateAlert() {
+    CreateAlert() { // 10 lines
         this.Alert = document.createElement('alert-rui')
+        this.Alert.innerHTML = `
+            <strong class="status"></strong>
+            <span class="message"></span>
+            <button type="button" class="close">×</button>
+        `
 
-            const status = document.createElement('strong')
-            status.className = 'status'
-
-            const message = document.createElement('span')
-            message.className = 'message'
-
-            const closeBtn = document.createElement('button')
-            closeBtn.type = 'button'
-            closeBtn.className = 'close'
-            closeBtn.innerHTML = '×'
-            closeBtn.addEventListener('click', () => {
-                this.Alert.classList.remove('open')
-                clearTimeout(this.AlertTimer)
-            })
-
-        this.Alert.appendChild(status)
-        this.Alert.appendChild( document.createTextNode(' ') )
-        this.Alert.appendChild(message)
-        this.Alert.appendChild(closeBtn)
+        this.Alert.querySelector('button').addEventListener('click', () => {
+            this.Alert.classList.remove('open')
+            clearTimeout(this.AlertTimer)
+        })
 
         document.body.appendChild(this.Alert)
-    }
-
-    CreateNewModal() {
-        this.NewModal = document.createElement('div')
-        this.NewModal.className = 'modal'
-
-            const content = document.createElement('div')
-            content.className = 'content'
-
-                const header = document.createElement('div')
-                header.className = 'header'
-
-                    const headerText = document.createElement('h3')
-                    headerText.className = 'header-text'
-                    headerText.textContent = `Add New ${this.TableName}`
-
-                    const closeBtn = document.createElement('button')
-                    closeBtn.type = 'button'
-                    closeBtn.className = 'close'
-                    closeBtn.innerHTML = `<span>&times;</span>`
-
-                header.appendChild(headerText)
-                header.appendChild(closeBtn)
-
-                const body = document.createElement('div')
-                body.className = 'body'
-
-                    const form = document.createElement('form')
-
-                        for (const col in this.Columns) {
-                            switch (this.Columns[col].tagName) {
-                                case 'input': {
-                                    form.appendChild( Input(this.Columns[col].tag) )
-                                    break
-                                }
-                                case 'textarea': {
-                                    form.appendChild( Textarea(this.Columns[col].tag) )
-                                    break
-                                }
-                                case 'select': {
-                                    form.appendChild( Select(this.Columns[col].tag) )
-                                    break
-                                }
-                                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
-                            }
-                        }
-
-                        const resetSubmit = document.createElement('div')
-                        resetSubmit.className = 'reset-submit'
-
-                            const resetBtn = document.createElement('button')
-                            resetBtn.type = 'reset'
-                            resetBtn.className = 'red'
-                            resetBtn.textContent = 'RESET'
-
-                            const submitBtn = document.createElement('button')
-                            submitBtn.type = 'submit'
-                            submitBtn.className = 'green'
-                            submitBtn.textContent = 'SUBMIT'
-
-                        resetSubmit.appendChild(resetBtn)
-                        resetSubmit.appendChild(submitBtn)
-
-                    form.appendChild(resetSubmit)
-
-
-                body.appendChild(form)
-
-            content.appendChild(header)
-            content.appendChild(body)
-
-        this.NewModal.appendChild(content)
-        document.body.appendChild(this.NewModal)
-    }
-
-    CreateDeleteModal() {
-        this.DeleteModal = document.createElement('div')
-        this.DeleteModal.className = 'modal delete'
-
-            const content = document.createElement('div')
-            content.className = 'content'
-
-                const header = document.createElement('div')
-                header.className = 'header'
-
-                    const headerText = document.createElement('h3')
-                    headerText.className = 'header-text'
-
-                    const closeBtn = document.createElement('button')
-                    closeBtn.type = 'button'
-                    closeBtn.className = 'close'
-                    closeBtn.innerHTML = `<span>&times;</span>`
-
-                header.appendChild(headerText)
-                header.appendChild(closeBtn)
-
-                const body = document.createElement('div')
-                body.className = 'body'
-
-                    const bodyText = document.createElement('div')
-                    bodyText.className = 'body-text'
-
-                    const form = document.createElement('form')
-
-                        const resetSubmit = document.createElement('div')
-                        resetSubmit.className = 'reset-submit'
-
-                            const resetBtn = document.createElement('button')
-                            resetBtn.type = 'reset'
-                            resetBtn.className = 'green'
-                            resetBtn.textContent = 'CANCEL'
-
-                            const submitBtn = document.createElement('button')
-                            submitBtn.type = 'submit'
-                            submitBtn.className = 'red'
-                            submitBtn.textContent = 'DELETE'
-
-                        resetSubmit.appendChild(resetBtn)
-                        resetSubmit.appendChild(submitBtn)
-
-                    form.appendChild(resetSubmit)
-
-
-                body.appendChild(bodyText)
-                body.appendChild(form)
-
-            content.appendChild(header)
-            content.appendChild(body)
-
-        this.DeleteModal.appendChild(content)
-        document.body.appendChild(this.DeleteModal)
     }
 
     CreateToolbar() {
@@ -266,8 +123,8 @@ export default class {
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.SetupNewModal()
-        this.SetupDeleteModal()
+        this.CreateNewModal()
+        this.CreateDeleteModal()
 
         this.DataGrid.appendChild(this.Toolbar)
     }
@@ -904,21 +761,52 @@ export default class {
         this.Toolbar.appendChild(SortsPanelContainer)
     } // CreateSortsPanelContainer()
 
-    SetupNewModal() {
-        const NewBtn = document.createElement('button')
-        NewBtn.type = 'button'
-        NewBtn.className = 'toolbar-btn new'
-        NewBtn.innerHTML = `<i class="fas fa-plus"></i> New`
-        NewBtn.addEventListener('click', () => this.NewModal.classList.add('open'))
+    /**
+     * Converts an HTML string to actual DOM node(s)
+     * @param {String} htmlString The HTML string
+     * @returns {HTMLCollection}
+     */
+    HTMLStringToNode(htmlString) {
+        const div = document.createElement('div')
+        div.innerHTML = htmlString
+        return div.children
+    }
 
-        this.NewModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open')
-        })
+    CreateNewModal() {
+        this.NewModal = document.createElement('rwc-modal')
+        this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
+        this.NewModal.innerHTML = `
+            <span slot="heading">Add New ${this.TableName}</span>
+            <div slot="body-content"><form></form></div>
+        `
+        const form = this.NewModal.querySelector('form')
 
-        this.NewModal.querySelector('button.close').addEventListener('click', () => this.NewModal.classList.remove('open'))
-
+        for (const col in this.Columns) {
+            switch (this.Columns[col].tagName) {
+                case 'input': {
+                    form.appendChild( Input(this.Columns[col].tag) )
+                    break
+                }
+                case 'textarea': {
+                    form.appendChild( Textarea(this.Columns[col].tag) )
+                    break
+                }
+                case 'select': {
+                    form.appendChild( Select(this.Columns[col].tag) )
+                    break
+                }
+                default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
+            }
+        }
+        
+        form.innerHTML += `
+            <div class="reset-submit">
+                <button type="reset" class="red">RESET</button>
+                <button type="submit" class="green">SUBMIT</button>
+            </div>
+        `
         const DataGrid = this
-        this.NewModal.querySelector('form').addEventListener('submit', function(e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault()
 
             DataGrid.Alert.classList.remove('open')
@@ -970,44 +858,40 @@ export default class {
             .catch(e => console.error(e))
         })
 
-        this.Toolbar.appendChild(NewBtn)
-    } // SetupNewModal()
+        document.body.appendChild(this.NewModal)
 
-    SetupDeleteModal() {
-        const DelBtn = document.createElement('button')
-        DelBtn.type = 'button'
-        DelBtn.className = 'toolbar-btn del'
-        DelBtn.innerHTML = `<i class="far fa-trash-alt"></i> Delete`
-        DelBtn.addEventListener('click', () => {
-            const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
-            const headerText = this.DeleteModal.querySelector('.header-text')
-            const bodyText = this.DeleteModal.querySelector('.body-text')
-            const delBtn = this.DeleteModal.querySelector('button[type="submit"]')
+        // New Button
+        const newBtn = this.HTMLStringToNode(`
+            <button type="button" class="toolbar-btn new">
+                <i class="fas fa-plus"></i> New
+            </button>
+        `)[0]
+        newBtn.addEventListener('click', () => this.NewModal.openModal())
+        this.Toolbar.appendChild(newBtn)
+    } // CreateNewModal()
 
-            if (numSelectedRows === 0) {
-                headerText.textContent = 'No Rows Selected!'
-                bodyText.textContent = 'Please select some row(s) first then click delete.'
-                delBtn.disabled = true
-            }
-            else {
-                headerText.textContent = 'Are You Sure?'
-                bodyText.textContent = `Are you sure you want to permanently delete ${numSelectedRows === 1 ? '1 row' : numSelectedRows + ' rows'}? This action cannot be undone!`
-                delBtn.disabled = false
-            }
+    CreateDeleteModal() {
+        this.DeleteModal = document.createElement('rwc-modal')
+        this.DeleteModal.modalOutlineColor = 'hsl(349, 84%, 65%)'
+        this.DeleteModal.innerHTML = `
+            <span slot="heading"></span>
+            <div slot="body-content">
+                <div class="body-text"></div>
+                <form>
+                    <div class="reset-submit">
+                        <button type="reset" class="green">CANCEL</button>
+                        <button type="submit" class="red">DELETE</button>
+                    </div>
+                </form>
+            </div>
+        `
+        document.body.appendChild(this.DeleteModal)
 
-            this.DeleteModal.classList.add('open')
-        })
-
-        this.DeleteModal.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open')
-        })
-
-        this.DeleteModal.querySelector('button.close').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
-
-        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.classList.remove('open'))
+        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.Modal.classList.remove('open'))
 
         const DataGrid = this
-        this.DeleteModal.querySelector('form').addEventListener('submit', function(e) {
+        const form = this.DeleteModal.querySelector('form')
+        form.addEventListener('submit', function(e) {
             e.preventDefault()
 
             DataGrid.Alert.classList.remove('open')
@@ -1035,7 +919,7 @@ export default class {
                  */
                 resp => {
                     if (resp.success) {
-                        DataGrid.DeleteModal.classList.remove('open')
+                        DataGrid.DeleteModal.closeModal()
                         DataGrid.ReadData()
                         
                         DataGrid.Alert.querySelector('.status').textContent = 'Success!'
@@ -1065,8 +949,33 @@ export default class {
             .catch(e => console.error(e))
         })
 
-        this.Toolbar.appendChild(DelBtn)
-    } // SetupDeleteModal()
+        // Delete Button
+        const deleteBtn = this.HTMLStringToNode(`
+            <button type="button" class="toolbar-btn del">
+                <i class="far fa-trash-alt"></i> Delete
+            </button>
+        `)[0]
+        deleteBtn.addEventListener('click', () => {
+            const numSelectedRows = +this.Footer.querySelector('num-selected-rows-rui').textContent.split(' row')[0]
+            const headerText = this.DeleteModal.querySelector('[slot="heading"]')
+            const bodyText = this.DeleteModal.querySelector('.body-text')
+            const delBtn = this.DeleteModal.querySelector('button[type="submit"]')
+
+            if (numSelectedRows === 0) {
+                headerText.textContent = 'No Rows Selected!'
+                bodyText.textContent = 'Please select some row(s) first then click delete.'
+                delBtn.disabled = true
+            }
+            else {
+                headerText.textContent = 'Are You Sure?'
+                bodyText.textContent = `Are you sure you want to permanently delete ${numSelectedRows === 1 ? '1 row' : numSelectedRows + ' rows'}? This action cannot be undone!`
+                delBtn.disabled = false
+            }
+
+            this.DeleteModal.openModal()
+        })
+        this.Toolbar.appendChild(deleteBtn)
+    } // CreateDeleteModal()
 
     CreateMain() {
         this.Main = document.createElement('main-rui')
@@ -1234,6 +1143,7 @@ export default class {
         }
     }
 
+    // TODO select, input media-file
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
@@ -1273,12 +1183,13 @@ export default class {
 
                         if (this.value === this.getAttribute('data-value')) return
 
+                        // Close alert if it was open
                         DataGrid.Alert.classList.remove('open')
                         clearTimeout(DataGrid.AlertTimer)
 
                         const data = new FormData()
                         data.append('REQUEST_ACTION', 'UPDATE')
-                        data.append('id', this.parentElement.getAttribute('data-entity-id'))
+                        data.append('id', +this.parentElement.getAttribute('data-entity-id'))
                         data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
                         data.append('value', this.value)
 

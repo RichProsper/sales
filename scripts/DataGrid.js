@@ -772,7 +772,6 @@ export default class {
         return div.children
     }
 
-    // TODO
     CreateNewModal() {
         this.NewModal = document.createElement('rwc-modal')
         this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
@@ -1144,6 +1143,7 @@ export default class {
         }
     }
 
+    // TODO select, input media-file
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
@@ -1183,12 +1183,13 @@ export default class {
 
                         if (this.value === this.getAttribute('data-value')) return
 
+                        // Close alert if it was open
                         DataGrid.Alert.classList.remove('open')
                         clearTimeout(DataGrid.AlertTimer)
 
                         const data = new FormData()
                         data.append('REQUEST_ACTION', 'UPDATE')
-                        data.append('id', this.parentElement.getAttribute('data-entity-id'))
+                        data.append('id', +this.parentElement.getAttribute('data-entity-id'))
                         data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
                         data.append('value', this.value)
 
