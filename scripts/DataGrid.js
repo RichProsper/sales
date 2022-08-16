@@ -3,6 +3,7 @@ import Switch from '../vendors/rui/rui-switch.min.js'
 import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
 import Textarea from '../vendors/rui/rui-textarea.min.js'
+//* Also dependent on rwc-modal
 
 /**
  * Grid Data

@@ -6,7 +6,7 @@
         "_global.scss",
         "_header.scss",
         "_section.scss",
-        "_modal.scss",
+        "_rwc-modal.scss",
         "_DataGrid.scss"
     ],
     "names": [],
