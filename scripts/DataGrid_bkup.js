@@ -85,8 +85,6 @@ export default class {
             }
         ]
         this.FilterTimer = null
-        this.AlertTimer = null
-        this.AlertDuration = 5 * 1000
 
         this.DataGrid = document.createElement('datagrid-rui')
         this.CreateAlert()
@@ -103,18 +101,7 @@ export default class {
     } // init()
 
     CreateAlert() { // 10 lines
-        this.Alert = document.createElement('alert-rui')
-        this.Alert.innerHTML = `
-            <strong class="status"></strong>
-            <span class="message"></span>
-            <button type="button" class="close">×</button>
-        `
-
-        this.Alert.querySelector('button').addEventListener('click', () => {
-            this.Alert.classList.remove('open')
-            clearTimeout(this.AlertTimer)
-        })
-
+        this.Alert = document.createElement('rwc-alert')
         document.body.appendChild(this.Alert)
     }
 
@@ -810,8 +797,7 @@ export default class {
         form.addEventListener('submit', function(e) {
             e.preventDefault()
 
-            DataGrid.Alert.classList.remove('open')
-            clearTimeout(DataGrid.AlertTimer)
+            DataGrid.Alert.closeAlert()
 
             const data = new FormData(this)
             data.append('REQUEST_ACTION', 'CREATE')
@@ -831,29 +817,28 @@ export default class {
                     if (resp.success) {
                         DataGrid.NewModal.querySelector('form').reset()
                         DataGrid.ReadData()
-                        
-                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp.message
-                        DataGrid.Alert.className = 'success open'
+
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Success!</span>
+                            <span slot="message">${resp.message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#bdd9a6'
+                        DataGrid.Alert.openAlert()
                     }
                     else {
                         console.error(resp)
-                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
+                        
+                        const message = typeof resp.message === 'object'
+                            ? 'Invalid data detected! Please remove invalid data and submit again.'
+                            : 'Something went wrong. Please try again later.'
 
-                        if (typeof resp.message === 'object') {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid data detected! Please remove invalid data and submit again.'
-                        }
-                        else {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
-                        }
-
-                        DataGrid.Alert.className = 'failure open'
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Failure!</span>
+                            <span slot="message">${message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#d9a6af'
+                        DataGrid.Alert.openAlert()
                     }
-
-                    // Close alert after some seconds
-                    DataGrid.AlertTimer = setTimeout(() => {
-                        DataGrid.Alert.classList.remove('open')
-                    }, DataGrid.AlertDuration)
                 }
             )
             .catch(e => console.error(e))
@@ -895,8 +880,7 @@ export default class {
         form.addEventListener('submit', function(e) {
             e.preventDefault()
 
-            DataGrid.Alert.classList.remove('open')
-            clearTimeout(DataGrid.AlertTimer)
+            DataGrid.Alert.closeAlert()
 
             const ids = []
             const selectedRows = DataGrid.RowsContainer.querySelectorAll('row-rui.selected')
@@ -923,28 +907,28 @@ export default class {
                         DataGrid.DeleteModal.closeModal()
                         DataGrid.ReadData()
                         
-                        DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                        DataGrid.Alert.querySelector('.message').textContent = resp.message
-                        DataGrid.Alert.className = 'success open'
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Success!</span>
+                            <span slot="message">${resp.message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#bdd9a6'
+                        DataGrid.Alert.openAlert()
                     }
                     else {
                         console.error(resp.message)
-                        DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
 
-                        if (resp.message === 'Invalid ID(s)!') {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Invalid ID(s) detected! Please remove invalid ID(s) and try again.'
-                        }
-                        else {
-                            DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
-                        }
+                        const message = resp.message === 'Invalid ID(s)!'
+                            ? 'Invalid ID(s) detected! Please remove invalid ID(s) and try again.'
+                            : 'Something went wrong. Please try again later.'
 
-                        DataGrid.Alert.className = 'failure open'
+                        
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Failure!</span>
+                            <span slot="message">${message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#d9a6af'
+                        DataGrid.Alert.openAlert()
                     }
-
-                    // Close alert after some seconds
-                    DataGrid.AlertTimer = setTimeout(() => {
-                        DataGrid.Alert.classList.remove('open')
-                    }, DataGrid.AlertDuration)
                 }
             )
             .catch(e => console.error(e))
@@ -1185,8 +1169,7 @@ export default class {
                         if (this.value === this.getAttribute('data-value')) return
 
                         // Close alert if it was open
-                        DataGrid.Alert.classList.remove('open')
-                        clearTimeout(DataGrid.AlertTimer)
+                        DataGrid.Alert.closeAlert()
 
                         const data = new FormData()
                         data.append('REQUEST_ACTION', 'UPDATE')
@@ -1209,28 +1192,27 @@ export default class {
                                 if (resp.success) {     
                                     this.setAttribute('data-value', this.value)
 
-                                    DataGrid.Alert.querySelector('.status').textContent = 'Success!'
-                                    DataGrid.Alert.querySelector('.message').textContent = resp.message
-                                    DataGrid.Alert.className = 'success open'
+                                    DataGrid.Alert.innerHTML = `
+                                        <span slot="status">Success!</span>
+                                        <span slot="message">${resp.message}</span>
+                                    `
+                                    DataGrid.Alert.alertColor = '#bdd9a6'
+                                    DataGrid.Alert.openAlert()
                                 }
                                 else {
                                     console.error(resp.message)
-                                    DataGrid.Alert.querySelector('.status').textContent = 'Failure!'
-            
-                                    if (resp.message === 'Invalid column data') {
-                                        DataGrid.Alert.querySelector('.message').textContent = 'Invalid column data detected! Please remove invalid data and submit again.'
-                                    }
-                                    else {
-                                        DataGrid.Alert.querySelector('.message').textContent = 'Something went wrong. Please try again later.'
-                                    }
-            
-                                    DataGrid.Alert.className = 'failure open'
+
+                                    const message = resp.message === 'Invalid column data'
+                                        ? 'Invalid column data detected! Please remove invalid data and submit again.'
+                                        : 'Something went wrong. Please try again later.'
+                                    
+                                    DataGrid.Alert.innerHTML = `
+                                        <span slot="status">Failure!</span>
+                                        <span slot="message">${message}</span>
+                                    `
+                                    DataGrid.Alert.alertColor = '#d9a6af'
+                                    DataGrid.Alert.openAlert()
                                 }
-            
-                                // Close alert after some seconds
-                                DataGrid.AlertTimer = setTimeout(() => {
-                                    DataGrid.Alert.classList.remove('open')
-                                }, DataGrid.AlertDuration)
                             }
                         )
                         .catch(e => console.error(e))

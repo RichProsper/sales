@@ -241,6 +241,6 @@ import DataGrid from './DataGrid.js'
     )
     .catch(e => console.error(e))
 
-    // TODO Integrate rwc-alert, select, input[type="file"][accept="image/*"]
+    // TODO Integrate select, input[type="file"][accept="image/*"]
     // TODO Update Product Image
 })()
