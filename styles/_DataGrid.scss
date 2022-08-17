@@ -361,14 +361,14 @@ main-rui {
                     outline: .1rem solid var(--blue-1);
                     outline-offset: -.1rem;
                 }
+                &:read-only {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
                 &.hide {
                     display: none;
                 }
-            }
-            input:read-only {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
             &:hover col-rui,
             &:hover input {

@@ -509,19 +509,20 @@ main-rui rows-container-rui row-rui input:focus {
   outline: 0.1rem solid var(--blue-1);
   outline-offset: -0.1rem;
 }
-main-rui rows-container-rui row-rui col-rui.hide,
-main-rui rows-container-rui row-rui input.hide {
-  display: none;
-}
-main-rui rows-container-rui row-rui input:-moz-read-only {
+main-rui rows-container-rui row-rui col-rui:-moz-read-only, main-rui rows-container-rui row-rui input:-moz-read-only {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+main-rui rows-container-rui row-rui col-rui:read-only,
 main-rui rows-container-rui row-rui input:read-only {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+main-rui rows-container-rui row-rui col-rui.hide,
+main-rui rows-container-rui row-rui input.hide {
+  display: none;
 }
 main-rui rows-container-rui row-rui:hover col-rui, main-rui rows-container-rui row-rui:hover input {
   background-color: var(--row-hover);
