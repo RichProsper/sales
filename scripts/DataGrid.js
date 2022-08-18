@@ -1006,13 +1006,25 @@ export default class {
         this.Main.appendChild(this.HeadingsContainer)
     }
 
+    CreateRowsContainer() {
+        this.RowsContainer = document.createElement('rows-container-rui')
+        this.BoundColumnNavigate = this.ColumnNavigate.bind(this)
+        this.BoundColumnEdit = this.ColumnEdit.bind(this)
+        this.CreateRows()
+        this.Main.appendChild(this.RowsContainer)
+
+        this.RowsContainer.addEventListener('scroll', () => {
+            this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
+        })
+    }
+
     /**
      * Scroll parent element if element is partially
      * or fully offscreen to the left or right
      * @param {HTMLInputElement} el The element to keep in view
      * @param {HTMLElement} containerEl The parent element to scroll if need be
      */
-    KeepElementInView(el, containerEl) {
+     KeepElementInView(el, containerEl) {
         // If this element is offscreen to the right
         if ( (el.offsetLeft + el.offsetWidth - containerEl.offsetLeft) > (containerEl.offsetWidth - this.ScrollbarWidth + containerEl.scrollLeft) ) {
             containerEl.scrollLeft = el.offsetLeft + el.offsetWidth - containerEl.offsetLeft - containerEl.offsetWidth + this.ScrollbarWidth + 1
@@ -1097,18 +1109,6 @@ export default class {
         }
     }
 
-    CreateRowsContainer() {
-        this.RowsContainer = document.createElement('rows-container-rui')
-        this.BoundColumnNavigate = this.ColumnNavigate.bind(this)
-        this.BoundColumnEdit = this.ColumnEdit.bind(this)
-        this.CreateRows()
-        this.Main.appendChild(this.RowsContainer)
-
-        this.RowsContainer.addEventListener('scroll', () => {
-            this.HeadingsContainer.children[0].style.transform = `translateX(-${this.RowsContainer.scrollLeft}px)`
-        })
-    }
-
     /**
      * Resize a given column to the given width
      * @param {HTMLElement} col The column to resize
@@ -1146,6 +1146,7 @@ export default class {
 
                 let j = 0
                 for (let col in this.Rows[i]) {
+                    // console.log(this.Columns[Object.keys(this.Columns)[j]])
                     const Col = document.createElement('input')
 
                     Col.setAttribute('data-colindex', j)

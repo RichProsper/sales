@@ -201,8 +201,7 @@ import DataGrid from './DataGrid.js'
                         tagName: 'input',
                         tag: {
                             attrs: {
-                                type: 'file', name: 'image',
-                                title: 'Only ".jfif", ".jpg", ".jpeg", ".webp", ".gif" and ".png" image file types allowed'
+                                type: 'file', name: 'image', accept: 'image/*'
                             }
                         }
                     },
@@ -241,6 +240,6 @@ import DataGrid from './DataGrid.js'
     )
     .catch(e => console.error(e))
 
-    // TODO Integrate select, input[type="file"][accept="image/*"]
+    // TODO Integrate rwc in create new modals, select, input[type="file"][accept="image/*"]
     // TODO Update Product Image
 })()
