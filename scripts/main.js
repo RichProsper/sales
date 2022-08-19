@@ -240,6 +240,6 @@ import DataGrid from './DataGrid.js'
     )
     .catch(e => console.error(e))
 
-    // TODO Integrate rwc in create new modals, select, input[type="file"][accept="image/*"]
+    // TODO Integrate input[type="file"][accept="image/*"]
     // TODO Update Product Image
 })()
