@@ -787,12 +787,13 @@ export default class {
             }
         }
         
-        form.innerHTML += `
+        form.append(...this.HTMLStringToNode(`
             <div class="reset-submit">
                 <button type="reset" class="red">RESET</button>
                 <button type="submit" class="green">SUBMIT</button>
             </div>
-        `
+        `))
+
         const DataGrid = this
         form.addEventListener('submit', function(e) {
             e.preventDefault()
@@ -1128,7 +1129,7 @@ export default class {
         }
     }
 
-    // TODO select, input media-file
+    // TODO input media-file
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
