@@ -1024,7 +1024,7 @@ export default class {
      * @param {HTMLInputElement} el The element to keep in view
      * @param {HTMLElement} containerEl The parent element to scroll if need be
      */
-     KeepElementInView(el, containerEl) {
+    KeepElementInView(el, containerEl) {
         // If this element is offscreen to the right
         if ( (el.offsetLeft + el.offsetWidth - containerEl.offsetLeft) > (containerEl.offsetWidth - this.ScrollbarWidth + containerEl.scrollLeft) ) {
             containerEl.scrollLeft = el.offsetLeft + el.offsetWidth - containerEl.offsetLeft - containerEl.offsetWidth + this.ScrollbarWidth + 1
