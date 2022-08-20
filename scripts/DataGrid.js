@@ -243,6 +243,225 @@ export default class {
 
         this.Toolbar.appendChild(ColumnsPanelContainer)
     } // CreateColumnsPanelContainer()
+
+    /**
+     * Determines whether to hide/display/disable the And/Or operator.
+     * @param {HTMLElement} PanelContent 
+     */
+    SetOperatorVisibility(PanelContent) {
+        const Operators = PanelContent.querySelectorAll('[data-operators]')
+
+        if (Operators.length === 1) {
+            Operators[0].className = 'mr-_5 hidden'
+            return
+        }
+
+        for (let i = 0; i < Operators.length; i++) {
+            if (i === 0) Operators[i].className = 'mr-_5 invisible'
+            else if (i === 1) {
+                Operators[i].className = 'mr-_5'
+                Operators[i].children[0].removeAttribute('disabled')
+            }
+            else {
+                Operators[i].className = 'mr-_5'
+                Operators[i].children[0].setAttribute('disabled','')
+            }
+        }
+    }
+
+    /**
+     * Determines whether to hide/display/disable the And/Or operator.
+     * @param {HTMLElement} PanelContent
+     * @param {HTMLButtonElement} FiltersBtn
+     * @param {HTMLElement} Indicator
+     */
+    CreateFilterRow(PanelContent, FiltersBtn, Indicator) {
+        const DataGrid = this
+        const Row = document.createElement('row-rui')
+
+            const DeleteRow = document.createElement('div')
+            DeleteRow.setAttribute('delete-row', '')
+
+                const Btn = document.createElement('button')
+                Btn.type = 'button'
+                Btn.innerHTML = '&times;'
+                Btn.addEventListener('click', function(e) {
+                    const numRows = +PanelContent.getAttribute('data-rows')
+                    if (numRows > 1) {
+                        e.stopPropagation()
+                        const row = this.parentElement.parentElement
+
+                        if ( row.hasAttribute('data-has-filter') ) {
+                            FiltersBtn.value = +FiltersBtn.value - 1
+                            if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                            else Indicator.classList.add('hide')
+                        }
+
+                        row.remove()
+                        DataGrid.SetOperatorVisibility(PanelContent)
+                        PanelContent.setAttribute('data-rows', numRows - 1)
+
+                        DataGrid.FilterReadData()
+                    }
+                    else {
+                        const row = this.parentElement.parentElement
+                        if ( !row.hasAttribute('data-has-filter') ) return
+                        
+                        row.removeAttribute('data-has-filter')
+                        const columns = row.children[2].children[0]
+                        const operations = row.children[3].children[0]
+                        const filter = row.children[4].children[0]
+
+                        columns.value = DataGrid.Columns[Object.keys(DataGrid.Columns)[0]].dbName
+                        operations.value = DataGrid.Operations[0].value
+                        operations.setAttribute('data-value', DataGrid.Operations[0].value)
+                        filter.value = null
+                        filter.parentElement.classList.remove('invisible')
+
+                        FiltersBtn.value = +FiltersBtn.value - 1
+                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                        else Indicator.classList.add('hide')
+
+                        DataGrid.FilterReadData()
+                    }
+                })
+
+            DeleteRow.appendChild(Btn)
+
+            const Operator = Select({
+                labelText: 'Operators',
+                attrs: { class: 'w8' },
+                evts: {
+                    change: function() {
+                        const Ops = PanelContent.querySelectorAll('[data-operators]')
+                        for (const Op of Ops) Op.children[0].value = this.value
+
+                        // When to call FilterReadData
+                        const row = this.parentElement.parentElement
+                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
+                    }
+                },
+                options: [
+                    {
+                        value: 'AND',
+                        textContent: 'And'
+                    },
+                    {
+                        value: 'OR',
+                        textContent: 'Or',
+                    }
+                ]
+            })
+            Operator.setAttribute('data-operators', '')
+            Operator.className = 'mr-_5 hidden'
+            if (PanelContent.children.length > 0) {
+                const PrevOp = PanelContent.lastElementChild.children[1].children[0]
+                if (PrevOp.value === 'AND') Operator.children[0].value = 'AND'
+                else Operator.children[0].value = 'OR'
+            }
+            
+            const colOptions = []
+            for (const col in this.Columns) {
+                colOptions.push({
+                    value: this.Columns[col].dbName,
+                    textContent: col
+                })
+            }
+            const Column = Select({
+                labelText: 'Columns',
+                attrs: { class: 'w14' },
+                evts: {
+                    change: function() {
+                        const row = this.parentElement.parentElement
+                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
+                    }
+                },
+                options: colOptions
+            })
+            Column.classList.add('mr-_5')
+
+            const Operation = Select({
+                labelText: 'Operations',
+                attrs: {
+                    class: 'w17',
+                    'data-value': this.Operations[0].value
+                },
+                evts: {
+                    change: function() {
+                        const filterValue = this.parentElement.nextElementSibling.children[0]
+                        const row = this.parentElement.parentElement
+
+                        if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
+                            filterValue.parentElement.classList.add('invisible')
+                            filterValue.value = null
+
+                            if (!row.hasAttribute('data-has-filter')) {
+                                row.setAttribute('data-has-filter', '')
+                                FiltersBtn.value = +FiltersBtn.value + 1
+                            }
+                            
+                            DataGrid.FilterReadData()
+                        }
+                        else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
+                        {
+                            filterValue.parentElement.classList.remove('invisible')
+                            row.removeAttribute('data-has-filter')
+
+                            FiltersBtn.value = +FiltersBtn.value - 1
+                            DataGrid.FilterReadData()
+                        }
+                        else if (filterValue.value) {
+                            DataGrid.FilterReadData()
+                        }
+
+                        this.setAttribute('data-value', this.value)
+
+                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                        else Indicator.classList.add('hide')
+                    }
+                },
+                options: this.Operations
+            })
+            Operation.classList.add('mr-_5')
+
+        Row.appendChild(DeleteRow)
+        Row.appendChild(Operator)
+        Row.appendChild(Column)
+        Row.appendChild(Operation)
+        Row.appendChild( Input({
+            attrs: {
+                class: 'w18',
+                placeholder: 'Filter Value'
+            },
+            evts: {
+                input: function() {
+                    clearTimeout(DataGrid.FilterTimer)
+                    DataGrid.FilterTimer = setTimeout(() => {
+                        if (this.value) {
+                            if ( !this.parentElement.parentElement.hasAttribute('data-has-filter') ) {
+                                this.parentElement.parentElement.setAttribute('data-has-filter', '')
+                                FiltersBtn.value = +FiltersBtn.value + 1
+                            }
+                        }
+                        else {
+                            this.parentElement.parentElement.removeAttribute('data-has-filter')
+                            FiltersBtn.value = +FiltersBtn.value - 1
+                        }
+
+                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
+                        else Indicator.classList.add('hide')
+
+                        DataGrid.FilterReadData()
+                    }, 1000)
+                }
+            }
+        }) )
+
+        PanelContent.appendChild(Row)
+
+        const numRows = +PanelContent.getAttribute('data-rows')
+        PanelContent.setAttribute('data-rows', numRows + 1)
+    } // CreateFilterRow()
     
     CreateFiltersPanelContainer() {
         const FiltersPanelContainer = document.createElement('toolbar-panel-container-rui')
@@ -260,216 +479,7 @@ export default class {
 
                 const PanelContent = document.createElement('panel-content-rui')
                 PanelContent.setAttribute('data-rows', 0)
-
-                    const SetOperatorVisibility = () => {
-                        const Operators = PanelContent.querySelectorAll('[data-operators]')
-
-                        if (Operators.length === 1) {
-                            Operators[0].className = 'mr-_5 hidden'
-                            return
-                        }
-
-                        for (let i = 0; i < Operators.length; i++) {
-                            if (i === 0) Operators[i].className = 'mr-_5 invisible'
-                            else if (i === 1) {
-                                Operators[i].className = 'mr-_5'
-                                Operators[i].children[0].removeAttribute('disabled')
-                            }
-                            else {
-                                Operators[i].className = 'mr-_5'
-                                Operators[i].children[0].setAttribute('disabled','')
-                            }
-                        }
-                    }
-
-                    const CreateFilterRow = () => {
-                        const DataGrid = this
-                        const Row = document.createElement('row-rui')
-
-                            const DeleteRow = document.createElement('div')
-                            DeleteRow.setAttribute('delete-row', '')
-
-                                const Btn = document.createElement('button')
-                                Btn.type = 'button'
-                                Btn.innerHTML = '&times;'
-                                Btn.addEventListener('click', function(e) {
-                                    const numRows = +PanelContent.getAttribute('data-rows')
-                                    if (numRows > 1) {
-                                        e.stopPropagation()
-                                        const row = this.parentElement.parentElement
-
-                                        if ( row.hasAttribute('data-has-filter') ) {
-                                            FiltersBtn.value = +FiltersBtn.value - 1
-                                            if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
-                                            else Indicator.classList.add('hide')
-                                        }
-
-                                        row.remove()
-                                        SetOperatorVisibility()
-                                        PanelContent.setAttribute('data-rows', numRows - 1)
-
-                                        DataGrid.FilterReadData()
-                                    }
-                                    else {
-                                        const row = this.parentElement.parentElement
-                                        if ( !row.hasAttribute('data-has-filter') ) return
-                                        
-                                        row.removeAttribute('data-has-filter')
-                                        const columns = row.children[2].children[0]
-                                        const operations = row.children[3].children[0]
-                                        const filter = row.children[4].children[0]
-
-                                        columns.value = DataGrid.Columns[ Object.keys(DataGrid.Columns)[0] ].dbName
-                                        operations.value = DataGrid.Operations[0].value
-                                        filter.value = null
-                                        operations.dispatchEvent(new Event('change'))
-
-                                        FiltersBtn.value = +FiltersBtn.value - 1
-                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
-                                        else Indicator.classList.add('hide')
-
-                                        DataGrid.FilterReadData()
-                                    }
-                                })
-
-                            DeleteRow.appendChild(Btn)
-
-                            const Operator = Select({
-                                labelText: 'Operators',
-                                attrs: { class: 'w8' },
-                                evts: {
-                                    change: function() {
-                                        const Ops = PanelContent.querySelectorAll('[data-operators]')
-                                        for (const Op of Ops) Op.children[0].value = this.value
-
-                                        // When to call FilterReadData
-                                        const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
-                                    }
-                                },
-                                options: [
-                                    {
-                                        value: 'AND',
-                                        textContent: 'And'
-                                    },
-                                    {
-                                        value: 'OR',
-                                        textContent: 'Or',
-                                    }
-                                ]
-                            })
-                            Operator.setAttribute('data-operators', '')
-                            Operator.className = 'mr-_5 hidden'
-                            if (PanelContent.children.length > 0) {
-                                const PrevOp = PanelContent.lastElementChild.children[1].children[0]
-                                if (PrevOp.value === 'AND') Operator.children[0].value = 'AND'
-                                else Operator.children[0].value = 'OR'
-                            }
-                            
-                            const colOptions = []
-                            for (const col in this.Columns) {
-                                colOptions.push({
-                                    value: this.Columns[col].dbName,
-                                    textContent: col
-                                })
-                            }
-                            const Column = Select({
-                                labelText: 'Columns',
-                                attrs: { class: 'w14' },
-                                evts: {
-                                    change: function() {
-                                        const row = this.parentElement.parentElement
-                                        if ( row.hasAttribute('data-has-filter') ) DataGrid.FilterReadData()
-                                    }
-                                },
-                                options: colOptions
-                            })
-                            Column.classList.add('mr-_5')
-
-                            const Operation = Select({
-                                labelText: 'Operations',
-                                attrs: {
-                                    class: 'w17',
-                                    'data-value': this.Operations[0].value
-                                },
-                                evts: {
-                                    change: function() {
-                                        const filterValue = this.parentElement.nextElementSibling.children[0]
-                                        const row = this.parentElement.parentElement
-
-                                        if (this.value === 'isEmpty' || this.value === 'isNotEmpty') {
-                                            filterValue.parentElement.classList.add('invisible')
-                                            filterValue.value = null
-
-                                            if (!row.hasAttribute('data-has-filter')) {
-                                                row.setAttribute('data-has-filter', '')
-                                                FiltersBtn.value = +FiltersBtn.value + 1
-                                            }
-                                            
-                                            DataGrid.FilterReadData()
-                                        }
-                                        else if (this.getAttribute('data-value') === 'isEmpty' || this.getAttribute('data-value') === 'isNotEmpty')
-                                        {
-                                            filterValue.parentElement.classList.remove('invisible')
-                                            row.removeAttribute('data-has-filter')
-
-                                            FiltersBtn.value = +FiltersBtn.value - 1
-                                            DataGrid.FilterReadData()
-                                        }
-                                        else if (filterValue.value) {
-                                            DataGrid.FilterReadData()
-                                        }
-
-                                        this.setAttribute('data-value', this.value)
-
-                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
-                                        else Indicator.classList.add('hide')
-                                    }
-                                },
-                                options: this.Operations
-                            })
-                            Operation.classList.add('mr-_5')
-
-                        Row.appendChild(DeleteRow)
-                        Row.appendChild(Operator)
-                        Row.appendChild(Column)
-                        Row.appendChild(Operation)
-                        Row.appendChild( Input({
-                            attrs: {
-                                class: 'w18',
-                                placeholder: 'Filter Value'
-                            },
-                            evts: {
-                                input: function() {
-                                    clearTimeout(DataGrid.FilterTimer)
-                                    DataGrid.FilterTimer = setTimeout(() => {
-                                        if (this.value) {
-                                            if ( !this.parentElement.parentElement.hasAttribute('data-has-filter') ) {
-                                                this.parentElement.parentElement.setAttribute('data-has-filter', '')
-                                                FiltersBtn.value = +FiltersBtn.value + 1
-                                            }
-                                        }
-                                        else {
-                                            this.parentElement.parentElement.removeAttribute('data-has-filter')
-                                            FiltersBtn.value = +FiltersBtn.value - 1
-                                        }
-
-                                        if (+FiltersBtn.value > 0) Indicator.classList.remove('hide')
-                                        else Indicator.classList.add('hide')
-
-                                        DataGrid.FilterReadData()
-                                    }, 1000)
-                                }
-                            }
-                        }) )
-
-                        PanelContent.appendChild(Row)
-
-                        const numRows = +PanelContent.getAttribute('data-rows')
-                        PanelContent.setAttribute('data-rows', numRows + 1)
-                    } // CreateFilterRow()
-                    CreateFilterRow()
-
+                    this.CreateFilterRow(PanelContent, FiltersBtn, Indicator)
                 const PanelFooter = document.createElement('panel-footer-rui')
 
                     const AddFilterBtn = document.createElement('button')
@@ -477,8 +487,8 @@ export default class {
                     AddFilterBtn.className = 'panel-btn'
                     AddFilterBtn.innerHTML = `<i class="fas fa-plus"></i> ADD FILTER`
                     AddFilterBtn.addEventListener('click', () => {
-                        CreateFilterRow()
-                        SetOperatorVisibility()
+                        this.CreateFilterRow(PanelContent, FiltersBtn, Indicator)
+                        this.SetOperatorVisibility(PanelContent)
                     })
 
                 PanelFooter.appendChild(AddFilterBtn)
