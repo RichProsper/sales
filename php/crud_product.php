@@ -132,6 +132,9 @@ switch ($_POST["REQUEST_ACTION"]) {
                     $response->message = "Error uploading file";
                     break;
                 }
+
+                // ! Important
+                $image = "php/" . $image;
             }
 
             try {

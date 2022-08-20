@@ -1259,7 +1259,6 @@ export default class {
         return Col
     }
 
-    // TODO input media-file
     CreateRows() {
         this.RowsContainer.innerHTML = null
 
