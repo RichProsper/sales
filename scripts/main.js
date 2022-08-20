@@ -203,7 +203,8 @@ import DataGrid from './DataGrid.js'
                             attrs: {
                                 type: 'file', name: 'image', accept: 'image/*'
                             }
-                        }
+                        },
+                        otherInfo: 'images'
                     },
                     Unit: {
                         dbName: 'unit',

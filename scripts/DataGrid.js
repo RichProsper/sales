@@ -270,7 +270,7 @@ export default class {
     }
 
     /**
-     * Determines whether to hide/display/disable the And/Or operator.
+     * Creates a row in the filters panel
      * @param {HTMLElement} PanelContent
      * @param {HTMLButtonElement} FiltersBtn
      * @param {HTMLElement} Indicator
@@ -1139,118 +1139,154 @@ export default class {
         }
     }
 
+    /**
+     * Creates a row in the datagrid
+     * @param {Number} i
+     * @param {Number} j
+     * @param {String} col
+     * @returns {HTMLInputElement}
+     */
+    CreateInputCols(i, j, col) {
+        const DataGrid = this
+        const Col = document.createElement('input')
+
+        Col.setAttribute('data-colindex', j)
+        Col.value = this.Rows[i][col] ? this.Rows[i][col] : ''
+        Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
+        Col.readOnly = true
+
+        Col.addEventListener('focus', function() {
+            DataGrid.SelectedCol = this
+        })
+
+        Col.addEventListener('keydown', this.BoundColumnNavigate)
+
+        Col.addEventListener('blur', function() {
+            if (this.readOnly) return
+
+            this.readOnly = true
+            this.removeEventListener('keydown', DataGrid.BoundColumnEdit)
+            this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
+
+            if (this.value === this.getAttribute('data-value')) return
+
+            // Close alert if it was open
+            DataGrid.Alert.closeAlert()
+
+            const data = new FormData()
+            data.append('REQUEST_ACTION', 'UPDATE')
+            data.append('id', +this.parentElement.getAttribute('data-entity-id'))
+            data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
+            data.append('value', this.value)
+
+            fetch(DataGrid.CrudUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String} resp.message
+                 */
+                resp => {
+                    if (resp.success) {     
+                        this.setAttribute('data-value', this.value)
+
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Success!</span>
+                            <span slot="message">${resp.message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#bdd9a6'
+                        DataGrid.Alert.openAlert()
+                    }
+                    else {
+                        console.error(resp.message)
+
+                        const message = resp.message === 'Invalid column data'
+                            ? 'Invalid column data detected! Please remove invalid data and submit again.'
+                            : 'Something went wrong. Please try again later.'
+                        
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Failure!</span>
+                            <span slot="message">${message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#d9a6af'
+                        DataGrid.Alert.openAlert()
+                    }
+                }
+            )
+            .catch(e => console.error(e))
+        }) // addEventListener('blur)
+
+        Col.addEventListener('dblclick', function() {
+            if (!this.readOnly) return
+
+            if (this.scrollWidth > this.offsetWidth) DataGrid.ResizeColumn(this, this.scrollWidth + 10)
+
+            this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
+            this.readOnly = false
+
+            this.setSelectionRange(this.value.length, this.value.length)
+            DataGrid.KeepElementInView(this, DataGrid.RowsContainer)
+
+            this.addEventListener('keydown', DataGrid.BoundColumnEdit)
+        })
+
+        return Col
+    } // CreateInputCols()
+
+    /**
+     * Creates a row in the datagrid
+     * @param {Number} i
+     * @param {Number} j
+     * @param {String} col
+     * @returns {HTMLInputElement}
+     */
+    CreateInputFileImageCols(i, j, col) {
+        const DataGrid = this
+        const splits = this.Rows[i][col].split('/')
+        const image = splits[splits.length - 1].split('.')[0]
+
+        const Col = this.HTMLStringToNode(`
+            <label data-colindex="${j}">
+                <input type="file" accept="image/*">
+                <img class="small" src="${this.Rows[i][col]}" alt="${image}">
+                <img class="big" src="${this.Rows[i][col]}" alt="${image}">
+            </label>
+        `)[0]
+        return Col
+    }
+
     // TODO input media-file
     CreateRows() {
-        const DataGrid = this
         this.RowsContainer.innerHTML = null
 
         for (let i = 0; i < this.Rows.length; i++) {
             const Row = document.createElement('row-rui')
             Row.setAttribute('data-rowindex', i)
-            Row.setAttribute('data-entity-id', this.RowIDs[i][ Object.keys(this.RowIDs[i])[0] ])
+            Row.setAttribute('data-entity-id', this.RowIDs[i][Object.keys(this.RowIDs[i])[0]])
 
                 const Col = document.createElement('col-rui')
                 Col.className = 'select-column'
-                Col.appendChild( Checkbox({ attrs: { 'data-checkbox-group-single': ''} }) )
+                Col.appendChild(Checkbox({ attrs: { 'data-checkbox-group-single': ''} }))
 
             Row.appendChild(Col)
 
                 let j = 0
                 for (let col in this.Rows[i]) {
-                    // console.log(this.Columns[Object.keys(this.Columns)[j]])
-                    const Col = document.createElement('input')
+                    const colObj = this.Columns[Object.keys(this.Columns)[j]]
+                    
+                    if (colObj.otherInfo === 'images') Row.appendChild(this.CreateInputFileImageCols(i, j, col))
+                    else Row.appendChild(this.CreateInputCols(i, j, col))
 
-                    Col.setAttribute('data-colindex', j)
-                    Col.value = this.Rows[i][col] ? this.Rows[i][col] : ''
-                    Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
-                    Col.readOnly = true
-
-                    Col.addEventListener('focus', function() {
-                        DataGrid.SelectedCol = this
-                    })
-
-                    Col.addEventListener('keydown', this.BoundColumnNavigate)
-
-                    Col.addEventListener('blur', function() {
-                        if (this.readOnly) return
-
-                        this.readOnly = true
-                        this.removeEventListener('keydown', DataGrid.BoundColumnEdit)
-                        this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
-
-                        if (this.value === this.getAttribute('data-value')) return
-
-                        // Close alert if it was open
-                        DataGrid.Alert.closeAlert()
-
-                        const data = new FormData()
-                        data.append('REQUEST_ACTION', 'UPDATE')
-                        data.append('id', +this.parentElement.getAttribute('data-entity-id'))
-                        data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
-                        data.append('value', this.value)
-
-                        fetch(DataGrid.CrudUrl, {
-                            method: 'POST',
-                            body: data
-                        })
-                        .then(respJSON => respJSON.json())
-                        .then(
-                            /**
-                             * @param {Object} resp
-                             * @param {Boolean} resp.success
-                             * @param {String} resp.message
-                             */
-                            resp => {
-                                if (resp.success) {     
-                                    this.setAttribute('data-value', this.value)
-
-                                    DataGrid.Alert.innerHTML = `
-                                        <span slot="status">Success!</span>
-                                        <span slot="message">${resp.message}</span>
-                                    `
-                                    DataGrid.Alert.alertColor = '#bdd9a6'
-                                    DataGrid.Alert.openAlert()
-                                }
-                                else {
-                                    console.error(resp.message)
-
-                                    const message = resp.message === 'Invalid column data'
-                                        ? 'Invalid column data detected! Please remove invalid data and submit again.'
-                                        : 'Something went wrong. Please try again later.'
-                                    
-                                    DataGrid.Alert.innerHTML = `
-                                        <span slot="status">Failure!</span>
-                                        <span slot="message">${message}</span>
-                                    `
-                                    DataGrid.Alert.alertColor = '#d9a6af'
-                                    DataGrid.Alert.openAlert()
-                                }
-                            }
-                        )
-                        .catch(e => console.error(e))
-                    })
-
-                    Col.addEventListener('dblclick', function() {
-                        if (!this.readOnly) return
-
-                        if (this.scrollWidth > this.offsetWidth) DataGrid.ResizeColumn(this, this.scrollWidth + 10)
-
-                        this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
-                        this.readOnly = false
-
-                        this.setSelectionRange(this.value.length, this.value.length)
-                        DataGrid.KeepElementInView(this, DataGrid.RowsContainer)
-
-                        this.addEventListener('keydown', DataGrid.BoundColumnEdit)
-                    })
-
-                    Row.appendChild(Col)
                     j++
-                } // End for
+                }
 
             this.RowsContainer.appendChild(Row)
-        } // End for
-    } // CreateRows()
+        }
+    }
 
     CreateFooter() {
         this.Footer = document.createElement('footer-rui')

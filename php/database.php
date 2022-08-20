@@ -135,7 +135,7 @@ class Validate {
         if ($image["size"] > 40000000) return false; // 38.15MB
 
         $type = strtolower( pathinfo("uploads/" . basename($image["name"]), PATHINFO_EXTENSION) );
-        $validTypes = array('jfif', 'jpg', 'jpeg', 'webp', 'gif', 'png');
+        $validTypes = array('tif', 'pjp', 'xbm', 'jxl', 'svgz', 'jpg', 'jpeg', 'ico', 'tiff', 'gif', 'svg', 'jfif', 'webp', 'png', 'bmp', 'pjpeg', 'avif');
 
         return (array_search($type, $validTypes, true) !== false);
     }
