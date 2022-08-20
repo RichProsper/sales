@@ -428,7 +428,7 @@ export default class {
         Row.appendChild(Operator)
         Row.appendChild(Column)
         Row.appendChild(Operation)
-        Row.appendChild( Input({
+        Row.appendChild(Input({
             attrs: {
                 class: 'w18',
                 placeholder: 'Filter Value'
@@ -455,7 +455,7 @@ export default class {
                     }, 1000)
                 }
             }
-        }) )
+        }))
 
         PanelContent.appendChild(Row)
 
