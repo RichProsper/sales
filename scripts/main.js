@@ -240,7 +240,4 @@ import DataGrid from './DataGrid.js'
         }
     )
     .catch(e => console.error(e))
-
-    // TODO Integrate input[type="file"][accept="image/*"]
-    // TODO Update Product Image
 })()

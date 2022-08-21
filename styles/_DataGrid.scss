@@ -346,7 +346,7 @@ main-rui {
 
             col-rui,
             input,
-            label {
+            label.image {
                 display: block;
                 height: 100%;
                 line-height: var(--Row-Height);
@@ -373,22 +373,22 @@ main-rui {
             }
             &:hover col-rui,
             &:hover input,
-            &:hover label {
+            &:hover label.image {
                 background-color: var(--row-hover);
             }
             &.selected {
                 col-rui,
                 input,
-                label {
+                label.image {
                     background-color: var(--row-select);
                 }
                 &:hover col-rui,
                 &:hover input,
-                &:hover label {
+                &:hover label.image {
                     background-color: var(--row-select-hover);
                 }
             }
-            label {
+            label.image {
                 position: relative;
                 padding: 0;
                 display: flex;

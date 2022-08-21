@@ -1054,43 +1054,45 @@ export default class {
 
         switch (e.key) {
             case 'ArrowUp' :
-                if (this.SelectedCol.parentElement.previousElementSibling) {
-                    this.SelectedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                if (this.FocusedCol.parentElement.previousElementSibling) {
+                    this.FocusedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
                 }
                 break
             case 'ArrowDown' :
-                if (this.SelectedCol.parentElement.nextElementSibling) {
-                    this.SelectedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                if (this.FocusedCol.parentElement.nextElementSibling) {
+                    this.FocusedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
                 }
                 break
             case 'ArrowLeft' :
-                if (this.SelectedCol.previousElementSibling.hasAttribute('data-colindex')) {
-                    this.SelectedCol.previousElementSibling.focus()
-                    this.KeepElementInView(this.SelectedCol, this.RowsContainer)
+                if (this.FocusedCol.previousElementSibling.hasAttribute('data-colindex')) {
+                    this.FocusedCol.previousElementSibling.focus()
+                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
                 }
                 break
             case 'ArrowRight' :
-                if (this.SelectedCol.nextElementSibling) {
-                    this.SelectedCol.nextElementSibling.focus()
-                    this.KeepElementInView(this.SelectedCol, this.RowsContainer)
+                if (this.FocusedCol.nextElementSibling) {
+                    this.FocusedCol.nextElementSibling.focus()
+                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
                 }
                 break
             case 'Home' :
-                this.SelectedCol.parentElement.querySelector('[data-colindex="0"]').focus()
-                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
+                this.FocusedCol.parentElement.querySelector('[data-colindex="0"]').focus()
+                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
                 break
             case 'End' :
-                this.SelectedCol.parentElement.querySelector(`[data-colindex="${this.SelectedCol.parentElement.children.length - 2}"]`).focus()
-                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
+                this.FocusedCol.parentElement.querySelector(`[data-colindex="${this.FocusedCol.parentElement.children.length - 2}"]`).focus()
+                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
                 break
             case 'PageUp' :
-                this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
                 break
             case 'PageDown' :
-                this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"] [data-colindex="${this.SelectedCol.getAttribute('data-colindex')}"]`).focus()
+                this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"] [data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
                 break
             case 'Enter' :
-                this.SelectedCol.dispatchEvent( new MouseEvent('dblclick') )
+                this.FocusedCol.tagName === 'INPUT'
+                    ? this.FocusedCol.dispatchEvent(new MouseEvent('dblclick'))
+                    : this.FocusedCol.dispatchEvent(new MouseEvent('click'))
                 break
             default :
         }
@@ -1100,24 +1102,20 @@ export default class {
      * @param {KeyboardEvent} e The key down event
      */
     ColumnEdit(e) {
-        switch (e.key) {
-            case 'Escape':
-            case 'Enter' :
-                if (this.SelectedCol.nextElementSibling) {
-                    this.SelectedCol.nextElementSibling.focus()
-                }
-                else if (this.SelectedCol.parentElement.nextElementSibling) {
-                    this.SelectedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]').focus()
-                }
-                else {
-                    this.SelectedCol.blur()
-                    this.SelectedCol.focus()
-                }
+        if (e.key !== 'Escape' && e.key !== 'Enter') return
 
-                this.KeepElementInView(this.SelectedCol, this.RowsContainer)
-                break
-            default :
+        if (this.FocusedCol.nextElementSibling) {
+            this.FocusedCol.nextElementSibling.focus()
         }
+        else if (this.FocusedCol.parentElement.nextElementSibling) {
+            this.FocusedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]').focus()
+        }
+        else {
+            this.FocusedCol.blur()
+            this.FocusedCol.focus()
+        }
+
+        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
     }
 
     /**
@@ -1155,10 +1153,7 @@ export default class {
         Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
         Col.readOnly = true
 
-        Col.addEventListener('focus', function() {
-            DataGrid.SelectedCol = this
-        })
-
+        Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
         Col.addEventListener('keydown', this.BoundColumnNavigate)
 
         Col.addEventListener('blur', function() {
@@ -1250,11 +1245,26 @@ export default class {
         const image = splits[splits.length - 1].split('.')[0]
 
         const Col = this.HTMLStringToNode(`
-            <label data-colindex="${j}" tabindex="0">
-                <input type="file" accept="image/*">
+            <label class="image" data-colindex="${j}" tabindex="0">
+                <form>
+                    <input type="file" accept="image/*">
+                    <button type="submit" style="display:none"></button>
+                </form>
                 <img src="${this.Rows[i][col]}" alt="${image}">
             </label>
         `)[0]
+
+        Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
+        Col.addEventListener('keydown', this.BoundColumnNavigate)
+
+        Col.querySelector('input').addEventListener('change', function() { this.nextElementSibling.click() })
+
+        Col.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault()
+
+            // TODO
+        })
+
         return Col
     }
 
