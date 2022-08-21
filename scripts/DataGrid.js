@@ -1250,10 +1250,9 @@ export default class {
         const image = splits[splits.length - 1].split('.')[0]
 
         const Col = this.HTMLStringToNode(`
-            <label data-colindex="${j}">
+            <label data-colindex="${j}" tabindex="0">
                 <input type="file" accept="image/*">
-                <img class="small" src="${this.Rows[i][col]}" alt="${image}">
-                <img class="big" src="${this.Rows[i][col]}" alt="${image}">
+                <img src="${this.Rows[i][col]}" alt="${image}">
             </label>
         `)[0]
         return Col

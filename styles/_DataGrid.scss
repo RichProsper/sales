@@ -345,7 +345,8 @@ main-rui {
             transition: .1s;
 
             col-rui,
-            input {
+            input,
+            label {
                 display: block;
                 height: 100%;
                 line-height: var(--Row-Height);
@@ -371,17 +372,48 @@ main-rui {
                 }
             }
             &:hover col-rui,
-            &:hover input {
+            &:hover input,
+            &:hover label {
                 background-color: var(--row-hover);
             }
             &.selected {
                 col-rui,
-                input {
+                input,
+                label {
                     background-color: var(--row-select);
                 }
                 &:hover col-rui,
-                &:hover input {
+                &:hover input,
+                &:hover label {
                     background-color: var(--row-select-hover);
+                }
+            }
+            label {
+                position: relative;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                
+                &:read-only {
+                    overflow: unset;
+                }
+                input[type=file] {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    opacity: 0;
+                    z-index: -1;
+                }
+                img {
+                    height: 100%;
+                    width: auto;
+                    transform-origin: bottom;
+                    transition: .2s;
+                }
+                &:hover img,
+                &:focus img {
+                    transform: scale(5);
                 }
             }
         }
