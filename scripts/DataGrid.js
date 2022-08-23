@@ -1246,10 +1246,7 @@ export default class {
 
         const Col = this.HTMLStringToNode(`
             <label class="image" data-colindex="${j}" tabindex="0">
-                <form>
-                    <input type="file" accept="image/*">
-                    <button type="submit" style="display:none"></button>
-                </form>
+                <input type="file" name="a" accept="image/*">
                 <img src="${this.Rows[i][col]}" alt="${image}">
             </label>
         `)[0]
@@ -1257,13 +1254,17 @@ export default class {
         Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
         Col.addEventListener('keydown', this.BoundColumnNavigate)
 
-        Col.querySelector('input').addEventListener('change', function() { this.nextElementSibling.click() })
+        const input = Col.querySelector('input')
+        const dT = new DataTransfer()
+        dT.items.add(new File([], '', {type: 'application/octet-stream'}))
+        input.files = dT.files
 
-        Col.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault()
-
-            // TODO
+        input.addEventListener('blur', function() {
+            console.log(this.value)
+            console.log(this.files)
         })
+
+        // TODO remove image, new image
 
         return Col
     }
