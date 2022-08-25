@@ -1098,7 +1098,7 @@ export default class {
         }
     }
 
-    /**
+    /** 
      * @param {KeyboardEvent} e The key down event
      */
     ColumnEdit(e) {
@@ -1241,28 +1241,32 @@ export default class {
      */
     CreateInputFileImageCols(i, j, col) {
         const DataGrid = this
-        const splits = this.Rows[i][col].split('/')
-        const image = splits[splits.length - 1].split('.')[0]
+        let Col = null
 
-        const Col = this.HTMLStringToNode(`
-            <label class="image" data-colindex="${j}" tabindex="0">
-                <input type="file" name="a" accept="image/*">
-                <img src="${this.Rows[i][col]}" alt="${image}">
-            </label>
-        `)[0]
-
+        if (this.Rows[i][col]) {
+            const splits = this.Rows[i][col].split('/')
+            const image = splits[splits.length - 1].split('.')[0]
+    
+            Col = this.HTMLStringToNode(`
+                <label class="image" data-colindex="${j}" tabindex="0">
+                    <input type="file" name="${col}" accept="image/*">
+                    <img src="${this.Rows[i][col]}" alt="${image}">
+                    <button type="button" class="remove">&times;</button>
+                </label>
+            `)[0]
+        }
+        else {
+            Col = this.HTMLStringToNode(`
+                <label class="image" data-colindex="${j}" tabindex="0">
+                    <input type="file" name="${col}" accept="image/*">
+                </label>
+            `)[0]
+        }
+        
         Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
         Col.addEventListener('keydown', this.BoundColumnNavigate)
 
         const input = Col.querySelector('input')
-        const dT = new DataTransfer()
-        dT.items.add(new File([], '', {type: 'application/octet-stream'}))
-        input.files = dT.files
-
-        input.addEventListener('blur', function() {
-            console.log(this.value)
-            console.log(this.files)
-        })
 
         // TODO remove image, new image
 
