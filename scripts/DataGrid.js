@@ -1270,9 +1270,52 @@ export default class {
 
         Col.querySelector('input').addEventListener('change', function() {
             const data = new FormData()
+            data.append('REQUEST_ACTION', 'UPDATE')
+            data.append('id', +this.parentElement.parentElement.getAttribute('data-entity-id'))
+            data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.parentElement.getAttribute('data-colindex') + 1].getAttribute('data-column'))
+            data.append('value', this.value)
             data.append(this.name, this.files[0])
 
-            for (const d of data) console.log(d)
+            fetch(DataGrid.CrudUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String} resp.message
+                 */
+                resp => {
+                    if (resp.success) {     
+                        DataGrid.ReadData()
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Success!</span>
+                            <span slot="message">${resp.message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#bdd9a6'
+                        DataGrid.Alert.openAlert()
+                    }
+                    else {
+                        console.error(resp.message)
+
+                        const message = (
+                            resp.message === 'Invalid column data' ||
+                            resp.message === 'Error uploading file'
+                        )
+                            ? 'Image upload failed! Please try to upload the image again.'
+                            : 'Something went wrong. Please try again later.'
+                        
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Failure!</span>
+                            <span slot="message">${message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#d9a6af'
+                        DataGrid.Alert.openAlert()
+                    }
+                }
+            )
         })
 
         return Col

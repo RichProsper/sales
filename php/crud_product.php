@@ -126,7 +126,7 @@ switch ($_POST["REQUEST_ACTION"]) {
         $unitPrice = Format::UnitPrice($unitPrice);
 
         if ( !array_search(false, $valid, true) ) {
-            if ( !empty($_FILES["image"]["tmp_name"]) ) {
+            if (!empty($_FILES["image"]["tmp_name"])) {
                 $arr = explode(".", basename($_FILES["image"]["name"]));
                 $ext = $arr[count($arr) - 1];
                 $imageName = date("Ymd-His") . "." . $ext;
@@ -225,6 +225,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 break;
             case "image" :
                 $validValue = Validate::Image($_FILES["image"]);
+                $value = "";
                 break;
             case "unit" :
                 $validValue = Validate::Unit($value);
@@ -238,6 +239,38 @@ switch ($_POST["REQUEST_ACTION"]) {
         }
     
         if ($validID && $validValue) {
+            // Deletes the corresponding image file
+            try {
+                $row = $conn->query("SELECT image FROM `products` WHERE pId = $id");
+                $row = $row->fetch(PDO::FETCH_ASSOC);
+
+                if ($row["image"]) {
+                    $file = explode("php/", $row["image"])[1];
+                    if (file_exists($file)) unlink($file);
+                }
+            }
+            catch (PDOException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+                break;
+            }
+
+            if ($column === "image" && !empty($_FILES["image"]["tmp_name"])) {
+                $arr = explode(".", basename($_FILES["image"]["name"]));
+                $ext = $arr[count($arr) - 1];
+                $imageName = date("Ymd-His") . "." . $ext;
+                $image = "uploads/" . $imageName;
+
+                if ( !move_uploaded_file($_FILES["image"]["tmp_name"], $image) ) {
+                    $response->success = false;
+                    $response->message = "Error uploading file";
+                    break;
+                }
+
+                // ! Important
+                $value = "php/" . $image;
+            }
+
             try {
                 $conn->exec("UPDATE products SET `$column` = '$value' WHERE pId = $id");
     
