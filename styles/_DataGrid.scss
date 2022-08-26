@@ -407,7 +407,7 @@ main-rui {
                 }
                 img {
                     height: 100%;
-                    width: auto;
+                    max-width: 100%;
                     transform-origin: bottom;
                     transition: .2s;
 

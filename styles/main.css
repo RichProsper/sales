@@ -561,7 +561,7 @@ main-rui rows-container-rui row-rui label.image input[type=file] {
 }
 main-rui rows-container-rui row-rui label.image img {
   height: 100%;
-  width: auto;
+  max-width: 100%;
   transform-origin: bottom;
   transition: 0.2s;
 }

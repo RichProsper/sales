@@ -10,7 +10,7 @@ $product = new stdClass;
 $response = new stdClass;
 
 switch ($_POST["REQUEST_ACTION"]) {
-    case "READ_ALL" :
+    case "READ_ALL": {
         // Almost equivalent to PHP's htmlspecialchars_decode()
         $desc = "REPLACE( REPLACE( REPLACE( REPLACE(`desc`, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
         
@@ -29,7 +29,8 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         echo json_encode($product);
         break;
-    case "READ" :
+    }
+    case "READ": {
         $filters = json_decode($_POST["filters"]);
         $sorts = json_decode($_POST["sorts"]);
 
@@ -110,7 +111,8 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         echo json_encode($product);
         break;
-    case "CREATE" :
+    } // case "READ"
+    case "CREATE": {
         $name = ucwords($_POST["name"]);
         $desc = DB::escapeString($_POST["desc"]);
         $image = "";
@@ -125,7 +127,10 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         if ( !array_search(false, $valid, true) ) {
             if ( !empty($_FILES["image"]["tmp_name"]) ) {
-                $image = "uploads/" . basename($_FILES["image"]["name"]);
+                $arr = explode(".", basename($_FILES["image"]["name"]));
+                $ext = $arr[count($arr) - 1];
+                $imageName = date("Ymd-His") . "." . $ext;
+                $image = "uploads/" . $imageName;
 
                 if ( !move_uploaded_file($_FILES["image"]["tmp_name"], $image) ) {
                     $response->success = false;
@@ -155,7 +160,8 @@ switch ($_POST["REQUEST_ACTION"]) {
         
         echo json_encode($response);
         break;
-    case "DELETE" :
+    }
+    case "DELETE": {
         $ids = json_decode($_POST["ids"]);
 
         if ( Validate::IDs($ids) ) {
@@ -183,7 +189,8 @@ switch ($_POST["REQUEST_ACTION"]) {
         
         echo json_encode($response);
         break;
-    case "UPDATE" :
+    }
+    case "UPDATE": {
         $id = intval($_POST["id"]);
         $column = $_POST["column"];
         $value = $_POST["value"];
@@ -199,7 +206,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 $value = DB::escapeString($value);
                 break;
             case "image" :
-                $validValue = empty($value) ? true : Validate::Image($value);
+                $validValue = Validate::Image($_FILES["image"]);
                 break;
             case "unit" :
                 $validValue = Validate::Unit($value);
@@ -231,9 +238,11 @@ switch ($_POST["REQUEST_ACTION"]) {
     
         echo json_encode($response);
         break;
-    default :
-    $req_action = $_POST["REQUEST_ACTION"];
-    echo json_encode("Action '$req_action' not recognized");
+    }
+    default: {
+        $req_action = $_POST["REQUEST_ACTION"];
+        echo json_encode("Action '$req_action' not recognized");
+    }
 }
 
 $conn = null;
