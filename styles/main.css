@@ -257,7 +257,7 @@ toolbar-rui toolbar-panel-container-rui toolbar-panel-rui {
   border-radius: 0.4rem;
   background-color: var(--grey-md);
   box-shadow: 0 0.5rem 0.5rem -0.3rem rgba(0, 0, 0, 0.2), 0 0.8rem 1rem 0.1rem rgba(0, 0, 0, 0.14), 0 0.3rem 1.4rem 0.2rem rgba(0, 0, 0, 0.12);
-  z-index: 2;
+  z-index: 5;
 }
 toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.sorts panel-header-rui, toolbar-rui toolbar-panel-container-rui toolbar-panel-rui.columns panel-header-rui {
   display: block;
@@ -564,6 +564,9 @@ main-rui rows-container-rui row-rui label.image img {
   width: auto;
   transform-origin: bottom;
   transition: 0.2s;
+}
+main-rui rows-container-rui row-rui label.image img.top {
+  transform-origin: top;
 }
 main-rui rows-container-rui row-rui label.image:hover img, main-rui rows-container-rui row-rui label.image:focus img {
   transform: scale(5);

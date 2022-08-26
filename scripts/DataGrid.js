@@ -1232,6 +1232,7 @@ export default class {
         return Col
     } // CreateInputCols()
 
+    // TODO remove image, new image
     /**
      * Creates a row in the datagrid
      * @param {Number} i
@@ -1250,10 +1251,11 @@ export default class {
             Col = this.HTMLStringToNode(`
                 <label class="image" data-colindex="${j}" tabindex="0">
                     <input type="file" name="${col}" accept="image/*">
-                    <img src="${this.Rows[i][col]}" alt="${image}">
+                    <img src="${this.Rows[i][col]}" alt="${image}" ${i <= 3 ? `class="top"` : ''}>
                     <button type="button" class="remove">&times;</button>
                 </label>
             `)[0]
+            Col.querySelector('img').style.zIndex = i <= 3 ? ((i - 3) * -1) : ''
         }
         else {
             Col = this.HTMLStringToNode(`
@@ -1266,9 +1268,12 @@ export default class {
         Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
         Col.addEventListener('keydown', this.BoundColumnNavigate)
 
-        const input = Col.querySelector('input')
+        Col.querySelector('input').addEventListener('change', function() {
+            const data = new FormData()
+            data.append(this.name, this.files[0])
 
-        // TODO remove image, new image
+            for (const d of data) console.log(d)
+        })
 
         return Col
     }

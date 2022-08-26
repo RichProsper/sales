@@ -61,7 +61,7 @@ toolbar-rui {
             box-shadow: 0 .5rem .5rem -.3rem rgba(0, 0, 0, .2),
                         0 .8rem 1rem .1rem rgba(0, 0, 0, .14),
                         0 .3rem 1.4rem .2rem rgba(0, 0, 0, .12);
-            z-index: 2;
+            z-index: 5;
             
             %panel-header-rui {
                 display: block;
@@ -410,6 +410,10 @@ main-rui {
                     width: auto;
                     transform-origin: bottom;
                     transition: .2s;
+
+                    &.top {
+                        transform-origin: top;
+                    }
                 }
                 &:hover img,
                 &:focus img {
