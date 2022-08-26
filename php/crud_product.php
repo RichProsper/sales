@@ -165,19 +165,37 @@ switch ($_POST["REQUEST_ACTION"]) {
         $ids = json_decode($_POST["ids"]);
 
         if ( Validate::IDs($ids) ) {
-            $sql = "DELETE FROM products WHERE pId IN (";
+            $idsSql = "";
     
             for ($i = 0; $i < count($ids); $i++) {
-                if ( $i < (count($ids) - 1) ) $sql .= $ids[$i] . ", ";
-                else $sql .= $ids[$i] . ")";
+                if ( $i < (count($ids) - 1) ) $idsSql .= $ids[$i] . ", ";
+                else $idsSql .= $ids[$i] . ")";
             }
-    
+
+            // Deletes the corresponding image file
             try {
-                $conn->exec($sql);
+                $rows = $conn->query("SELECT image FROM `products` WHERE pId IN (" . $idsSql);
+                $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($rows as $row) {
+                    if (!$row["image"]) continue;
+
+                    $file = explode("php/", $row["image"])[1];
+                    if (file_exists($file)) unlink($file);
+                }
+            }
+            catch (PDOException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+                break;
+            }
+
+            try {
+                $conn->exec("DELETE FROM products WHERE pId IN (" . $idsSql);
                 $response->success = true;
                 $response->message = "Record(s) deleted successfully.";
             }
-            catch(PDOException $e) {
+            catch (PDOException $e) {
                 $response->success = false;
                 $response->message = $e->getMessage();
             }
