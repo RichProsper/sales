@@ -15,6 +15,7 @@ datagrid-rui {
     --hue-1 : 349;
     --red-1 : hsla(var(--hue-1), 84%, 60%, .25);
     --red-2 : hsl(var(--hue-1), 84%, 80%);
+    --red-3 : hsl(var(--hue-1), 84%, 70%);
     // Light Green
     --hue-2   : 122;
     --green-1 : hsla(var(--hue-2), 39%, 49%, .25);
@@ -392,7 +393,7 @@ main-rui {
                 position: relative;
                 padding: 0;
                 display: flex;
-                justify-content: center;
+                justify-content: space-between;
                 
                 &:read-only {
                     overflow: unset;
@@ -413,6 +414,21 @@ main-rui {
 
                     &.top {
                         transform-origin: top;
+                    }
+                }
+                button {
+                    background: none;
+                    border: none;
+                    font-size: 1.4rem;
+                    padding: 0 .125em;
+                    font-weight: bold;
+                    background-color: var(--red-2);
+                    transition: background-color .2s;
+                    cursor: pointer;
+
+                    &:hover,
+                    &:focus {
+                        background-color: var(--red-3);
                     }
                 }
             }

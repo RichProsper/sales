@@ -218,6 +218,7 @@ datagrid-rui {
   --hue-1: 349;
   --red-1: hsla(var(--hue-1), 84%, 60%, .25);
   --red-2: hsl(var(--hue-1), 84%, 80%);
+  --red-3: hsl(var(--hue-1), 84%, 70%);
   --hue-2: 122;
   --green-1: hsla(var(--hue-2), 39%, 49%, .25);
   --green-2: hsl(var(--hue-2), 39%, 75%);
@@ -543,7 +544,7 @@ main-rui rows-container-rui row-rui .image {
   position: relative;
   padding: 0;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
 }
 main-rui rows-container-rui row-rui .image:-moz-read-only {
   overflow: unset;
@@ -567,6 +568,19 @@ main-rui rows-container-rui row-rui .image img {
 }
 main-rui rows-container-rui row-rui .image img.top {
   transform-origin: top;
+}
+main-rui rows-container-rui row-rui .image button {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  padding: 0 0.125em;
+  font-weight: bold;
+  background-color: var(--red-2);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+main-rui rows-container-rui row-rui .image button:hover, main-rui rows-container-rui row-rui .image button:focus {
+  background-color: var(--red-3);
 }
 main-rui rows-container-rui row-rui label:hover img,
 main-rui rows-container-rui row-rui label:focus img {

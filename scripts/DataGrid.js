@@ -1265,14 +1265,14 @@ export default class {
         const DataGrid = this
         let Col = null
 
-        if (this.Rows[i][col]) {    
+        if (this.Rows[i][col]) { 
             Col = this.HTMLStringToNode(`
                 <div class="image" data-colindex="${j}" tabindex="0">
                     <label>
                         <input type="file" name="${col}" accept="image/*">
                         <img src="${this.Rows[i][col]}" ${i <= 3 ? `class="top"` : ''}>
                     </label>
-                    <button type="button" class="remove">&times;</button>
+                    <button type="button" title="Remove image">&times;</button>
                 </div>
             `)[0]
 
@@ -1386,7 +1386,7 @@ export default class {
         })
 
         return Col
-    }
+    } // CreateInputFileImageCols()
 
     CreateRows() {
         this.RowsContainer.innerHTML = null
