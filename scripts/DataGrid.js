@@ -980,6 +980,18 @@ export default class {
         this.DataGrid.appendChild(this.Main)
     }
 
+    /**
+     * Convert px to rem units
+     * @param {Number | String} px the length in px
+     * @returns {Number} the length in rem
+     */
+    PxToRem(px) {
+        if (window.innerWidth >= 2700) return (+px / 15)
+        if (window.innerWidth >= 1800) return (+px / 12.5)
+        if (window.innerWidth >= 900 ) return (+px / 10)
+        return (+px / 7.5)
+    }
+
     CreateHeadingsContainer() {
         this.HeadingsContainer = document.createElement('headings-container-rui')
             const Headings = document.createElement('headings-rui')
@@ -997,8 +1009,17 @@ export default class {
                 for (let i = 0; i < Object.keys(this.Columns).length; i++) {
                     const HCol = document.createElement('hcol-rui')
                     HCol.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
-                    HCol.style.minWidth = '12rem'
-                    HCol.style.maxWidth = '12rem'
+
+                    const tempDiv = document.createElement('div')
+                    tempDiv.textContent = Object.keys(this.Columns)[i]
+                    tempDiv.style.display = 'inline-block'
+                    tempDiv.style.opacity = 0
+                    document.body.appendChild(tempDiv)
+                    const width = this.PxToRem(tempDiv.scrollWidth + 24)
+
+                    // 5rem is the minimum column width
+                    HCol.style.minWidth = width >= 5 ? `${width}rem` : '5rem'
+                    HCol.style.maxWidth = width >= 5 ? `${width}rem` : '5rem'
 
                         const HeadingTitle = document.createElement('heading-title-rui')
                         HeadingTitle.textContent = Object.keys(this.Columns)[i]
@@ -1232,7 +1253,7 @@ export default class {
         return Col
     } // CreateInputCols()
 
-    // TODO remove image, new image
+    // TODO remove image
     /**
      * Creates a row in the datagrid
      * @param {Number} i
@@ -1244,18 +1265,64 @@ export default class {
         const DataGrid = this
         let Col = null
 
-        if (this.Rows[i][col]) {
-            const splits = this.Rows[i][col].split('/')
-            const image = splits[splits.length - 1].split('.')[0]
-    
+        if (this.Rows[i][col]) {    
             Col = this.HTMLStringToNode(`
-                <label class="image" data-colindex="${j}" tabindex="0">
-                    <input type="file" name="${col}" accept="image/*">
-                    <img src="${this.Rows[i][col]}" alt="${image}" ${i <= 3 ? `class="top"` : ''}>
+                <div class="image" data-colindex="${j}" tabindex="0">
+                    <label>
+                        <input type="file" name="${col}" accept="image/*">
+                        <img src="${this.Rows[i][col]}" ${i <= 3 ? `class="top"` : ''}>
+                    </label>
                     <button type="button" class="remove">&times;</button>
-                </label>
+                </div>
             `)[0]
-            Col.querySelector('img').style.zIndex = i <= 3 ? ((i - 3) * -1) : ''
+
+            Col.style.zIndex = i <= 3 ? ((i - 3) * -1) : ''
+            Col.querySelector('button').addEventListener('click', function() {
+                const data = new FormData()
+                data.append('REQUEST_ACTION', 'UPDATE')
+                data.append('id', +DataGrid.RowIDs[i][Object.keys(DataGrid.RowIDs[i])[0]])
+                data.append('column', col)
+                data.append('value', '')
+                data.append(col, new File([], ''))
+
+                fetch(DataGrid.CrudUrl, {
+                    method: 'POST',
+                    body: data
+                })
+                .then(respJSON => respJSON.json())
+                .then(
+                    /**
+                     * @param {Object} resp
+                     * @param {Boolean} resp.success
+                     * @param {String} resp.message
+                     */
+                    resp => {
+                        if (resp.success) {     
+                            DataGrid.ReadData()
+                            DataGrid.Alert.innerHTML = `
+                                <span slot="status">Success!</span>
+                                <span slot="message">${resp.message}</span>
+                            `
+                            DataGrid.Alert.alertColor = '#bdd9a6'
+                            DataGrid.Alert.openAlert()
+                        }
+                        else {
+                            console.error(resp.message)
+    
+                            const message = resp.message === 'Invalid column data'
+                                ? 'Image upload failed! Please try to upload the image again.'
+                                : 'Something went wrong. Please try again later.'
+                            
+                            DataGrid.Alert.innerHTML = `
+                                <span slot="status">Failure!</span>
+                                <span slot="message">${message}</span>
+                            `
+                            DataGrid.Alert.alertColor = '#d9a6af'
+                            DataGrid.Alert.openAlert()
+                        }
+                    }
+                )
+            })
         }
         else {
             Col = this.HTMLStringToNode(`
@@ -1271,10 +1338,10 @@ export default class {
         Col.querySelector('input').addEventListener('change', function() {
             const data = new FormData()
             data.append('REQUEST_ACTION', 'UPDATE')
-            data.append('id', +this.parentElement.parentElement.getAttribute('data-entity-id'))
-            data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.parentElement.getAttribute('data-colindex') + 1].getAttribute('data-column'))
+            data.append('id', +DataGrid.RowIDs[i][Object.keys(DataGrid.RowIDs[i])[0]])
+            data.append('column', col)
             data.append('value', this.value)
-            data.append(this.name, this.files[0])
+            data.append(col, this.files[0])
 
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',
@@ -1527,18 +1594,6 @@ export default class {
         }
     }
 
-    /**
-     * Convert px to rem units
-     * @param {Number} px the length in px
-     * @returns {Number} the length in rem
-     */
-    PxToRem(px) {
-        if (window.innerWidth >= 2700) return (+px / 15)
-        if (window.innerWidth >= 1800) return (+px / 12.5)
-        if (window.innerWidth >= 900 ) return (+px / 10)
-        return (+px / 7.5)
-    }
-
     SetupResizingColumns() {
         const DataGrid = this
         const Headings = this.DataGrid.querySelector('headings-rui')
@@ -1551,6 +1606,7 @@ export default class {
             minWidth: 5, //5rem
             minLeft: 0
         }
+
         /**
          * @param {MouseEvent} e 
          */
@@ -1579,11 +1635,13 @@ export default class {
                 col.style.maxWidth = `${newWidth}rem`
             }
         }
+
         const cleanup = () => {
             Headings.querySelector('resizable-rui.active').classList.remove('active')
             window.removeEventListener('mousemove', resizeCols)
             window.removeEventListener('mouseup', cleanup)
         }
+        
         for (let i = 0; i < Resizables.length; i++) {
             Resizables[i].addEventListener('mousedown', function(e) {
                 curPos.x = e.clientX
