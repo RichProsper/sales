@@ -14,13 +14,13 @@ switch ($_POST["REQUEST_ACTION"]) {
         // Almost equivalent to PHP's htmlspecialchars_decode()
         $desc = "REPLACE( REPLACE( REPLACE( REPLACE(`desc`, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
         
-        $rows = $conn->query("SELECT name, $desc, image, unit, unitPrice FROM products LIMIT 25");
+        $rows = $conn->query("SELECT name, $desc, image, unit, unitPrice FROM products WHERE isDeleted = 'No' LIMIT 25");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
 
-        $rowIds = $conn->query("SELECT pId FROM products LIMIT 25");
+        $rowIds = $conn->query("SELECT pId FROM products WHERE isDeleted = 'No' LIMIT 25");
         $rowIds = $rowIds->fetchAll(PDO::FETCH_ASSOC);
 
-        $numRows = $conn->query("SELECT COUNT(pId) FROM products");
+        $numRows = $conn->query("SELECT COUNT(pId) FROM products WHERE isDeleted = 'No'");
         $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
 
         $product->rows = $rows;
@@ -36,9 +36,9 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         $desc = "REPLACE( REPLACE( REPLACE( REPLACE(`desc`, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
 
-        $rowsSQL = "SELECT name, $desc, image, unit, unitPrice FROM products";
-        $rowIdsSQL = "SELECT pId FROM products";
-        $numRowsSQL = "SELECT COUNT(pId) FROM products";
+        $rowsSQL = "SELECT name, $desc, image, unit, unitPrice FROM products WHERE (`isDeleted` = 'No')";
+        $rowIdsSQL = "SELECT pId FROM products WHERE (`isDeleted` = 'No')";
+        $numRowsSQL = "SELECT COUNT(pId) FROM products WHERE (`isDeleted` = 'No')";
 
         $limit = DB::sanitizeLimit( intval($_POST["limit"]) );
         $offset = DB::sanitizeOffset( intval($_POST["offset"]) );
@@ -79,8 +79,8 @@ switch ($_POST["REQUEST_ACTION"]) {
                 $filtersSQL .= ") ";
             }
 
-            $r_ri .= " WHERE " . $filtersSQL;
-            $nr .= " WHERE " . $filtersSQL;
+            $r_ri .= " AND (" . $filtersSQL . ")";
+            $nr .= " AND (" . $filtersSQL . ")";
         }
 
         if (count($sorts) > 0) {
@@ -143,7 +143,7 @@ switch ($_POST["REQUEST_ACTION"]) {
             }
 
             try {
-                $conn->exec("INSERT INTO products VALUES (NULL, '$name', '$desc', '$image', '$unit', '$unitPrice', NULL, NULL)");
+                $conn->exec("INSERT INTO products VALUES (NULL, '$name', '$desc', '$image', '$unit', '$unitPrice', NULL, NULL, 'No', NULL)");
 
                 $response->success = true;
                 $response->message = "New record added successfully.";
@@ -172,26 +172,8 @@ switch ($_POST["REQUEST_ACTION"]) {
                 else $idsSql .= $ids[$i] . ")";
             }
 
-            // Deletes the corresponding image file
             try {
-                $rows = $conn->query("SELECT image FROM `products` WHERE pId IN (" . $idsSql);
-                $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
-
-                foreach ($rows as $row) {
-                    if (!$row["image"]) continue;
-
-                    $file = explode("php/", $row["image"])[1];
-                    if (file_exists($file)) unlink($file);
-                }
-            }
-            catch (PDOException $e) {
-                $response->success = false;
-                $response->message = $e->getMessage();
-                break;
-            }
-
-            try {
-                $conn->exec("DELETE FROM products WHERE pId IN (" . $idsSql);
+                $conn->exec("UPDATE products SET `isDeleted` = 'Yes' WHERE pId IN (" . $idsSql);
                 $response->success = true;
                 $response->message = "Record(s) deleted successfully.";
             }
@@ -255,6 +237,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 break;
             }
 
+            // Upload the new image file if one exists
             if ($column === "image" && !empty($_FILES["image"]["tmp_name"])) {
                 $arr = explode(".", basename($_FILES["image"]["name"]));
                 $ext = $arr[count($arr) - 1];
@@ -289,7 +272,7 @@ switch ($_POST["REQUEST_ACTION"]) {
     
         echo json_encode($response);
         break;
-    }
+    } // case "UPDATE"
     default: {
         $req_action = $_POST["REQUEST_ACTION"];
         echo json_encode("Action '$req_action' not recognized");

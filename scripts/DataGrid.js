@@ -1010,12 +1010,14 @@ export default class {
                     const HCol = document.createElement('hcol-rui')
                     HCol.setAttribute('data-column', this.Columns[ Object.keys(this.Columns)[i] ].dbName)
 
+                    // Determines how wide a column should be
                     const tempDiv = document.createElement('div')
                     tempDiv.textContent = Object.keys(this.Columns)[i]
                     tempDiv.style.display = 'inline-block'
                     tempDiv.style.opacity = 0
                     document.body.appendChild(tempDiv)
                     const width = this.PxToRem(tempDiv.scrollWidth + 24)
+                    document.body.removeChild(tempDiv)
 
                     // 5rem is the minimum column width
                     HCol.style.minWidth = width >= 5 ? `${width}rem` : '5rem'
@@ -1253,7 +1255,6 @@ export default class {
         return Col
     } // CreateInputCols()
 
-    // TODO remove image
     /**
      * Creates a row in the datagrid
      * @param {Number} i

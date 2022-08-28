@@ -10,17 +10,17 @@ $customer = new stdClass;
 $response = new stdClass;
 
 switch ($_POST["REQUEST_ACTION"]) {
-    case "READ_ALL" :
+    case "READ_ALL": {
         // Almost equivalent to PHP's htmlspecialchars_decode()
         $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
         
-        $rows = $conn->query("SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers LIMIT 25");
+        $rows = $conn->query("SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers WHERE isDeleted = 'No' LIMIT 25");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
 
-        $rowIds = $conn->query("SELECT cId FROM customers LIMIT 25");
+        $rowIds = $conn->query("SELECT cId FROM customers WHERE isDeleted = 'No' LIMIT 25");
         $rowIds = $rowIds->fetchAll(PDO::FETCH_ASSOC);
 
-        $numRows = $conn->query("SELECT COUNT(cId) FROM customers");
+        $numRows = $conn->query("SELECT COUNT(cId) FROM customers WHERE isDeleted = 'No'");
         $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
 
         $customer->rows = $rows;
@@ -29,15 +29,16 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         echo json_encode($customer);
         break;
-    case "READ" :
+    }
+    case "READ": {
         $filters = json_decode($_POST["filters"]);
         $sorts = json_decode($_POST["sorts"]);
 
         $address = "REPLACE( REPLACE( REPLACE( REPLACE(address, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
 
-        $rowsSQL = "SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers";
-        $rowIdsSQL = "SELECT cId FROM customers";
-        $numRowsSQL = "SELECT COUNT(cId) FROM customers";
+        $rowsSQL = "SELECT title, fname, lname, email, parish, $address, homeNo, cellNo, otherNos FROM customers WHERE (`isDeleted` = 'No')";
+        $rowIdsSQL = "SELECT cId FROM customers WHERE (`isDeleted` = 'No')";
+        $numRowsSQL = "SELECT COUNT(cId) FROM customers WHERE (`isDeleted` = 'No')";
 
         $limit = DB::sanitizeLimit( intval($_POST["limit"]) );
         $offset = DB::sanitizeOffset( intval($_POST["offset"]) );
@@ -78,8 +79,8 @@ switch ($_POST["REQUEST_ACTION"]) {
                 $filtersSQL .= ") ";
             }
 
-            $r_ri .= " WHERE " . $filtersSQL;
-            $nr .= " WHERE " . $filtersSQL;
+            $r_ri .= " AND (" . $filtersSQL . ")";
+            $nr .= " AND (" . $filtersSQL . ")";
         }
 
         if (count($sorts) > 0) {
@@ -110,7 +111,8 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         echo json_encode($customer);
         break;
-    case "CREATE" :
+    } // case "READ"
+    case "CREATE": {
         $title = $_POST["title"];
         $fname = ucwords($_POST["fname"]);
         $lname = ucwords($_POST["lname"]);
@@ -132,7 +134,7 @@ switch ($_POST["REQUEST_ACTION"]) {
 
         if ( !array_search(false, $valid, true) ) {
             try {
-                $conn->exec("INSERT INTO customers VALUES (NULL, '$title', '$fname', '$lname', '$email', '$parish', '$address', '$homeNo', '$cellNo', '$otherNos', NULL, NULL)");
+                $conn->exec("INSERT INTO customers VALUES (NULL, '$title', '$fname', '$lname', '$email', '$parish', '$address', '$homeNo', '$cellNo', '$otherNos', NULL, NULL, 'No', NULL)");
 
                 $response->success = true;
                 $response->message = "New record added successfully.";
@@ -149,11 +151,12 @@ switch ($_POST["REQUEST_ACTION"]) {
         
         echo json_encode($response);
         break;
-    case "DELETE" :
+    }
+    case "DELETE": {
         $ids = json_decode($_POST["ids"]);
 
         if ( Validate::IDs($ids) ) {
-            $sql = "DELETE FROM customers WHERE cId IN (";
+            $sql = "UPDATE customers SET `isDeleted` = 'Yes' WHERE cId IN (";
     
             for ($i = 0; $i < count($ids); $i++) {
                 if ( $i < (count($ids) - 1) ) $sql .= $ids[$i] . ", ";
@@ -177,7 +180,8 @@ switch ($_POST["REQUEST_ACTION"]) {
         
         echo json_encode($response);
         break;
-    case "UPDATE" :
+    }
+    case "UPDATE": {
         $id = intval($_POST["id"]);
         $column = $_POST["column"];
         $value = $_POST["value"];
@@ -234,9 +238,11 @@ switch ($_POST["REQUEST_ACTION"]) {
     
         echo json_encode($response);
         break;
-    default :
+    }
+    default: {
         $req_action = $_POST["REQUEST_ACTION"];
         echo json_encode("Action '$req_action' not recognized");
+    }
 }
 
 $conn = null;
