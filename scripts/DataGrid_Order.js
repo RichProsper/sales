@@ -19,6 +19,7 @@ export default class {
      * @param {GridData} data The data to fill the grid
      */
     constructor(data) {
+        this.DataGridContainer = document.querySelector(`[data-grid="orders"]`)
         this.Rows = data.rows
         this.RowIDs = data.rowIds
         this.NumRows = data.numRows
