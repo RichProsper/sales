@@ -1,14 +1,15 @@
 import DataGrid from './DataGrid.js'
+import DataGridOrder from './DataGrid_Order.js'
 
 (() => {
     window.DataGrids = {} 
 
-    const crudOrderUrl = '../sales/php/crud_order.php' // TODO DataGrid_Order
+    const crudOrderUrl = '../sales/php/crud_order.php'
     const crudCustomerUrl = '../sales/php/crud_customer.php'
     const crudProductUrl = '../sales/php/crud_product.php'
 
     const REQUEST_ACTION = new FormData()
-    REQUEST_ACTION.append('REQUEST_ACTION', 'READ_ALL')
+    REQUEST_ACTION.append('REQUEST_ACTION', 'READ_ALL')  
     
     // Customers
     fetch(crudCustomerUrl, {
@@ -241,4 +242,27 @@ import DataGrid from './DataGrid.js'
         }
     )
     .catch(e => console.error(e))
+
+    // Orders
+    fetch(crudOrderUrl, {
+        method: 'POST',
+        body: REQUEST_ACTION
+    })
+    .then(response => response.json())
+    .then(
+        /**
+         * @param {Object} order
+         * @param {Object[]} order.rows
+         * @param {Object[]} order.rowIds
+         * @param {Number} order.numRows
+         */
+        order => {
+            window.DataGrids.Orders = new DataGridOrder({
+                rows: order.rows,
+                numRows: order.numRows,
+                rowIds: order.rowIds,
+                crudUrl: crudOrderUrl
+            })
+        }
+    )
 })()
