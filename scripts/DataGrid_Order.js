@@ -4,6 +4,7 @@ import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
 import Textarea from '../vendors/rui/rui-textarea.min.js'
 //* Also dependent on rwc-modal
+//* Also dependent on rwc-alert
 
 /**
  * Grid Data
@@ -107,9 +108,8 @@ export default class {
         this.CreateColumnsPanelContainer()
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
-        this.CreateNewModal()
-        this.CreateDeleteModal()
-
+        this.CreateNewModal().then(() => this.CreateDeleteModal())
+        
         this.DataGrid.appendChild(this.Toolbar)
     }
 
@@ -766,7 +766,75 @@ export default class {
         return div.children
     }
 
-    CreateNewModal() {
+    SelectCustomer() {
+        const REQUEST_ACTION = new FormData()
+        REQUEST_ACTION.append('REQUEST_ACTION', 'CUSTOMER_READ_ALL')
+
+        return fetch(this.CrudUrl, {
+            method: 'POST',
+            body: REQUEST_ACTION
+        })
+        .then(response => response.json())
+        .then(
+            /**
+             * @param {Object[]} customers
+             */
+            customers => {
+                const options = []
+                options.push({value: '', textContent: 'Select a customer...'})
+
+                for (const customer of customers) {
+                    options.push({
+                        value: customer.cId,
+                        textContent: `${customer.title} ${customer.fname} ${customer.lname}`.trim()
+                    })
+                }
+        
+                return Select({
+                    labelText: 'Customer',
+                    attrs: {name: 'cId', required: ''},
+                    options
+                })
+            }
+        )
+        .catch(e => console.error(e))
+    }
+
+    SelectProduct() {
+        const REQUEST_ACTION = new FormData()
+        REQUEST_ACTION.append('REQUEST_ACTION', 'PRODUCT_READ_ALL')
+
+        return fetch(this.CrudUrl, {
+            method: 'POST',
+            body: REQUEST_ACTION
+        })
+        .then(response => response.json())
+        .then(
+            /**
+             * @param {Object[]} products
+             */
+            products => {
+                const options = []
+                options.push({value: '', textContent: 'Select a product...'})
+
+                for (const product of products) {
+                    options.push({
+                        value: product.pId,
+                        textContent: product.name
+                    })
+                }
+        
+                return Select({
+                    labelText: 'Product',
+                    attrs: {required: ''},
+                    options
+                })
+            }
+        )
+        .catch(e => console.error(e))
+    }
+
+    async CreateNewModal() {
         this.NewModal = document.createElement('rwc-modal')
         this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
         this.NewModal.innerHTML = `
@@ -774,25 +842,18 @@ export default class {
             <div slot="body-content"><form></form></div>
         `
         const form = this.NewModal.querySelector('form')
-
-        // for (const col in this.Columns) {
-        //     switch (this.Columns[col].tagName) {
-        //         case 'input': {
-        //             form.appendChild( Input(this.Columns[col].tag) )
-        //             break
-        //         }
-        //         case 'textarea': {
-        //             form.appendChild( Textarea(this.Columns[col].tag) )
-        //             break
-        //         }
-        //         case 'select': {
-        //             form.appendChild( Select(this.Columns[col].tag) )
-        //             break
-        //         }
-        //         default: console.error(`Invalid tag name: ${this.Columns[col].tagName}`)
-        //     }
-        // }
-        
+        form.appendChild(await this.SelectCustomer())
+            const container = document.createElement('container-rui')
+                const content = document.createElement('content-rui')
+                const footer = document.createElement('footer-rui')
+                    const NewProdBtn = document.createElement('button')
+                    NewProdBtn.type = 'button'
+                    NewProdBtn.className = 'add-btn'
+                    NewProdBtn.innerHTML = `<i class="fas fa-plus"></i> ADD PRODUCT`
+                footer.appendChild(NewProdBtn)
+            container.appendChild(content)
+            container.appendChild(footer)
+        form.appendChild(container)
         form.append(...this.HTMLStringToNode(`
             <div class="reset-submit">
                 <button type="reset" class="red">RESET</button>
@@ -808,6 +869,9 @@ export default class {
 
             const data = new FormData(this)
             data.append('REQUEST_ACTION', 'CREATE')
+
+            for (const d of data) console.log(d)
+            return
 
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',

@@ -1,12 +1,27 @@
 rwc-modal form {
-    max-height: 70vh;
-    overflow-y: auto;
-
     div {
         margin-top: 2.8rem;
 
         &:first-child {
             margin-top: 1.6rem;
+        }
+    }
+    container-rui {
+        .add-btn {
+            background: none;
+            border: none;
+            color: hsl(122, 39%, 75%);
+            font-size: 1.3rem;
+            font-weight: 500;
+            padding: .5rem 1rem;
+            cursor: pointer;
+            border-radius: .4rem;
+            transition: .2s;
+
+            &:hover,
+            &:focus {
+                background-color: hsla(122, 39%, 49%, .25);
+            }
         }
     }
     .reset-submit {
@@ -46,21 +61,6 @@ rwc-modal form {
                 pointer-events: none;
                 opacity: .5;
             }
-        }
-    }
-    &.delete .content {
-        border-color: var(--red-1);
-
-        .header .close {
-            border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
-
-            &:hover,
-            &:focus {
-                color: var(--red-1);
-            }
-        }
-        .body .body-text {
-            margin-top: 2rem;
         }
     }
 }

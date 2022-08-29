@@ -147,15 +147,25 @@ header.header .links li a:hover, header.header .links li a:focus {
   }
 }
 
-rwc-modal form {
-  max-height: 70vh;
-  overflow-y: auto;
-}
 rwc-modal form div {
   margin-top: 2.8rem;
 }
 rwc-modal form div:first-child {
   margin-top: 1.6rem;
+}
+rwc-modal form container-rui .add-btn {
+  background: none;
+  border: none;
+  color: hsl(122deg, 39%, 75%);
+  font-size: 1.3rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  transition: 0.2s;
+}
+rwc-modal form container-rui .add-btn:hover, rwc-modal form container-rui .add-btn:focus {
+  background-color: hsla(122deg, 39%, 49%, 0.25);
 }
 rwc-modal form .reset-submit {
   display: flex;
@@ -189,18 +199,6 @@ rwc-modal form .reset-submit button:disabled {
   cursor: default;
   pointer-events: none;
   opacity: 0.5;
-}
-rwc-modal form.delete .content {
-  border-color: var(--red-1);
-}
-rwc-modal form.delete .content .header .close {
-  border-color: var(--red-1) var(--red-1) var(--red-1) transparent;
-}
-rwc-modal form.delete .content .header .close:hover, rwc-modal form.delete .content .header .close:focus {
-  color: var(--red-1);
-}
-rwc-modal form.delete .content .body .body-text {
-  margin-top: 2rem;
 }
 
 datagrid-rui {

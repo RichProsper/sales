@@ -4,6 +4,7 @@ import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
 import Textarea from '../vendors/rui/rui-textarea.min.js'
 //* Also dependent on rwc-modal
+//* Also dependent on rwc-alert
 
 /**
  * Grid Data

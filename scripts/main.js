@@ -265,4 +265,5 @@ import DataGridOrder from './DataGrid_Order.js'
             })
         }
     )
+    .catch(e => console.error(e))
 })()
