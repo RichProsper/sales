@@ -834,6 +834,11 @@ export default class {
         .catch(e => console.error(e))
     }
 
+    CreateProductRow() {
+        const row = document.createElement('row-rui')
+        return row
+    }
+
     async CreateNewModal() {
         this.NewModal = document.createElement('rwc-modal')
         this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
@@ -845,6 +850,8 @@ export default class {
         form.appendChild(await this.SelectCustomer())
             const container = document.createElement('container-rui')
                 const content = document.createElement('content-rui')
+                content.appendChild(this.CreateProductRow())
+
                 const footer = document.createElement('footer-rui')
                     const NewProdBtn = document.createElement('button')
                     NewProdBtn.type = 'button'
