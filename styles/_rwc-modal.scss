@@ -7,20 +7,41 @@ rwc-modal form {
         }
     }
     container-rui {
-        .add-btn {
-            background: none;
-            border: none;
-            color: hsl(122, 39%, 75%);
-            font-size: 1.3rem;
-            font-weight: 500;
-            padding: .5rem 1rem;
-            cursor: pointer;
-            border-radius: .4rem;
-            transition: .2s;
+        content-rui {
+            row-rui {
+                margin-top: 2.8rem;
+                display: flex;
 
-            &:hover,
-            &:focus {
-                background-color: hsla(122, 39%, 49%, .25);
+                *:not(:last-child) {
+                    margin-right: .5rem;
+                }
+                div {
+                    margin-top: 0;
+
+                    &:first-child {
+                        margin-top: 0;
+                    }
+                }
+            }
+        }
+        footer-rui {
+            padding: 1rem 0;
+
+            .add-btn {
+                background: none;
+                border: none;
+                color: hsl(122, 39%, 75%);
+                font-size: 1.3rem;
+                font-weight: 500;
+                padding: .5rem 1rem;
+                cursor: pointer;
+                border-radius: .4rem;
+                transition: .2s;
+    
+                &:hover,
+                &:focus {
+                    background-color: hsla(122, 39%, 49%, .25);
+                }
             }
         }
     }

@@ -228,7 +228,7 @@ import DataGridOrder from './DataGrid_Order.js'
                         tagName: 'input',
                         tag: {
                             attrs: {
-                                type: 'number', name: 'unitPrice', min: '0.01', step: '0.01',
+                                type: 'number', name: 'unitPrice', min: 0.01, step: 0.01,
                                 placeholder: 'Unit Price ($)', required: ''
                             }
                         }

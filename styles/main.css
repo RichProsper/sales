@@ -153,7 +153,23 @@ rwc-modal form div {
 rwc-modal form div:first-child {
   margin-top: 1.6rem;
 }
-rwc-modal form container-rui .add-btn {
+rwc-modal form container-rui content-rui row-rui {
+  margin-top: 2.8rem;
+  display: flex;
+}
+rwc-modal form container-rui content-rui row-rui *:not(:last-child) {
+  margin-right: 0.5rem;
+}
+rwc-modal form container-rui content-rui row-rui div {
+  margin-top: 0;
+}
+rwc-modal form container-rui content-rui row-rui div:first-child {
+  margin-top: 0;
+}
+rwc-modal form container-rui footer-rui {
+  padding: 1rem 0;
+}
+rwc-modal form container-rui footer-rui .add-btn {
   background: none;
   border: none;
   color: hsl(122deg, 39%, 75%);
@@ -164,7 +180,7 @@ rwc-modal form container-rui .add-btn {
   border-radius: 0.4rem;
   transition: 0.2s;
 }
-rwc-modal form container-rui .add-btn:hover, rwc-modal form container-rui .add-btn:focus {
+rwc-modal form container-rui footer-rui .add-btn:hover, rwc-modal form container-rui footer-rui .add-btn:focus {
   background-color: hsla(122deg, 39%, 49%, 0.25);
 }
 rwc-modal form .reset-submit {

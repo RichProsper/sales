@@ -11,13 +11,13 @@ $response = new stdClass;
 
 switch ($_POST["REQUEST_ACTION"]) {
     case "CUSTOMER_READ_ALL": {                
-        $rows = $conn->query("SELECT cId, title, fname, lname FROM customers WHERE isDeleted = 'No' ");
+        $rows = $conn->query("SELECT cId, title, fname, lname FROM customers WHERE isDeleted = 'No' ORDER BY fname, lname");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($rows);
         break;
     }
     case "PRODUCT_READ_ALL": {
-        $rows = $conn->query("SELECT pId, name, unit FROM products WHERE isDeleted = 'No'");
+        $rows = $conn->query("SELECT pId, name, unit, unitPrice FROM products WHERE isDeleted = 'No' ORDER BY name");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($rows);
         break;

@@ -801,6 +801,61 @@ export default class {
     }
 
     SelectProduct() {
+        const options = []
+        options.push({value: '', textContent: 'Select a product...'})
+
+        for (const product of this.ProductRows) {
+            options.push({
+                value: product.pId,
+                textContent: product.name
+            })
+        }
+
+        return Select({
+            labelText: 'Product',
+            attrs: {required: '', 'data-name': ''},
+            evts: {},
+            options
+        })
+    }
+
+    CreateProductRow() {
+        const Row = document.createElement('row-rui')
+        Row.appendChild(this.SelectProduct())
+        Row.appendChild(Input({
+            attrs: {
+                type: 'number',
+                placeholder: 'Quantity',
+                min: 0.25,
+                step: 0.25
+            },
+            evts: {}
+        }))
+        Row.appendChild(Input({
+            attrs: {
+                type: 'text',
+                placeholder: 'Units',
+                readonly: ''
+            }
+        }))
+        Row.appendChild(Input({
+            attrs: {
+                type: 'number',
+                placeholder: 'Unit Price',
+                readonly: ''
+            }
+        }))
+        Row.appendChild(Input({
+            attrs: {
+                type: 'number',
+                placeholder: 'Sub Total',
+                readonly: ''
+            }
+        }))
+        return Row
+    }
+
+    FetchProductRows() {
         const REQUEST_ACTION = new FormData()
         REQUEST_ACTION.append('REQUEST_ACTION', 'PRODUCT_READ_ALL')
 
@@ -814,29 +869,11 @@ export default class {
              * @param {Object[]} products
              */
             products => {
-                const options = []
-                options.push({value: '', textContent: 'Select a product...'})
-
-                for (const product of products) {
-                    options.push({
-                        value: product.pId,
-                        textContent: product.name
-                    })
-                }
-        
-                return Select({
-                    labelText: 'Product',
-                    attrs: {required: ''},
-                    options
-                })
+                this.ProductRows = products
+                return this.CreateProductRow()
             }
         )
         .catch(e => console.error(e))
-    }
-
-    CreateProductRow() {
-        const row = document.createElement('row-rui')
-        return row
     }
 
     async CreateNewModal() {
@@ -850,7 +887,7 @@ export default class {
         form.appendChild(await this.SelectCustomer())
             const container = document.createElement('container-rui')
                 const content = document.createElement('content-rui')
-                content.appendChild(this.CreateProductRow())
+                content.appendChild(await this.FetchProductRows())
 
                 const footer = document.createElement('footer-rui')
                     const NewProdBtn = document.createElement('button')
