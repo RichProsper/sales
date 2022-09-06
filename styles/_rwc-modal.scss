@@ -21,6 +21,9 @@ rwc-modal form {
                     &:first-child {
                         margin-top: 0;
                     }
+                    &.mx-width {
+                        max-width: 8.2rem;
+                    }
                 }
             }
         }

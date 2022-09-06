@@ -32,6 +32,7 @@ export default class {
         this.Columns = ['Customer ID', 'Customer First Name', 'Customer Last Name', 'General Status', 'Delivery Status', 'Payment Status', 'Comments', 'Order Date']
         this.dbColumns = ['cId', 'fname', 'lname', 'genStatus', 'delStatus', 'pmtStatus', 'comments', 'createdAt']
 
+        this.Currency = new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'})
         this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
         this.RPPDV = 25 //RowsPerPageDefaultValue
         this.ScrollbarWidth = 15
@@ -811,25 +812,61 @@ export default class {
             })
         }
 
+        const DataGrid = this
         return Select({
             labelText: 'Product',
             attrs: {required: '', 'data-name': ''},
-            evts: {},
+            evts: {
+                change: function() {
+                    const quantityInput = this.parentElement.nextElementSibling.children[0]
+                    const unitsInput = this.parentElement.nextElementSibling.nextElementSibling.children[0]
+                    const priceInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
+                    const subTotalInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
+
+                    const product = DataGrid.ProductRows.find(p => p.pId === this.value)
+                    unitsInput.value = product ? product.unit : ''
+                    priceInput.value = product ? product.unitPrice : ''
+
+                    if (!quantityInput.value || !product) {
+                        subTotalInput.value = ''
+                        return
+                    }
+
+                    const subTotal = +quantityInput.value * +priceInput.value
+                    subTotalInput.value = DataGrid.Currency.format(subTotal)
+                }
+            },
             options
         })
     }
 
     CreateProductRow() {
+        const DataGrid = this
         const Row = document.createElement('row-rui')
+
         Row.appendChild(this.SelectProduct())
         Row.appendChild(Input({
             attrs: {
                 type: 'number',
+                required: '',
                 placeholder: 'Quantity',
                 min: 0.25,
                 step: 0.25
             },
-            evts: {}
+            evts: {
+                input: function() {
+                    const productSelect = this.parentElement.previousElementSibling.children[0]
+                    const priceInput = this.parentElement.nextElementSibling.nextElementSibling.children[0]
+                    const subTotalInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
+
+                    if (!productSelect.value || !this.value) {
+                        subTotalInput.value = ''
+                        return
+                    }
+
+                    subTotalInput.value = DataGrid.Currency.format(+this.value * priceInput.value)
+                }
+            }
         }))
         Row.appendChild(Input({
             attrs: {
@@ -838,16 +875,20 @@ export default class {
                 readonly: ''
             }
         }))
-        Row.appendChild(Input({
+        
+        const price = Input({
             attrs: {
                 type: 'number',
-                placeholder: 'Unit Price',
+                placeholder: 'Price ($)',
                 readonly: ''
             }
-        }))
+        })
+        price.className = 'mx-width'
+        Row.appendChild(price)
+
         Row.appendChild(Input({
             attrs: {
-                type: 'number',
+                type: 'text',
                 placeholder: 'Sub Total',
                 readonly: ''
             }

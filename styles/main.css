@@ -166,6 +166,9 @@ rwc-modal form container-rui content-rui row-rui div {
 rwc-modal form container-rui content-rui row-rui div:first-child {
   margin-top: 0;
 }
+rwc-modal form container-rui content-rui row-rui div.mx-width {
+  max-width: 8.2rem;
+}
 rwc-modal form container-rui footer-rui {
   padding: 1rem 0;
 }
