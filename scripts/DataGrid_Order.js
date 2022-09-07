@@ -815,7 +815,7 @@ export default class {
         const DataGrid = this
         return Select({
             labelText: 'Product',
-            attrs: {required: '', 'data-name': ''},
+            attrs: {required: ''},
             evts: {
                 change: function() {
                     const quantityInput = this.parentElement.nextElementSibling.children[0]
@@ -844,6 +844,23 @@ export default class {
         const DataGrid = this
         const Row = document.createElement('row-rui')
 
+        const deleteRow = document.createElement('div')
+        deleteRow.className = 'delete-row hidden'
+            const delBtn = document.createElement('button')
+            delBtn.type = 'button'
+            delBtn.innerHTML = '&times;'
+            delBtn.addEventListener('click', function() {
+                const rows = this.parentElement.parentElement.parentElement.children
+                // Removes row
+                this.parentElement.parentElement.remove()
+
+                if (rows.length > 1) return
+
+                rows[0].children[0].classList.replace('invisible', 'hidden')
+            })
+        deleteRow.appendChild(delBtn)
+
+        Row.appendChild(deleteRow)
         Row.appendChild(this.SelectProduct())
         Row.appendChild(Input({
             attrs: {
@@ -918,6 +935,8 @@ export default class {
     }
 
     async CreateNewModal() {
+        const DataGrid = this
+
         this.NewModal = document.createElement('rwc-modal')
         this.NewModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
         this.NewModal.innerHTML = `
@@ -931,11 +950,20 @@ export default class {
                 content.appendChild(await this.FetchProductRows())
 
                 const footer = document.createElement('footer-rui')
-                    const NewProdBtn = document.createElement('button')
-                    NewProdBtn.type = 'button'
-                    NewProdBtn.className = 'add-btn'
-                    NewProdBtn.innerHTML = `<i class="fas fa-plus"></i> ADD PRODUCT`
-                footer.appendChild(NewProdBtn)
+                    const AddProdBtn = document.createElement('button')
+                    AddProdBtn.type = 'button'
+                    AddProdBtn.className = 'add-btn'
+                    AddProdBtn.innerHTML = `<i class="fas fa-plus"></i> ADD PRODUCT`
+                    AddProdBtn.addEventListener('click', function() {
+                        content.appendChild(DataGrid.CreateProductRow())
+
+                        for (let i = 0; i < content.children.length; i++) {
+                            i === 0
+                                ? content.children[i].children[0].classList.replace('hidden', 'invisible')
+                                : content.children[i].children[0].classList.remove('hidden')
+                        }
+                    })
+                footer.appendChild(AddProdBtn)
             container.appendChild(content)
             container.appendChild(footer)
         form.appendChild(container)
@@ -946,7 +974,6 @@ export default class {
             </div>
         `))
 
-        const DataGrid = this
         form.addEventListener('submit', function(e) {
             e.preventDefault()
 

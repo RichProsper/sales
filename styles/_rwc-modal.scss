@@ -1,4 +1,8 @@
 rwc-modal form {
+    --green: hsl(122, 39%, 75%);
+    --green-hover: hsla(122, 39%, 49%, .25);
+    --grey-hover: hsla(0, 0%, 100%, .125);
+
     div {
         margin-top: 2.8rem;
 
@@ -21,6 +25,39 @@ rwc-modal form {
                     &:first-child {
                         margin-top: 0;
                     }
+                    &.delete-row {
+                        display: inline-flex;
+                        flex-direction: column;
+                        justify-content: flex-end;
+                        margin: 0 0.4rem 0.16rem 0;
+
+                        button {
+                            background: none;
+                            border: none;
+                            color: inherit;
+                            width: 3rem;
+                            height: 3rem;
+                            font-size: 2.5rem;
+                            font-weight: 300;
+                            line-height: 1;
+                            border-radius: 50%;
+                            cursor: pointer;
+                            transition: background-color 0.2s;
+
+                            &:hover,
+                            &:focus {
+                                background-color: var(--grey-hover);
+                            }
+                        }
+                        &.hidden {
+                            display: none;
+                        }
+                        &.invisible {
+                            opacity: 0;
+                            visibility: hidden;
+                            pointer-events: none;
+                        }
+                    }
                     &.mx-width {
                         max-width: 8.2rem;
                     }
@@ -33,7 +70,7 @@ rwc-modal form {
             .add-btn {
                 background: none;
                 border: none;
-                color: hsl(122, 39%, 75%);
+                color: var(--green);
                 font-size: 1.3rem;
                 font-weight: 500;
                 padding: .5rem 1rem;
@@ -43,7 +80,7 @@ rwc-modal form {
     
                 &:hover,
                 &:focus {
-                    background-color: hsla(122, 39%, 49%, .25);
+                    background-color: var(--green-hover);
                 }
             }
         }
