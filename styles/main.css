@@ -206,6 +206,7 @@ rwc-modal form container-rui content-rui row-rui div.mx-width {
 }
 rwc-modal form container-rui footer-rui {
   padding: 1rem 0;
+  align-items: center;
 }
 rwc-modal form container-rui footer-rui .add-btn {
   background: none;

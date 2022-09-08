@@ -2,7 +2,6 @@ import Checkbox from '../vendors/rui/rui-checkbox.min.js'
 import Switch from '../vendors/rui/rui-switch.min.js'
 import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
-import Textarea from '../vendors/rui/rui-textarea.min.js'
 //* Also dependent on rwc-modal
 //* Also dependent on rwc-alert
 
@@ -819,21 +818,32 @@ export default class {
             evts: {
                 change: function() {
                     const quantityInput = this.parentElement.nextElementSibling.children[0]
-                    const unitsInput = this.parentElement.nextElementSibling.nextElementSibling.children[0]
-                    const priceInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
-                    const subTotalInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
+                    const unitsInput = this.parentElement.parentElement.children[3].children[0]
+                    const priceInput = this.parentElement.parentElement.children[4].children[0]
+                    const subTotalInput = this.parentElement.parentElement.children[5].children[0]
+                    const subTotalInputs = this.parentElement.parentElement.parentElement.querySelectorAll('[data-value]')
+                    const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                    let total = 0
 
                     const product = DataGrid.ProductRows.find(p => p.pId === this.value)
                     unitsInput.value = product ? product.unit : ''
                     priceInput.value = product ? product.unitPrice : ''
 
                     if (!quantityInput.value || !product) {
-                        subTotalInput.value = ''
-                        return
+                        subTotalInput.setAttribute('data-value', 0)
+                        subTotalInput.value = '$0.00'
+                    }
+                    else {
+                        const subTotal = +quantityInput.value * +priceInput.value
+                        subTotalInput.setAttribute('data-value', subTotal)
+                        subTotalInput.value = DataGrid.Currency.format(subTotal)
+                    }
+                    
+                    for (const subTotalInput_ of subTotalInputs) {
+                        total += +subTotalInput_.getAttribute('data-value')
                     }
 
-                    const subTotal = +quantityInput.value * +priceInput.value
-                    subTotalInput.value = DataGrid.Currency.format(subTotal)
+                    totalInput.value = DataGrid.Currency.format(total)
                 }
             },
             options
@@ -851,17 +861,29 @@ export default class {
             delBtn.innerHTML = '&times;'
             delBtn.addEventListener('click', function() {
                 const rows = this.parentElement.parentElement.parentElement.children
+                const content = this.parentElement.parentElement.parentElement
+                const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                let total = 0
+
                 // Removes row
                 this.parentElement.parentElement.remove()
 
-                if (rows.length > 1) return
+                if (rows.length === 1) {
+                    rows[0].children[0].classList.add('hidden')
 
-                rows[0].children[0].classList.replace('invisible', 'hidden')
+                }
+
+                for (const subTotalInput of content.querySelectorAll('[data-value]')) {
+                    total += +subTotalInput.getAttribute('data-value')
+                }
+
+                totalInput.value = DataGrid.Currency.format(total)
             })
         deleteRow.appendChild(delBtn)
 
         Row.appendChild(deleteRow)
         Row.appendChild(this.SelectProduct())
+        // Quantity
         Row.appendChild(Input({
             attrs: {
                 type: 'number',
@@ -873,18 +895,32 @@ export default class {
             evts: {
                 input: function() {
                     const productSelect = this.parentElement.previousElementSibling.children[0]
-                    const priceInput = this.parentElement.nextElementSibling.nextElementSibling.children[0]
-                    const subTotalInput = this.parentElement.nextElementSibling.nextElementSibling.nextElementSibling.children[0]
+                    const priceInput = this.parentElement.parentElement.children[4].children[0]
+                    const subTotalInput = this.parentElement.parentElement.children[5].children[0]
+                    const subTotalInputs = this.parentElement.parentElement.parentElement.querySelectorAll('[data-value]')
+                    const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                    let total = 0
 
                     if (!productSelect.value || !this.value) {
-                        subTotalInput.value = ''
-                        return
+                        subTotalInput.setAttribute('data-value', 0)
+                        subTotalInput.value = '$0.00'
+                    }
+                    else {
+                        const subTotal = +this.value * +priceInput.value
+                        subTotalInput.setAttribute('data-value', subTotal)
+                        subTotalInput.value = DataGrid.Currency.format(subTotal)
+
                     }
 
-                    subTotalInput.value = DataGrid.Currency.format(+this.value * priceInput.value)
+                    for (const subTotalInput_ of subTotalInputs) {
+                        total += +subTotalInput_.getAttribute('data-value')
+                    }
+
+                    totalInput.value = DataGrid.Currency.format(total)
                 }
             }
         }))
+        // Units
         Row.appendChild(Input({
             attrs: {
                 type: 'text',
@@ -903,13 +939,17 @@ export default class {
         price.className = 'mx-width'
         Row.appendChild(price)
 
+        // Sub Total
         Row.appendChild(Input({
             attrs: {
                 type: 'text',
                 placeholder: 'Sub Total',
-                readonly: ''
+                readonly: '',
+                'data-value': 0,
+                value: '$0.00'
             }
         }))
+
         return Row
     }
 
@@ -958,12 +998,20 @@ export default class {
                         content.appendChild(DataGrid.CreateProductRow())
 
                         for (let i = 0; i < content.children.length; i++) {
-                            i === 0
-                                ? content.children[i].children[0].classList.replace('hidden', 'invisible')
-                                : content.children[i].children[0].classList.remove('hidden')
+                            content.children[i].children[0].classList.remove('hidden')
                         }
                     })
                 footer.appendChild(AddProdBtn)
+                footer.appendChild(Input({
+                    attrs: {
+                        type: 'text',
+                        placeholder: 'Total',
+                        readonly: '',
+                        'data-id': 'total',
+                        'data-value': 0,
+                        value: '$0.00'
+                    }
+                }))
             container.appendChild(content)
             container.appendChild(footer)
         form.appendChild(container)
