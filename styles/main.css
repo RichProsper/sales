@@ -196,11 +196,6 @@ rwc-modal form container-rui content-rui row-rui div.delete-row button:hover, rw
 rwc-modal form container-rui content-rui row-rui div.delete-row.hidden {
   display: none;
 }
-rwc-modal form container-rui content-rui row-rui div.delete-row.invisible {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 rwc-modal form container-rui content-rui row-rui div.mx-width {
   max-width: 8.2rem;
 }

@@ -52,11 +52,6 @@ rwc-modal form {
                         &.hidden {
                             display: none;
                         }
-                        &.invisible {
-                            opacity: 0;
-                            visibility: hidden;
-                            pointer-events: none;
-                        }
                     }
                     &.mx-width {
                         max-width: 8.2rem;
