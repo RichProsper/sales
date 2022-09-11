@@ -137,7 +137,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 $conn->exec("INSERT INTO customers VALUES (NULL, '$title', '$fname', '$lname', '$email', '$parish', '$address', '$homeNo', '$cellNo', '$otherNos', NULL, NULL, 'No', NULL)");
 
                 $response->success = true;
-                $response->message = "New record added successfully.";
+                $response->message = "New customer added successfully.";
             }
             catch(PDOException $e) {
                 $response->success = false;
@@ -166,7 +166,7 @@ switch ($_POST["REQUEST_ACTION"]) {
             try {
                 $conn->exec($sql);
                 $response->success = true;
-                $response->message = "Record(s) deleted successfully.";
+                $response->message = "Customer(s) deleted successfully.";
             }
             catch(PDOException $e) {
                 $response->success = false;

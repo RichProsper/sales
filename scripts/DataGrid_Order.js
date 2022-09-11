@@ -814,7 +814,7 @@ export default class {
         const DataGrid = this
         return Select({
             labelText: 'Product',
-            attrs: {required: ''},
+            attrs: {required: '', name: 'pId[]'},
             evts: {
                 change: function() {
                     const quantityInput = this.parentElement.nextElementSibling.children[0]
@@ -888,6 +888,7 @@ export default class {
             attrs: {
                 type: 'number',
                 required: '',
+                name: 'quantity[]',
                 placeholder: 'Quantity',
                 min: 0.25,
                 step: 0.25
@@ -1027,11 +1028,22 @@ export default class {
 
             DataGrid.Alert.closeAlert()
 
-            const data = new FormData(this)
-            data.append('REQUEST_ACTION', 'CREATE')
+            const order = {cId: +this.cId.value, pIds: [], quantities: []}
 
-            for (const d of data) console.log(d)
-            return
+            if (this['pId[]'].toString() === '[object RadioNodeList]') {
+                for (let i = 0; i < this['pId[]'].length; i++) {
+                    order.pIds.push(+this['pId[]'][i].value)
+                    order.quantities.push(+this['quantity[]'][i].value)
+                }
+            }
+            else {
+                order.pIds.push(+this['pId[]'].value)
+                order.quantities.push(+this['quantity[]'].value)
+            }
+            
+            const data = new FormData()
+            data.append('order', JSON.stringify(order))
+            data.append('REQUEST_ACTION', 'CREATE')
 
             fetch(DataGrid.CrudUrl, {
                 method: 'POST',
@@ -1087,6 +1099,7 @@ export default class {
         this.Toolbar.appendChild(newBtn)
     } // CreateNewModal()
 
+    // TODO
     CreateDeleteModal() {
         this.DeleteModal = document.createElement('rwc-modal')
         this.DeleteModal.modalOutlineColor = 'hsl(349, 84%, 65%)'

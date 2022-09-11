@@ -146,7 +146,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 $conn->exec("INSERT INTO products VALUES (NULL, '$name', '$desc', '$image', '$unit', '$unitPrice', NULL, NULL, 'No', NULL)");
 
                 $response->success = true;
-                $response->message = "New record added successfully.";
+                $response->message = "New product added successfully.";
             }
             catch(PDOException $e) {
                 $response->success = false;
@@ -175,7 +175,7 @@ switch ($_POST["REQUEST_ACTION"]) {
             try {
                 $conn->exec("UPDATE products SET `isDeleted` = 'Yes' WHERE pId IN (" . $idsSql);
                 $response->success = true;
-                $response->message = "Record(s) deleted successfully.";
+                $response->message = "Product(s) deleted successfully.";
             }
             catch (PDOException $e) {
                 $response->success = false;

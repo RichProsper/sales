@@ -152,11 +152,36 @@ class Validate {
         
         return true;
     }
+
+    public static function Quantity($quantity) {
+        if ( !is_numeric($quantity) ) return false;
+        if ($quantity < 0.25) return false;
+        
+        return true;
+    }
+
+    public static function Quantities($quantities) {
+        if ( !is_array($quantities) ) return false;
+        if (count($quantities) === 0) return false;
+
+        foreach($quantities as $quantity) {
+            if ( !self::Quantity($quantity) ) return false;
+        }
+
+        return true;
+    }
 } // class Validate
 
 class Format {
+    public static function roundToFraction($number, $denominator) {
+        $result = $number * $denominator;
+        $result = round($result);
+        $result = $result / $denominator;
+        return $result;
+    }
+
     public static function UnitPrice($unitPrice = "0.01") {
-        $unitPrice = round($unitPrice, 2);
+        $unitPrice = self::roundToFraction($unitPrice, 100);
         $hasDecimal = strpos($unitPrice, '.');
 
         if (!$hasDecimal) return $unitPrice . ".00";
@@ -165,5 +190,25 @@ class Format {
         }
 
         return $unitPrice;
+    }
+
+    public static function Quantity($quantity = "0.25") {
+        $quantity = self::roundToFraction($quantity, 4);
+        $hasDecimal = strpos($quantity, '.');
+
+        if (!$hasDecimal) return $quantity . ".00";
+        else {
+            if ( $hasDecimal === (strlen($quantity) - 2) ) return $quantity . "0";
+        }
+
+        return $quantity;
+    }
+
+    public static function Quantities($quantities = array()) {
+        for ($i = 0; $i < count($quantities); $i++) {
+            $quantities[$i] = self::Quantity($quantities[$i]);
+        }
+
+        return $quantities;
     }
 } // class Format
