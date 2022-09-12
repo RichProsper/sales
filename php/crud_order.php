@@ -22,9 +22,21 @@ switch ($_POST["REQUEST_ACTION"]) {
         echo json_encode($rows);
         break;
     }
-    // TODO
     case "READ_ALL": {
-        echo json_encode($_POST["REQUEST_ACTION"]);
+        $rows = $conn->query("SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, comments, orders.createdAt FROM orders, customers WHERE orders.cId = customers.cId AND orders.isDeleted = 'No' LIMIT 25");
+        $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
+
+        $rowIds = $conn->query("SELECT oId FROM orders WHERE isDeleted = 'No' LIMIT 25");
+        $rowIds = $rowIds->fetchAll(PDO::FETCH_ASSOC);
+
+        $numRows = $conn->query("SELECT COUNT(oId) FROM orders WHERE isDeleted = 'No'");
+        $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+
+        $order->rows = $rows;
+        $order->rowIds = $rowIds;
+        $order->numRows = (int)$numRows[0]["COUNT(oId)"];
+
+        echo json_encode($order);
         break;
     }
     // TODO
@@ -71,9 +83,33 @@ switch ($_POST["REQUEST_ACTION"]) {
         echo json_encode($response);
         break;
     }
-    // TODO
     case "DELETE": {
-        echo json_encode($_POST["REQUEST_ACTION"]);
+        $ids = json_decode($_POST["ids"]);
+
+        if ( Validate::IDs($ids) ) {
+            $sql = "UPDATE orders SET `isDeleted` = 'Yes' WHERE oId IN (";
+    
+            for ($i = 0; $i < count($ids); $i++) {
+                if ( $i < (count($ids) - 1) ) $sql .= $ids[$i] . ", ";
+                else $sql .= $ids[$i] . ")";
+            }
+    
+            try {
+                $conn->exec($sql);
+                $response->success = true;
+                $response->message = "Order(s) deleted successfully.";
+            }
+            catch(PDOException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+            }
+        }
+        else {
+            $response->success = false;
+            $response->message = "Invalid ID(s)!";
+        }
+        
+        echo json_encode($response);
         break;
     }
     // TODO

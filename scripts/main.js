@@ -252,15 +252,16 @@ import DataGridOrder from './DataGrid_Order.js'
     .then(
         /**
          * @param {Object} order
-         * @param {Object[]} order.rows
-         * @param {Object[]} order.rowIds
-         * @param {Number} order.numRows
+         * @param {Object[]} order.orderRows
+         * @param {Object[]} order.orderRowIds
+         * @param {Number} order.orderNumRows
+         * @param {Object[]} order.orderProductRows
          */
         order => {
             window.DataGrids.Orders = new DataGridOrder({
                 rows: order.rows,
-                numRows: order.numRows,
                 rowIds: order.rowIds,
+                numRows: order.numRows,
                 crudUrl: crudOrderUrl
             })
         }
