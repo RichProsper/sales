@@ -1301,7 +1301,6 @@ export default class {
         })
     }
 
-    // TODO
     /**
      * @param {KeyboardEvent} e The key down event
      */
