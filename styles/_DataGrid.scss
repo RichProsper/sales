@@ -343,8 +343,12 @@ main-rui {
         row-rui {
             display: flex;
             height: calc(var(--Row-Height) + .1rem);
-            transition: .1s;
 
+            &:focus {
+                width: fit-content;
+                outline: .1rem solid var(--blue-1);
+                outline-offset: -.1rem;
+            }
             col-rui,
             input,
             .image {
@@ -358,6 +362,7 @@ main-rui {
                 font-size: inherit;
                 border-right: .1rem solid var(--row-hover);
                 border-bottom: .1rem solid var(--grey);
+                transition: .1s;
 
                 &:focus {
                     outline: .1rem solid var(--blue-1);

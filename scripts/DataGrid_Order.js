@@ -49,6 +49,7 @@ export default class {
         this.dbColumns = ['cId', 'fname', 'lname', 'genStatus', 'delStatus', 'pmtStatus', 'comments', 'createdAt']
 
         this.Currency = new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'})
+        this.Date_ = new Intl.DateTimeFormat('en-US', {dateStyle: 'full'})
         this.RPPVs = [5, 10, 25, 50, 100] //RowsPerPageValues
         this.RPPDV = 25 //RowsPerPageDefaultValue
         this.ScrollbarWidth = 15
@@ -1289,11 +1290,9 @@ export default class {
         this.Main.appendChild(this.HeadingsContainer)
     }
 
-    // TODO
     CreateRowsContainer() {
         this.RowsContainer = document.createElement('rows-container-rui')
         this.BoundColumnNavigate = this.ColumnNavigate.bind(this)
-        this.BoundColumnEdit = this.ColumnEdit.bind(this)
         this.CreateRows()
         this.Main.appendChild(this.RowsContainer)
 
@@ -1302,23 +1301,7 @@ export default class {
         })
     }
 
-    /**
-     * Scroll parent element if element is partially
-     * or fully offscreen to the left or right
-     * @param {HTMLInputElement} el The element to keep in view
-     * @param {HTMLElement} containerEl The parent element to scroll if need be
-     */
-    KeepElementInView(el, containerEl) {
-        // If this element is offscreen to the right
-        if ( (el.offsetLeft + el.offsetWidth - containerEl.offsetLeft) > (containerEl.offsetWidth - this.ScrollbarWidth + containerEl.scrollLeft) ) {
-            containerEl.scrollLeft = el.offsetLeft + el.offsetWidth - containerEl.offsetLeft - containerEl.offsetWidth + this.ScrollbarWidth + 1
-        }
-        // If this element is offscreen to the left
-        else if ( (el.offsetLeft - containerEl.offsetLeft) < containerEl.scrollLeft ) {
-            containerEl.scrollLeft = el.offsetLeft - containerEl.offsetLeft - 1
-        }
-    }
-
+    // TODO
     /**
      * @param {KeyboardEvent} e The key down event
      */
@@ -1327,90 +1310,24 @@ export default class {
 
         switch (e.key) {
             case 'ArrowUp' :
-                if (this.FocusedCol.parentElement.previousElementSibling) {
-                    this.FocusedCol.parentElement.previousElementSibling.querySelector(`[data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
-                }
+                this.FocusedRow.previousElementSibling?.focus()
                 break
             case 'ArrowDown' :
-                if (this.FocusedCol.parentElement.nextElementSibling) {
-                    this.FocusedCol.parentElement.nextElementSibling.querySelector(`[data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
-                }
-                break
-            case 'ArrowLeft' :
-                if (this.FocusedCol.previousElementSibling.hasAttribute('data-colindex')) {
-                    this.FocusedCol.previousElementSibling.focus()
-                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
-                }
-                break
-            case 'ArrowRight' :
-                if (this.FocusedCol.nextElementSibling) {
-                    this.FocusedCol.nextElementSibling.focus()
-                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
-                }
-                break
-            case 'Home' :
-                this.FocusedCol.parentElement.querySelector('[data-colindex="0"]').focus()
-                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
-                break
-            case 'End' :
-                this.FocusedCol.parentElement.querySelector(`[data-colindex="${this.FocusedCol.parentElement.children.length - 2}"]`).focus()
-                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                this.FocusedRow.nextElementSibling?.focus()
                 break
             case 'PageUp' :
-                this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
+                this.RowsContainer.querySelector(`[data-rowindex="0"]`).focus()
                 break
             case 'PageDown' :
-                this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"] [data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
+                this.RowsContainer.querySelector(`[data-rowindex="${+this.Pagination.querySelector('offset-max-rui').textContent - 1}"]`).focus()
                 break
             case 'Enter' :
-                this.FocusedCol.tagName === 'INPUT'
-                    ? this.FocusedCol.dispatchEvent(new MouseEvent('dblclick'))
-                    : this.FocusedCol.dispatchEvent(new MouseEvent('click'))
+                this.FocusedRow.dispatchEvent(new MouseEvent('dblclick'))
                 break
             default :
         }
     }
 
-    /** 
-     * @param {KeyboardEvent} e The key down event
-     */
-    ColumnEdit(e) {
-        if (e.key !== 'Escape' && e.key !== 'Enter') return
-
-        if (this.FocusedCol.nextElementSibling) {
-            this.FocusedCol.nextElementSibling.focus()
-        }
-        else if (this.FocusedCol.parentElement.nextElementSibling) {
-            this.FocusedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]').focus()
-        }
-        else {
-            this.FocusedCol.blur()
-            this.FocusedCol.focus()
-        }
-
-        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
-    }
-
-    /**
-     * Resize a given column to the given width
-     * @param {HTMLElement} col The column to resize
-     * @param {Number} newPxWidth The width in px to resize to
-     */
-    ResizeColumn(col, newPxWidth) {
-        const newRemWidth = this.PxToRem(newPxWidth)
-        const HCol = this.HeadingsContainer.children[0].children[+col.getAttribute('data-colindex') + 1]
-        const Cols = this.RowsContainer.querySelectorAll(`[data-colindex="${col.getAttribute('data-colindex')}"]`)
-
-        HCol.style.minWidth = `${newRemWidth}rem`
-        HCol.style.maxWidth = `${newRemWidth}rem`
-
-        for (const Col of Cols) {
-            Col.style.minWidth = `${newRemWidth}rem`
-            Col.style.maxWidth = `${newRemWidth}rem`
-        }
-    }
-
-    // TODO
     /**
      * Creates a row in the datagrid
      * @param {Number} i
@@ -1419,99 +1336,22 @@ export default class {
      * @returns {HTMLInputElement}
      */
     CreateInputCols(i, j, col) {
-        const DataGrid = this
-        const Col = document.createElement('input')
-
+        const Col = document.createElement('col-rui')
         Col.setAttribute('data-colindex', j)
-        Col.value = this.Rows[i][col] ? this.Rows[i][col] : ''
-        Col.setAttribute('data-value', this.Rows[i][col] ? this.Rows[i][col] : '')
-        Col.readOnly = true
-
-        Col.addEventListener('focus', function() { DataGrid.FocusedCol = this })
-        Col.addEventListener('keydown', this.BoundColumnNavigate)
-
-        Col.addEventListener('blur', function() {
-            if (this.readOnly) return
-
-            this.readOnly = true
-            this.removeEventListener('keydown', DataGrid.BoundColumnEdit)
-            this.addEventListener('keydown', DataGrid.BoundColumnNavigate)
-
-            if (this.value === this.getAttribute('data-value')) return
-
-            // Close alert if it was open
-            DataGrid.Alert.closeAlert()
-
-            const data = new FormData()
-            data.append('REQUEST_ACTION', 'UPDATE')
-            data.append('id', +this.parentElement.getAttribute('data-entity-id'))
-            data.append('column', DataGrid.HeadingsContainer.children[0].children[+this.getAttribute('data-colindex') + 1].getAttribute('data-column'))
-            data.append('value', this.value)
-
-            fetch(DataGrid.CrudUrl, {
-                method: 'POST',
-                body: data
-            })
-            .then(respJSON => respJSON.json())
-            .then(
-                /**
-                 * @param {Object} resp
-                 * @param {Boolean} resp.success
-                 * @param {String} resp.message
-                 */
-                resp => {
-                    if (resp.success) {     
-                        this.setAttribute('data-value', this.value)
-
-                        DataGrid.Alert.innerHTML = `
-                            <span slot="status">Success!</span>
-                            <span slot="message">${resp.message}</span>
-                        `
-                        DataGrid.Alert.alertColor = '#bdd9a6'
-                        DataGrid.Alert.openAlert()
-                    }
-                    else {
-                        console.error(resp.message)
-
-                        const message = resp.message === 'Invalid column data'
-                            ? 'Invalid column data detected! Please remove invalid data and submit again.'
-                            : 'Something went wrong. Please try again later.'
-                        
-                        DataGrid.Alert.innerHTML = `
-                            <span slot="status">Failure!</span>
-                            <span slot="message">${message}</span>
-                        `
-                        DataGrid.Alert.alertColor = '#d9a6af'
-                        DataGrid.Alert.openAlert()
-                    }
-                }
-            )
-            .catch(e => console.error(e))
-        }) // addEventListener('blur)
-
-        Col.addEventListener('dblclick', function() {
-            if (!this.readOnly) return
-
-            if (this.scrollWidth > this.offsetWidth) DataGrid.ResizeColumn(this, this.scrollWidth + 10)
-
-            this.removeEventListener('keydown', DataGrid.BoundColumnNavigate)
-            this.readOnly = false
-
-            this.setSelectionRange(this.value.length, this.value.length)
-            DataGrid.KeepElementInView(this, DataGrid.RowsContainer)
-
-            this.addEventListener('keydown', DataGrid.BoundColumnEdit)
-        })
-
+        col === 'createdAt'
+            ? Col.textContent = this.Date_.format(new Date(this.Rows[i][col]))
+            : Col.textContent = this.Rows[i][col] ? this.Rows[i][col] : ''
         return Col
     } // CreateInputCols()
 
     // TODO
     CreateRows() {
+        const DataGrid = this
         this.RowsContainer.innerHTML = null
 
         for (let i = 0; i < this.Rows.length; i++) {
             const Row = document.createElement('row-rui')
+            Row.tabIndex = 0
             Row.setAttribute('data-rowindex', i)
             Row.setAttribute('data-entity-id', this.RowIDs[i][Object.keys(this.RowIDs[i])[0]])
 
@@ -1527,6 +1367,14 @@ export default class {
                     Row.appendChild(this.CreateInputCols(i, j, col))
                     j++
                 }
+
+            Row.addEventListener('focus', function() { DataGrid.FocusedRow = this })
+            Row.addEventListener('keydown', this.BoundColumnNavigate)
+
+            // TODO
+            Row.addEventListener('dblclick', function() {
+                console.log('Open update modal')
+            })
 
             this.RowsContainer.appendChild(Row)
         }
@@ -1707,6 +1555,25 @@ export default class {
 
                 NumSelectedRows.textContent = selectedCount === 1 ? `${selectedCount} row selected` : `${selectedCount} rows selected`
             })
+        }
+    }
+
+    /**
+     * Resize a given column to the given width
+     * @param {HTMLElement} col The column to resize
+     * @param {Number} newPxWidth The width in px to resize to
+     */
+    ResizeColumn(col, newPxWidth) {
+        const newRemWidth = this.PxToRem(newPxWidth)
+        const HCol = this.HeadingsContainer.children[0].children[+col.getAttribute('data-colindex') + 1]
+        const Cols = this.RowsContainer.querySelectorAll(`[data-colindex="${col.getAttribute('data-colindex')}"]`)
+
+        HCol.style.minWidth = `${newRemWidth}rem`
+        HCol.style.maxWidth = `${newRemWidth}rem`
+
+        for (const Col of Cols) {
+            Col.style.minWidth = `${newRemWidth}rem`
+            Col.style.maxWidth = `${newRemWidth}rem`
         }
     }
 
