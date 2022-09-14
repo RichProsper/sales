@@ -1070,7 +1070,6 @@ export default class {
         }
     }
 
-    // TODO left, right, home, end
     /**
      * @param {KeyboardEvent} e The key down event
      */
@@ -1089,24 +1088,56 @@ export default class {
                 }
                 break
             case 'ArrowLeft' :
-                if (this.FocusedCol.previousElementSibling.hasAttribute('data-colindex')) {
-                    this.FocusedCol.previousElementSibling.focus()
-                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                for (
+                    let curElem = this.FocusedCol.previousElementSibling;
+                    curElem.hasAttribute('data-colindex');
+                    curElem = curElem.previousElementSibling
+                ) {
+                    if (!curElem.classList.contains('hide')) {
+                        curElem.focus()
+                        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                        break
+                    }
                 }
                 break
             case 'ArrowRight' :
-                if (this.FocusedCol.nextElementSibling) {
-                    this.FocusedCol.nextElementSibling.focus()
-                    this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                for (
+                    let curElem = this.FocusedCol.nextElementSibling;
+                    curElem !== null;
+                    curElem = curElem.nextElementSibling
+                ) {
+                    if (!curElem.classList.contains('hide')) {
+                        curElem.focus()
+                        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                        break
+                    }
                 }
                 break
             case 'Home' :
-                this.FocusedCol.parentElement.querySelector('[data-colindex="0"]').focus()
-                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                for (
+                    let curElem = this.FocusedCol.parentElement.querySelector('[data-colindex="0"]');
+                    curElem !== null;
+                    curElem = curElem.nextElementSibling
+                ) {
+                    if (!curElem.classList.contains('hide')) {
+                        curElem.focus()
+                        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                        break
+                    }
+                }
                 break
             case 'End' :
-                this.FocusedCol.parentElement.querySelector(`[data-colindex="${this.FocusedCol.parentElement.children.length - 2}"]`).focus()
-                this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                for (
+                    let curElem = this.FocusedCol.parentElement.querySelector(`[data-colindex="${this.FocusedCol.parentElement.children.length - 2}"]`);
+                    curElem.hasAttribute('data-colindex');
+                    curElem = curElem.previousElementSibling
+                ) {
+                    if (!curElem.classList.contains('hide')) {
+                        curElem.focus()
+                        this.KeepElementInView(this.FocusedCol, this.RowsContainer)
+                        break
+                    }
+                }
                 break
             case 'PageUp' :
                 this.RowsContainer.querySelector(`[data-rowindex="0"] [data-colindex="${this.FocusedCol.getAttribute('data-colindex')}"]`).focus()
@@ -1123,20 +1154,43 @@ export default class {
         }
     }
 
-    // TODO
     /** 
      * @param {KeyboardEvent} e The key down event
      */
     ColumnEdit(e) {
         if (e.key !== 'Escape' && e.key !== 'Enter') return
 
+        let isFocused = false
+
         if (this.FocusedCol.nextElementSibling) {
-            this.FocusedCol.nextElementSibling.focus()
+            for (
+                let curElem = this.FocusedCol.nextElementSibling;
+                curElem !== null;
+                curElem = curElem.nextElementSibling
+            ) {
+                if (!curElem.classList.contains('hide')) {
+                    curElem.focus()
+                    isFocused = true
+                    break
+                }
+            }
         }
-        else if (this.FocusedCol.parentElement.nextElementSibling) {
-            this.FocusedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]').focus()
+
+        if (!isFocused && this.FocusedCol.parentElement.nextElementSibling) {
+            for (
+                let curElem = this.FocusedCol.parentElement.nextElementSibling.querySelector('[data-colindex="0"]');
+                curElem !== null;
+                curElem = curElem.nextElementSibling
+            ) {
+                if (!curElem.classList.contains('hide')) {
+                    curElem.focus()
+                    isFocused = true
+                    break
+                }
+            }
         }
-        else {
+
+        if (!isFocused) {
             this.FocusedCol.blur()
             this.FocusedCol.focus()
         }
