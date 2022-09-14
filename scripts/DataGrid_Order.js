@@ -1327,22 +1327,6 @@ export default class {
         }
     }
 
-    /**
-     * Creates a row in the datagrid
-     * @param {Number} i
-     * @param {Number} j
-     * @param {String} col
-     * @returns {HTMLInputElement}
-     */
-    CreateInputCols(i, j, col) {
-        const Col = document.createElement('col-rui')
-        Col.setAttribute('data-colindex', j)
-        col === 'createdAt'
-            ? Col.textContent = this.Date_.format(new Date(this.Rows[i][col]))
-            : Col.textContent = this.Rows[i][col] ? this.Rows[i][col] : ''
-        return Col
-    } // CreateInputCols()
-
     // TODO
     CreateRows() {
         const DataGrid = this
@@ -1362,8 +1346,13 @@ export default class {
 
                 let j = 0
                 for (let col in this.Rows[i]) {
-                    const colObj = this.Columns[Object.keys(this.Columns)[j]]
-                    Row.appendChild(this.CreateInputCols(i, j, col))
+                    const Col_ = document.createElement('col-rui')
+                    Col_.setAttribute('data-colindex', j)
+                    col === 'createdAt'
+                        ? Col_.textContent = this.Date_.format(new Date(this.Rows[i][col]))
+                        : Col_.textContent = this.Rows[i][col] ? this.Rows[i][col] : ''
+                        
+                    Row.appendChild(Col_)
                     j++
                 }
 
