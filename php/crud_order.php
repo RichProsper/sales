@@ -39,11 +39,86 @@ switch ($_POST["REQUEST_ACTION"]) {
         echo json_encode($order);
         break;
     }
-    // TODO
     case "READ": {
-        echo json_encode($_POST["REQUEST_ACTION"]);
+        $filters = json_decode($_POST["filters"]);
+        $sorts = json_decode($_POST["sorts"]);
+
+        $rowsSQL = "SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, comments, orders.createdAt FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
+        $rowIdsSQL = "SELECT oId FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
+        $numRowsSQL = "SELECT COUNT(oId) FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
+
+        $limit = DB::sanitizeLimit( intval($_POST["limit"]) );
+        $offset = DB::sanitizeOffset( intval($_POST["offset"]) );
+
+        $r_ri = ""; // for rows & row Ids
+        $nr = ""; // For num rows
+
+        if (count($filters) > 0) {
+            $filtersArr = DB::sanitizeFilters($filters);
+            $filtersSQL = "";
+
+            foreach ($filtersArr as $i => $obj) {
+                if ($obj->operator) {
+                    $filtersSQL .= $obj->operator . " ";
+                }
+
+                $filtersSQL .= "(" . $obj->column . " ";
+                
+                if ($obj->operation === "contain") {
+                    $filtersSQL .= "LIKE '%" . $obj->filterValue . "%'";
+                }
+                elseif ($obj->operation === "startWith") {
+                    $filtersSQL .= "LIKE '" . $obj->filterValue . "%'";
+                }
+                elseif ($obj->operation === "endWith") {
+                    $filtersSQL .= "LIKE '%" . $obj->filterValue . "'";
+                }
+                elseif ($obj->operation === "isEmpty") {
+                    $filtersSQL .= "IS NULL OR " . $obj->column . " = ''";
+                }
+                elseif ($obj->operation === "isNotEmpty") {
+                    $filtersSQL .= "IS NOT NULL AND " . $obj->column . " != ''";
+                }
+                else {
+                    $filtersSQL .= $obj->operation . " '" . $obj->filterValue . "'";
+                }
+
+                $filtersSQL .= ") ";
+            }
+
+            $r_ri .= " AND (" . $filtersSQL . ")";
+            $nr .= " AND (" . $filtersSQL . ")";
+        }
+
+        if (count($sorts) > 0) {
+            $sortsArr = DB::sanitizeSorts($sorts);
+            $sortsSQL = "";
+
+            for ($i = 0; $i < count($sortsArr); $i++) {
+                $sortsSQL .= "" . $sortsArr[$i]->column . " " . $sortsArr[$i]->direction;
+
+                if ($i < (count($sortsArr) - 1) ) $sortsSQL .= ", ";
+            }
+
+            $r_ri .= " ORDER BY " . $sortsSQL;
+        }
+        
+        $rows = $conn->query($rowsSQL . $r_ri . " LIMIT " . $offset . ", " . $limit);
+        $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
+
+        $rowIds = $conn->query($rowIdsSQL . $r_ri . " LIMIT " . $offset . ", " . $limit);
+        $rowIds = $rowIds->fetchAll(PDO::FETCH_ASSOC);
+
+        $numRows = $conn->query($numRowsSQL . $nr);
+        $numRows = $numRows->fetchAll(PDO::FETCH_ASSOC);
+
+        $order->rows = $rows;
+        $order->rowIds = $rowIds;
+        $order->numRows = (int)$numRows[0]["COUNT(oId)"];
+
+        echo json_encode($order);
         break;
-    }
+    } // case "READ"
     case "CREATE": {
         $order = json_decode($_POST["order"]);
         $cId = $order->cId;

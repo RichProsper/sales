@@ -22,7 +22,7 @@ class DB {
             if ($filters[$i]->operator !== false && $filters[$i]->operator !== "AND" && $filters[$i]->operator !== "OR") $filters[$i]->operator = false;
 
             // Column
-            $filters[$i]->column = preg_replace('/[^A-Za-z0-9_]/', '', $filters[$i]->column);
+            $filters[$i]->column = preg_replace('/[^A-Za-z0-9_.]/', '', $filters[$i]->column);
 
             // Operation
             $validOperations = array('=', '!=', '>', '>=', '<', '<=', 'contain', 'startWith', 'endWith', 'isEmpty', 'isNotEmpty');
@@ -55,7 +55,7 @@ class DB {
     public static function sanitizeSorts($sorts = array()) {
         for ($i = 0; $i < count($sorts); $i++) {
             // Column
-            $sorts[$i]->column = preg_replace('/[^A-Za-z0-9_]/', '', $sorts[$i]->column);
+            $sorts[$i]->column = preg_replace('/[^A-Za-z0-9_.]/', '', $sorts[$i]->column);
 
             // Direction
             if ($sorts[$i]->direction !== "ASC" && $sorts[$i]->direction !== "DESC") $sorts[$i]->direction = "ASC";

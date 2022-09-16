@@ -46,7 +46,7 @@ export default class {
 
     init() {
         this.Columns = ['Customer ID', 'Customer First Name', 'Customer Last Name', 'General Status', 'Delivery Status', 'Payment Status', 'Comments', 'Order Date']
-        this.dbColumns = ['cId', 'fname', 'lname', 'genStatus', 'delStatus', 'pmtStatus', 'comments', 'createdAt']
+        this.dbColumns = ['orders.cId', 'fname', 'lname', 'genStatus', 'delStatus', 'pmtStatus', 'comments', 'orders.createdAt']
 
         this.Currency = new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'})
         this.Date_ = new Intl.DateTimeFormat('en-US', {dateStyle: 'full'})
