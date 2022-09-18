@@ -170,6 +170,24 @@ class Validate {
 
         return true;
     }
+
+    public static function GenStatus($unit) {
+        $validGenStatuses = array('Not Completed', 'Partially Completed', 'Completed');
+
+        return (array_search($unit, $validGenStatuses, true) !== false);
+    }
+
+    public static function DelStatus($unit) {
+        $validDelStatuses = array('Not Delivered', 'Partially Delivered', 'Delivered');
+
+        return (array_search($unit, $validDelStatuses, true) !== false);
+    }
+
+    public static function PmtStatus($unit) {
+        $validPmtStatuses = array('Not Paid', 'Partially Paid', 'Paid');
+
+        return (array_search($unit, $validPmtStatuses, true) !== false);
+    }
 } // class Validate
 
 class Format {

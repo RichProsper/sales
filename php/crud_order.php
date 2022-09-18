@@ -10,20 +10,23 @@ $order = new stdClass;
 $response = new stdClass;
 
 switch ($_POST["REQUEST_ACTION"]) {
-    case "CUSTOMER_READ_ALL": {                
+    case "READ_ALL_CUSTOMER": {                
         $rows = $conn->query("SELECT cId, title, fname, lname FROM customers WHERE isDeleted = 'No' ORDER BY fname, lname");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($rows);
         break;
     }
-    case "PRODUCT_READ_ALL": {
+    case "READ_ALL_PRODUCT": {
         $rows = $conn->query("SELECT pId, name, unit, unitPrice FROM products WHERE isDeleted = 'No' ORDER BY name");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
         echo json_encode($rows);
         break;
     }
     case "READ_ALL": {
-        $rows = $conn->query("SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, comments, orders.createdAt FROM orders, customers WHERE orders.cId = customers.cId AND orders.isDeleted = 'No' LIMIT 25");
+        // Almost equivalent to PHP's htmlspecialchars_decode()
+        $comments = "REPLACE( REPLACE( REPLACE( REPLACE(comments, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
+
+        $rows = $conn->query("SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, $comments, orders.createdAt FROM orders, customers WHERE orders.cId = customers.cId AND orders.isDeleted = 'No' LIMIT 25");
         $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
 
         $rowIds = $conn->query("SELECT oId FROM orders WHERE isDeleted = 'No' LIMIT 25");
@@ -39,11 +42,38 @@ switch ($_POST["REQUEST_ACTION"]) {
         echo json_encode($order);
         break;
     }
+    case "READ_ORDERPRODUCT": {
+        $oId = json_decode($_POST["oId"]);
+
+        if (Validate::ID($oId)) {
+            try {
+                $rows = $conn->query("SELECT pId, quantity FROM orderproducts WHERE oId = $oId");
+                $rows = $rows->fetchAll(PDO::FETCH_ASSOC);
+
+                $response->success = true;
+                $response->orderProducts = $rows;
+            }
+            catch(PDOException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+            }
+        }
+        else {
+            $response->success = false;
+            $response->message = "Invalid ID!";
+        }
+        
+        echo json_encode($response);
+        break; 
+    }
     case "READ": {
         $filters = json_decode($_POST["filters"]);
         $sorts = json_decode($_POST["sorts"]);
 
-        $rowsSQL = "SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, comments, orders.createdAt FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
+        // Almost equivalent to PHP's htmlspecialchars_decode()
+        $comments = "REPLACE( REPLACE( REPLACE( REPLACE(comments, '&amp;', '&'), '&quot;', '\"'), '&lt;', '<'), '&gt;', '>')";
+
+        $rowsSQL = "SELECT orders.cId, fname, lname, genStatus, delStatus, pmtStatus, $comments, orders.createdAt FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
         $rowIdsSQL = "SELECT oId FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
         $numRowsSQL = "SELECT COUNT(oId) FROM orders, customers WHERE (orders.cId = customers.cId AND orders.isDeleted = 'No')";
 
@@ -139,7 +169,7 @@ switch ($_POST["REQUEST_ACTION"]) {
                 
                 foreach ($order->quantities as $i => $quantity) {
                     $pId = $order->pIds[$i];
-                    $conn->exec("INSERT INTO orderproducts VALUES (NULL, '$oId', '$pId', '$quantity')");
+                    $conn->exec("INSERT INTO orderproducts VALUES (NULL, $oId, $pId, '$quantity')");
                 }
 
                 $response->success = true;
@@ -187,9 +217,48 @@ switch ($_POST["REQUEST_ACTION"]) {
         echo json_encode($response);
         break;
     }
-    // TODO
     case "UPDATE": {
-        echo json_encode($_POST["REQUEST_ACTION"]);
+        $order = json_decode($_POST["order"]);
+        $oId = $order->oId;
+        $genStatus = $order->genStatus;
+        $delStatus = $order->delStatus;
+        $pmtStatus = $order->pmtStatus;
+        $comments = DB::escapeString($order->comments);
+
+        $valid["oId"] = Validate::ID($oId);
+        $valid["genStatus"] = Validate::GenStatus($genStatus);
+        $valid["delStatus"] = Validate::DelStatus($delStatus);
+        $valid["pmtStatus"] = Validate::PmtStatus($pmtStatus);
+        $valid["pIds"] = Validate::IDs($order->pIds);
+        $valid["quantities"] = Validate::Quantities($order->quantities);
+
+        if ( !array_search(false, $valid, true) ) {
+            try {
+                $conn->exec("UPDATE orders SET genStatus = '$genStatus', delStatus = '$delStatus', pmtStatus = '$pmtStatus', comments = '$comments' WHERE oId = $oId");
+
+                $conn->exec("DELETE FROM orderproducts WHERE oId = $oId");
+
+                $order->quantities = Format::Quantities($order->quantities);
+
+                foreach ($order->quantities as $i => $quantity) {
+                    $pId = $order->pIds[$i];
+                    $conn->exec("INSERT INTO orderproducts VALUES (NULL, $oId, $pId, '$quantity')");
+                }
+
+                $response->success = true;
+                $response->message = "Order updated successfully.";
+            }
+            catch(PDOException $e) {
+                $response->success = false;
+                $response->message = $e->getMessage();
+            }
+        }
+        else {
+            $response->success = false;
+            $response->message = $valid;
+        }
+
+        echo json_encode($response);
         break;
     }
     default: {

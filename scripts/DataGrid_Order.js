@@ -788,7 +788,7 @@ export default class {
 
     SelectCustomer() {
         const REQUEST_ACTION = new FormData()
-        REQUEST_ACTION.append('REQUEST_ACTION', 'CUSTOMER_READ_ALL')
+        REQUEST_ACTION.append('REQUEST_ACTION', 'READ_ALL_CUSTOMER')
 
         return fetch(this.CrudUrl, {
             method: 'POST',
@@ -842,7 +842,7 @@ export default class {
                     const priceInput = this.parentElement.parentElement.children[4].children[0]
                     const subTotalInput = this.parentElement.parentElement.children[5].children[0]
                     const subTotalInputs = this.parentElement.parentElement.parentElement.querySelectorAll('[data-value]')
-                    const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                    const totalInput = this.parentElement.parentElement.parentElement.parentElement.querySelector('[data-id="total"]')
                     let total = 0
 
                     const product = DataGrid.ProductRows.find(p => p.pId === this.value)
@@ -882,7 +882,7 @@ export default class {
             delBtn.addEventListener('click', function() {
                 const rows = this.parentElement.parentElement.parentElement.children
                 const content = this.parentElement.parentElement.parentElement
-                const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                const totalInput = this.parentElement.parentElement.parentElement.parentElement.querySelector('[data-id="total"]')
                 let total = 0
 
                 // Removes row
@@ -919,7 +919,7 @@ export default class {
                     const priceInput = this.parentElement.parentElement.children[4].children[0]
                     const subTotalInput = this.parentElement.parentElement.children[5].children[0]
                     const subTotalInputs = this.parentElement.parentElement.parentElement.querySelectorAll('[data-value]')
-                    const totalInput = DataGrid.NewModal.querySelector('[data-id="total"]')
+                    const totalInput = this.parentElement.parentElement.parentElement.parentElement.querySelector('[data-id="total"]')
                     let total = 0
 
                     if (!productSelect.value || !this.value) {
@@ -976,7 +976,7 @@ export default class {
 
     FetchProductRows() {
         const REQUEST_ACTION = new FormData()
-        REQUEST_ACTION.append('REQUEST_ACTION', 'PRODUCT_READ_ALL')
+        REQUEST_ACTION.append('REQUEST_ACTION', 'READ_ALL_PRODUCT')
 
         return fetch(this.CrudUrl, {
             method: 'POST',
@@ -1136,7 +1136,7 @@ export default class {
         `
         document.body.appendChild(this.DeleteModal)
 
-        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.Modal.classList.remove('open'))
+        this.DeleteModal.querySelector('button[type="reset"]').addEventListener('click', () => this.DeleteModal.closeModal())
 
         const DataGrid = this
         const form = this.DeleteModal.querySelector('form')
@@ -1225,7 +1225,6 @@ export default class {
         this.Toolbar.appendChild(deleteBtn)
     } // CreateDeleteModal()
 
-    // TODO
     CreateUpdateModal() {
         this.UpdateModal = document.createElement('rwc-modal')
         this.UpdateModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
@@ -1289,8 +1288,33 @@ export default class {
             }))
 
             const container = document.createElement('container-rui')
-                const content = document.createElement('content-rui')                    
+                const content = document.createElement('content-rui')
+
+                const footer = document.createElement('footer-rui')
+                    const AddProdBtn = document.createElement('button')
+                    AddProdBtn.type = 'button'
+                    AddProdBtn.className = 'add-btn'
+                    AddProdBtn.innerHTML = `<i class="fas fa-plus"></i> ADD PRODUCT`
+                    AddProdBtn.addEventListener('click', () => {
+                        content.appendChild(this.CreateProductRow())
+
+                        for (let i = 0; i < content.children.length; i++) {
+                            content.children[i].children[0].classList.remove('hidden')
+                        }
+                    })
+                footer.appendChild(AddProdBtn)
+                footer.appendChild(Input({
+                    attrs: {
+                        type: 'text',
+                        placeholder: 'Total',
+                        readonly: '',
+                        'data-id': 'total',
+                        'data-value': 0,
+                        value: '$0.00'
+                    }
+                }))
             container.appendChild(content)
+            container.appendChild(footer)
         
         form.appendChild(Row1)
         form.appendChild(Row2)
@@ -1304,77 +1328,88 @@ export default class {
         form.appendChild(container)
         form.append(...this.HTMLStringToNode(`
             <div class="reset-submit">
-                <button type="reset" class="red">RESET</button>
+                <button type="reset" class="red">CANCEL</button>
                 <button type="submit" class="green">UPDATE</button>
             </div>
         `))
 
+        this.UpdateModal.querySelector('button[type="reset"]').addEventListener('click', () => this.UpdateModal.closeModal())
+
+        const DataGrid = this
         form.addEventListener('submit', function(e) {
             e.preventDefault()
 
-            // DataGrid.Alert.closeAlert()
+            DataGrid.Alert.closeAlert()
 
-            // const order = {cId: +this.cId.value, pIds: [], quantities: []}
+            const order = {
+                oId: this.oId,
+                genStatus: this.genStatus.value,
+                delStatus: this.delStatus.value,
+                pmtStatus: this.pmtStatus.value,
+                comments: this.comments.value,
+                pIds: [],
+                quantities: []
+            }
 
-            // if (this['pId[]'].toString() === '[object RadioNodeList]') {
-            //     for (let i = 0; i < this['pId[]'].length; i++) {
-            //         order.pIds.push(+this['pId[]'][i].value)
-            //         order.quantities.push(+this['quantity[]'][i].value)
-            //     }
-            // }
-            // else {
-            //     order.pIds.push(+this['pId[]'].value)
-            //     order.quantities.push(+this['quantity[]'].value)
-            // }
+            if (this['pId[]'].toString() === '[object RadioNodeList]') {
+                for (let i = 0; i < this['pId[]'].length; i++) {
+                    order.pIds.push(+this['pId[]'][i].value)
+                    order.quantities.push(+this['quantity[]'][i].value)
+                }
+            }
+            else {
+                order.pIds.push(+this['pId[]'].value)
+                order.quantities.push(+this['quantity[]'].value)
+            }
             
-            // const data = new FormData()
-            // data.append('order', JSON.stringify(order))
-            // data.append('REQUEST_ACTION', 'CREATE')
+            const data = new FormData()
+            data.append('order', JSON.stringify(order))
+            data.append('REQUEST_ACTION', 'UPDATE')
 
-            // fetch(DataGrid.CrudUrl, {
-            //     method: 'POST',
-            //     body: data
-            // })
-            // .then(respJSON => respJSON.json())
-            // .then(
-            //     /**
-            //      * @param {Object} resp
-            //      * @param {Boolean} resp.success
-            //      * @param {String|Object} resp.message
-            //      */
-            //     resp => {
-            //         if (resp.success) {
-            //             DataGrid.NewModal.querySelector('form').reset()
-            //             DataGrid.ReadData()
+            fetch(DataGrid.CrudUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(respJSON => respJSON.json())
+            .then(
+                /**
+                 * @param {Object} resp
+                 * @param {Boolean} resp.success
+                 * @param {String|Object} resp.message
+                 */
+                resp => {
+                    if (resp.success) {
+                        DataGrid.UpdateModal.closeModal()
+                        DataGrid.ReadData()
 
-            //             DataGrid.Alert.innerHTML = `
-            //                 <span slot="status">Success!</span>
-            //                 <span slot="message">${resp.message}</span>
-            //             `
-            //             DataGrid.Alert.alertColor = '#bdd9a6'
-            //             DataGrid.Alert.openAlert()
-            //         }
-            //         else {
-            //             console.error(resp)
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Success!</span>
+                            <span slot="message">${resp.message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#bdd9a6'
+                        DataGrid.Alert.openAlert()
+                    }
+                    else {
+                        console.error(resp)
                         
-            //             const message = typeof resp.message === 'object'
-            //                 ? 'Invalid data detected! Please remove invalid data and submit again.'
-            //                 : 'Something went wrong. Please try again later.'
+                        const message = typeof resp.message === 'object'
+                            ? 'Invalid data detected! Please remove invalid data and submit again.'
+                            : 'Something went wrong. Please try again later.'
 
-            //             DataGrid.Alert.innerHTML = `
-            //                 <span slot="status">Failure!</span>
-            //                 <span slot="message">${message}</span>
-            //             `
-            //             DataGrid.Alert.alertColor = '#d9a6af'
-            //             DataGrid.Alert.openAlert()
-            //         }
-            //     }
-            // )
-            // .catch(e => console.error(e))
+                        DataGrid.Alert.innerHTML = `
+                            <span slot="status">Failure!</span>
+                            <span slot="message">${message}</span>
+                        `
+                        DataGrid.Alert.alertColor = '#d9a6af'
+                        DataGrid.Alert.openAlert()
+                    }
+                }
+            )
+            .catch(e => console.error(e))
         })
 
         document.body.appendChild(this.UpdateModal)
-    }
+    } // CreateUpdateModal()
 
     CreateMain() {
         this.Main = document.createElement('main-rui')
@@ -1480,7 +1515,6 @@ export default class {
         }
     }
 
-    // TODO
     CreateRows() {
         const DataGrid = this
         this.RowsContainer.innerHTML = null
@@ -1490,11 +1524,9 @@ export default class {
             Row.tabIndex = 0
             Row.setAttribute('data-rowindex', i)
             Row.setAttribute('data-entity-id', this.RowIDs[i][Object.keys(this.RowIDs[i])[0]])
-
                 const Col = document.createElement('col-rui')
                 Col.className = 'select-column'
                 Col.appendChild(Checkbox({ attrs: { 'data-checkbox-group-single': ''} }))
-
             Row.appendChild(Col)
 
                 let j = 0
@@ -1512,14 +1544,93 @@ export default class {
             Row.addEventListener('focus', function() { DataGrid.FocusedRow = this })
             Row.addEventListener('keydown', this.BoundColumnNavigate)
 
-            // TODO
             Row.addEventListener('dblclick', function() {
-                DataGrid.UpdateModal.openModal()
+                DataGrid.UpdateModal.querySelector('form').oId = +this.getAttribute('data-entity-id')
+
+                DataGrid.UpdateModal.querySelector('input[placeholder="Customer ID"]').value = this.children[1].textContent
+                DataGrid.UpdateModal.querySelector('input[placeholder="Customer First Name"]').value = this.children[2].textContent
+                DataGrid.UpdateModal.querySelector('input[placeholder="Customer Last Name"]').value = this.children[3].textContent
+
+                for (const option of DataGrid.UpdateModal.querySelector('select[name="genStatus"]').options) {
+                    if (option.textContent === this.children[4].textContent) {
+                        option.selected = true
+                        break
+                    }
+                }
+                for (const option of DataGrid.UpdateModal.querySelector('select[name="delStatus"]').options) {
+                    if (option.textContent === this.children[5].textContent) {
+                        option.selected = true
+                        break
+                    }
+                }
+                for (const option of DataGrid.UpdateModal.querySelector('select[name="pmtStatus"]').options) {
+                    if (option.textContent === this.children[6].textContent) {
+                        option.selected = true
+                        break
+                    }
+                }
+
+                DataGrid.UpdateModal.querySelector('textarea[name="comments"]').value = this.children[7].textContent
+
+                const data = new FormData()
+                data.append('oId', JSON.stringify(+this.getAttribute('data-entity-id')))
+                data.append('REQUEST_ACTION', 'READ_ORDERPRODUCT')
+
+                fetch(DataGrid.CrudUrl, {
+                    method: 'POST',
+                    body: data
+                })
+                .then(respJSON => respJSON.json())
+                .then(
+                    /**
+                     * @param {Object} resp
+                     * @param {Boolean} resp.success
+                     * @param {String|Object} resp.message
+                     * @param {{pId: number, quantity: string}[]} resp.orderProducts 
+                     */
+                    resp => {
+                        if (resp.success) {
+                            const content = DataGrid.UpdateModal.querySelector('content-rui')
+                            content.innerHTML = null
+
+                            for (const op of resp.orderProducts) {
+                                const opRow = DataGrid.CreateProductRow()
+                                content.appendChild(opRow)
+
+                                const productSelect = opRow.querySelector('select')
+                                const quantityInput = opRow.querySelector('input[name="quantity[]"]')
+
+                                for (const option of productSelect.options) {
+                                    if (option.value === op.pId) {
+                                        option.setAttribute('selected', '')
+                                        break
+                                    }
+                                }
+                                productSelect.dispatchEvent(new Event('change'))
+
+                                quantityInput.setAttribute('value', op.quantity)
+                                quantityInput.dispatchEvent(new InputEvent('input'))
+
+                                if (content.children.length > 1) {
+                                    for (let i = 0; i < content.children.length; i++) {
+                                        content.children[i].children[0].classList.remove('hidden')
+                                    }
+                                }
+                            }
+    
+                            DataGrid.UpdateModal.openModal()
+                        }
+                        else {
+                            console.error(resp)
+                        }
+                    }
+                )
+                .catch(e => console.error(e))
             })
 
             this.RowsContainer.appendChild(Row)
         }
-    }
+    } // CreateRows()
 
     CreateFooter() {
         this.Footer = document.createElement('footer-rui')

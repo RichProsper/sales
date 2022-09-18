@@ -1,5 +1,5 @@
-import DataGrid from './DataGrid.js'
-import DataGridOrder from './DataGrid_Order.js'
+import DataGrid from './DataGrid.min.js'
+import DataGridOrder from './DataGrid_Order.min.js'
 
 (() => {
     window.DataGrids = {} 
@@ -252,10 +252,9 @@ import DataGridOrder from './DataGrid_Order.js'
     .then(
         /**
          * @param {Object} order
-         * @param {Object[]} order.orderRows
-         * @param {Object[]} order.orderRowIds
-         * @param {Number} order.orderNumRows
-         * @param {Object[]} order.orderProductRows
+         * @param {Object[]} order.rows
+         * @param {Object[]} order.rowIds
+         * @param {Number} order.numRows
          */
         order => {
             window.DataGrids.Orders = new DataGridOrder({
