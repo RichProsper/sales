@@ -2,6 +2,7 @@ import Checkbox from '../vendors/rui/rui-checkbox.min.js'
 import Switch from '../vendors/rui/rui-switch.min.js'
 import Input from '../vendors/rui/rui-input.min.js'
 import Select from '../vendors/rui/rui-select.min.js'
+import Textarea from '../vendors/rui/rui-textarea.min.js'
 //* Also dependent on rwc-modal
 //* Also dependent on rwc-alert
 
@@ -127,6 +128,7 @@ export default class {
         this.CreateFiltersPanelContainer()
         this.CreateSortsPanelContainer()
         this.CreateNewModal().then(() => this.CreateDeleteModal())
+        this.CreateUpdateModal()
         
         this.DataGrid.appendChild(this.Toolbar)
     }
@@ -1223,6 +1225,157 @@ export default class {
         this.Toolbar.appendChild(deleteBtn)
     } // CreateDeleteModal()
 
+    // TODO
+    CreateUpdateModal() {
+        this.UpdateModal = document.createElement('rwc-modal')
+        this.UpdateModal.modalOutlineColor = 'hsl(93, 98%, 30%)'
+        this.UpdateModal.innerHTML = `
+            <span slot="heading">View & Update Order</span>
+            <div slot="body-content"><form></form></div>
+        `
+        const form = this.UpdateModal.querySelector('form')
+            const Row1 = document.createElement('div')
+            Row1.className = 'row'
+            Row1.appendChild(Input({
+                attrs: {
+                    type: 'text',
+                    placeholder: 'Customer ID',
+                    readonly: ''
+                }
+            }))
+            Row1.appendChild(Input({
+                attrs: {
+                    type: 'text',
+                    placeholder: 'Customer First Name',
+                    readonly: ''
+                }
+            }))
+            Row1.appendChild(Input({
+                attrs: {
+                    type: 'text',
+                    placeholder: 'Customer Last Name',
+                    readonly: ''
+                }
+            }))
+
+            const Row2 = document.createElement('div')
+            Row2.className = 'row'
+            Row2.appendChild(Select({
+                labelText: 'General Status',
+                attrs: {name: 'genStatus'},
+                options: [
+                    {textContent: 'Not Completed'},
+                    {textContent: 'Partially Completed'},
+                    {textContent: 'Completed'}
+                ]
+            }))
+            Row2.appendChild(Select({
+                labelText: 'Delivery Status',
+                attrs: {name: 'delStatus'},
+                options: [
+                    {textContent: 'Not Delivered'},
+                    {textContent: 'Partially Delivered'},
+                    {textContent: 'Delivered'}
+                ]
+            }))
+            Row2.appendChild(Select({
+                labelText: 'Payment Status',
+                attrs: {name: 'pmtStatus'},
+                options: [
+                    {textContent: 'Not Paid'},
+                    {textContent: 'Partially Paid'},
+                    {textContent: 'Paid'}
+                ]
+            }))
+
+            const container = document.createElement('container-rui')
+                const content = document.createElement('content-rui')                    
+            container.appendChild(content)
+        
+        form.appendChild(Row1)
+        form.appendChild(Row2)
+        form.appendChild(Textarea({
+            attrs: {
+                name: 'comments',
+                rows: 4,
+                placeholder: 'Comments'
+            }
+        }))
+        form.appendChild(container)
+        form.append(...this.HTMLStringToNode(`
+            <div class="reset-submit">
+                <button type="reset" class="red">RESET</button>
+                <button type="submit" class="green">UPDATE</button>
+            </div>
+        `))
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault()
+
+            // DataGrid.Alert.closeAlert()
+
+            // const order = {cId: +this.cId.value, pIds: [], quantities: []}
+
+            // if (this['pId[]'].toString() === '[object RadioNodeList]') {
+            //     for (let i = 0; i < this['pId[]'].length; i++) {
+            //         order.pIds.push(+this['pId[]'][i].value)
+            //         order.quantities.push(+this['quantity[]'][i].value)
+            //     }
+            // }
+            // else {
+            //     order.pIds.push(+this['pId[]'].value)
+            //     order.quantities.push(+this['quantity[]'].value)
+            // }
+            
+            // const data = new FormData()
+            // data.append('order', JSON.stringify(order))
+            // data.append('REQUEST_ACTION', 'CREATE')
+
+            // fetch(DataGrid.CrudUrl, {
+            //     method: 'POST',
+            //     body: data
+            // })
+            // .then(respJSON => respJSON.json())
+            // .then(
+            //     /**
+            //      * @param {Object} resp
+            //      * @param {Boolean} resp.success
+            //      * @param {String|Object} resp.message
+            //      */
+            //     resp => {
+            //         if (resp.success) {
+            //             DataGrid.NewModal.querySelector('form').reset()
+            //             DataGrid.ReadData()
+
+            //             DataGrid.Alert.innerHTML = `
+            //                 <span slot="status">Success!</span>
+            //                 <span slot="message">${resp.message}</span>
+            //             `
+            //             DataGrid.Alert.alertColor = '#bdd9a6'
+            //             DataGrid.Alert.openAlert()
+            //         }
+            //         else {
+            //             console.error(resp)
+                        
+            //             const message = typeof resp.message === 'object'
+            //                 ? 'Invalid data detected! Please remove invalid data and submit again.'
+            //                 : 'Something went wrong. Please try again later.'
+
+            //             DataGrid.Alert.innerHTML = `
+            //                 <span slot="status">Failure!</span>
+            //                 <span slot="message">${message}</span>
+            //             `
+            //             DataGrid.Alert.alertColor = '#d9a6af'
+            //             DataGrid.Alert.openAlert()
+            //         }
+            //     }
+            // )
+            // .catch(e => console.error(e))
+        })
+
+        document.body.appendChild(this.UpdateModal)
+    }
+
     CreateMain() {
         this.Main = document.createElement('main-rui')
         this.CreateHeadingsContainer()
@@ -1361,7 +1514,7 @@ export default class {
 
             // TODO
             Row.addEventListener('dblclick', function() {
-                console.log('Open update modal')
+                DataGrid.UpdateModal.openModal()
             })
 
             this.RowsContainer.appendChild(Row)

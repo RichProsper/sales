@@ -158,6 +158,16 @@ rwc-modal form div {
 rwc-modal form div:first-child {
   margin-top: 1.6rem;
 }
+rwc-modal form div.row {
+  display: flex;
+  justify-content: space-between;
+}
+rwc-modal form div.row *:not(:last-child) {
+  margin-right: 0.5rem;
+}
+rwc-modal form div.row div {
+  margin-top: 0;
+}
 rwc-modal form container-rui content-rui row-rui {
   margin-top: 2.8rem;
   display: flex;

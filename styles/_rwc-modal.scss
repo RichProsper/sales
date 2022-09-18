@@ -9,6 +9,17 @@ rwc-modal form {
         &:first-child {
             margin-top: 1.6rem;
         }
+        &.row {
+            display: flex;
+            justify-content: space-between;
+
+            *:not(:last-child) {
+                margin-right: .5rem;
+            }
+            div {
+                margin-top: 0;
+            }
+        }
     }
     container-rui {
         content-rui {
